@@ -161,8 +161,6 @@ function(input, output, session) {
         } else{
           raw_data_columns$date_column_name <- possible_date_columns[1]
         }
-        
-        alert(compositeCols[['flag']])
 
         ## this part is to find any column name related to "ID" or "Flag"
         idx_no_ID_Flag <- !str_detect(my_colnames,"ID") & !str_detect(my_colnames,"SITE") & !str_detect(my_colnames,"Flag") & !str_detect(my_colnames,"Comment")
