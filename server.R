@@ -49,13 +49,14 @@
 # library("IHA")
 # library("XLConnect")
 
+
 ## Moved to Global ***
 
 # source("_moved/import_raw_data.R")
 # source("update_ContDataQC/config.R")
 # source("update_ContDataQC/CompSiteCDF.updated.R")
 # source("update_ContDataQC/SumStats.updated.R")
-# source("update_ContDataQC/ReportMetaData.R")
+#source("update_ContDataQC/ReportMetaData.R")
 #
 #
 # options(shiny.maxRequestSize = 100*1024^2)
@@ -67,6 +68,7 @@ function(input, output, session) {
   conflict_prefer("dataTableOutput", "DT")
   loaded_data <- reactiveValues()
   raw_data_columns<-reactiveValues()
+  compositeCols <- reactiveValues()
   selected_to_plot <- reactiveValues(all_selected=data.frame())
   processed <- reactiveValues(processed_dailyStats=list(),
                               ST.freq=data.frame(),
@@ -74,7 +76,7 @@ function(input, output, session) {
                               ST.roc=data.frame(),
                               ST.tim=data.frame(),
                               ST.var=data.frame())
-  
+
   to_download <- reactiveValues()
   saveToReport <- reactiveValues(metadataTable=data.frame())
 
@@ -85,7 +87,7 @@ function(input, output, session) {
   do.call(file.remove, list(list.files("Selected_Files", full.names = TRUE)))
 
   uploaded_data<-eventReactive(c(input$uploaded_data_file),{
-                                loaded_data$name <- input$uploaded_data_file$name
+                                loaded_data$name <- input$uploaded_data_file$name # nolint
                                if(grepl("csv$",input$uploaded_data_file$datapath)){
                                  my_data<-import_raw_data(input$uploaded_data_file$datapath,"csv",has_header=TRUE)
                                }else if(grepl("xlsx$",input$uploaded_data_file$datapath)){
@@ -108,6 +110,7 @@ function(input, output, session) {
   ## Copy uploaded files to local folder
   observeEvent(input$uploadId,{
 
+    
     ## this part is for copying multiple files and saving them in a reactive datasetlist()
     # if (!file.exists("Selected_Files")) dir.create(file.path("","Selected_Files"),showWarnings = FALSE, recursive = TRUE)
     # #print(is.null(input$uploaded_data_file))
@@ -125,13 +128,13 @@ function(input, output, session) {
     # saveRDS2(df, "File_Format.rds")
     ## update the line choices in the raw time series plot
     my_data <- uploaded_data()
-
+    compositeCols$flag <- FALSE
     output$display_raw_ts <- renderUI({
 
       if (length(my_data) > 0 ) {
         ## this part is to find any column name related to Date or Time
         all_date_related_keys <- c("Date.Time","DATE.TIME","Year","YEAR","Date","DATE","MonthDay","MONTHDAY","Time","TIME","Month","Day","RAW.Date.Time","mm.dd.yyyy.HH.MM.SS")
-        date_keys_in_favor_order <- c("Date.Time","DATE.TIME","Year","YEAR","Date","DATE","MonthDay","mm.dd.yyyy.HH.MM.SS")
+        date_keys_in_favor_order <- c("Date.Time","DATE.TIME","Date","DATE","Year","YEAR","MonthDay","mm.dd.yyyy.HH.MM.SS")
         my_colnames <- colnames(my_data)
 
         ## get possible date columns in order according to "date_keys_in_favor_order"
@@ -139,16 +142,28 @@ function(input, output, session) {
         all_date_columns <- all_date_related_keys[all_date_related_keys %in% my_colnames]
 
         print(possible_date_columns)
-
+        #check the fun checkIgnoreCaseColExist, it is not working properly
+        #!'DATE.TIME' %in% my_colnames & !'Date.Time' %in% my_colnames & ('Date' %in% my_colnames | 'DATE' %in% my_colnames ) & ('Time' %in% my_colnames | 'TIME' %in% my_colnames)
+        #isFALSE(checkIgnoreCaseColExist(my_colnames, 'Date.Time')) & isTRUE(checkIgnoreCaseColExist(my_colnames, 'Date')) & isTRUE(checkIgnoreCaseColExist(my_colnames, 'Time'))
+        #lower colnames to compare
         ## send out alert message if the date column cannot be identified
         alert_message_no_date_column = paste0("We assume the dataset you uploaded contains at lease one date time column, but no date time column is identified, please check.")
+
+        # R ignore.case or pattern matching not wokring properly
         if (identical(length(possible_date_columns),integer(0))){
           print("inside shinyalert loop now...")
           shinyalert("Warning",alert_message_no_date_column,closeOnClickOutside = TRUE,closeOnEsc = TRUE,
                      confirmButtonText="OK",inputId = "alert_no_date")
-        }else{
+        } else if(!'DATE.TIME' %in% my_colnames & !'Date.Time' %in% my_colnames & ('Date' %in% my_colnames | 'DATE' %in% my_colnames ) & ('Time' %in% my_colnames | 'TIME' %in% my_colnames)){
+          compositeCols[['flag']] <- TRUE
+          #creating a new composite column
+          raw_data_columns$date_column_name <- "Date.Time"
+        } else{
           raw_data_columns$date_column_name <- possible_date_columns[1]
         }
+        
+        alert(compositeCols[['flag']])
+
         ## this part is to find any column name related to "ID" or "Flag"
         idx_no_ID_Flag <- !str_detect(my_colnames,"ID") & !str_detect(my_colnames,"SITE") & !str_detect(my_colnames,"Flag") & !str_detect(my_colnames,"Comment")
         not_ID_or_Flag_cols <- my_colnames[idx_no_ID_Flag]
@@ -164,10 +179,16 @@ function(input, output, session) {
                        hr(),
                        radioButtons("raw_datetime_format", "Select datetime format", choices = c("%Y-%m-%d %H:%M:%S"="%Y-%m-%d %H:%M:%S",
                                                                                                  "%Y-%m-%d %H:%M"="%Y-%m-%d %H:%M",
+                                                                                                 "%Y-%m-%d %H:%M:%S"="%Y-%m-%d %H:%M:%S",
                                                                                                  "%d-%m-%Y %H:%M:%S"="%d-%m-%Y %H:%M:%S",
                                                                                                  "%Y-%m-%d"="%Y-%m-%d",
                                                                                                  "%d-%m-%Y"="%d-%m-%Y",
-                                                                                                 "%m%d"="%m%d"),
+                                                                                                 "%m-%d-%Y"="%m-%d-%Y",
+                                                                                                 "%m/%d/%Y %H:%M:%S"="%m/%d/%Y %H:%M:%S",
+                                                                                                 "%d-%h-%Y %H:%M:%S"="%d-%h-%Y %H:%M:%S",
+                                                                                                 "%m/%d/%y %H:%M:%S"="%m/%d/%y %H:%M:%S",
+                                                                                                 "%m%d"="%m%d"
+                                                                                                 ),
                                     selected = "%Y-%m-%d %H:%M:%S"),
                        hr(),
                        actionButton(inputId="showrawTS", label="Display time series",style="color:cornflowerblue;background-color:black;font-weight:bold"),
@@ -307,6 +328,14 @@ function(input, output, session) {
       }
     },type="html",bordered = TRUE,striped=TRUE,align="c")
   })
+  
+  detectDateFormatMismatch <- function(selectedFormat) {
+    firstRows <- head(uploaded_data())
+    return(isDate(firstRows$Date.Time(),selectedFormat))
+  }
+  isDate <- function(mydate, date.format = "%d/%m/%y") {
+    tryCatch(!is.na(as.Date(mydate, date.format)),error = function(err) {FALSE})  
+  }
 
   myQuickSummary <- function(myDf){
     all.days <- seq.Date(min(myDf$Date),max(myDf$Date),by="day")
@@ -336,8 +365,9 @@ function(input, output, session) {
     my_raw_choices = c(input$line1_1sec,input$line2_1sec,input$line3_1sec,input$line4_1sec,input$line5_1sec,input$line6_1sec)
     ## remove those choices not initiated
     my_raw_choices = my_raw_choices[!grepl("choose a column",my_raw_choices)]
-    print(my_raw_choices)
-    print(is.null(my_raw_choices))
+    #print(my_raw_choices)
+    #print(is.null(my_raw_choices))
+
     if (!is.null(my_raw_choices)){
      all_raw_selected =data.frame(cbind(raw_data[,input$line1_1sec==colnames(raw_data)],raw_data[,input$line2_1sec==colnames(raw_data)],
                                      raw_data[,input$line3_1sec==colnames(raw_data)],raw_data[,input$line4_1sec==colnames(raw_data)]
@@ -345,8 +375,20 @@ function(input, output, session) {
 
       colnames(all_raw_selected) <- my_raw_choices
       raw_data_columns$to_plot_raw_ts <- my_raw_choices
+      print(raw_data_columns$date_column_name)
 
-      all_raw_selected$TimeStamp <- raw_data[,(names(raw_data) %in% raw_data_columns$date_column_name)]
+      
+      if (compositeCols[['flag']] == TRUE) {
+        all_raw_selected$TimeStamp <-
+          paste(raw_data$Date, raw_data$Time, sep = " ")
+      } else {
+        all_raw_selected$TimeStamp <-
+          raw_data[, (names(raw_data) %in% raw_data_columns$date_column_name)]
+      }
+      
+     
+      
+      #print(all_raw_selected)
 
      ## save(all_raw_selected,file="test_all_raw_selected.RData")
 
@@ -361,15 +403,16 @@ function(input, output, session) {
       } # the first if end
 
     }
-
+    
     output$all_raw_ts <- renderPlotly({
-
+      tryCatch({
       if (ncol(all_raw_selected)>1) {
         x_date_label = "%Y-%m"
-        print(input$raw_datetime_format)
+        #print(input$raw_datetime_format)
         myBreaks = paste0(2," months")
 
         all_raw_selected_to_plot <- reshape2::melt(all_raw_selected,"TimeStamp")
+
         ##save(all_raw_selected_to_plot,file="test_selected_raw_data.RData")
 
           if (input$raw_datetime_format=="%m%d" & !is.null(input$get_the_year)){
@@ -384,7 +427,7 @@ function(input, output, session) {
                     axis.text.x=element_text(angle=45, hjust=1), panel.grid.major.y=element_blank())
             all_raw_ts_plot <- ggplotly(all_raw_ts_plot,height=500,width=1200,dynamicTicks = TRUE)
 
-          }else if(input$raw_datetime_format!="%m%d"){
+          }  else if(input$raw_datetime_format != "%m%d"){
             print("inside else loop now...")
             all_raw_ts_plot <- ggplot(data=all_raw_selected_to_plot)+
             geom_point(mapping = aes(x=as.POSIXct(TimeStamp,format=paste0(input$raw_datetime_format)),y=value,color=variable),size=0.5)+
@@ -395,119 +438,217 @@ function(input, output, session) {
             all_raw_ts_plot <- ggplotly(all_raw_ts_plot,height=500,width=1200,dynamicTicks = TRUE)
 
           }  ## else end
+      
     } ## outer if loop end
-    })  ## renderPlot end
+    }, error= function(e) {
+        if(!(detectDateFormatMismatch(isolate(input$raw_datetime_format)))){
+          #R throws different errors each time there is an error with date format
+          shinyalert("Error","Selected datetime format is not matching with the uploaded column values.",
+                     confirmButtonText="OK",inputId = "wrong_date_format")
+        } else {
+          #other errors
+          shinyalert("Error","some data issue occured while performing the task",
+                     confirmButtonText="OK",inputId = "wrong_date_format")
+        }
+        #toggle(id = 'text', condition = FALSE)
+      })  # end of tryCatch 
+    }) ## renderPlot end 
   })  ## observeEvent end
+ 
+
 
   observeEvent(input$runQS,{
-
-    raw_data <- uploaded_data()
-    ##save(raw_data,file="test_raw_data.RData")
-    my_colnames <- names(raw_data)
-    idx_ID_col <- str_detect(my_colnames,"SiteID") | str_detect(my_colnames,"SITEID")
-    loaded_data$siteID <- unique(raw_data[idx_ID_col])
-    if (length(unique(raw_data[idx_ID_col]))>1){
-      shinyalert("Warning","More than one site ID is detected, please confirm if the loaded data is a single site file.",
-                 closeOnClickOutside = TRUE,closeOnEsc = TRUE, confirmButtonText="OK",inputId = "alert_not_single_site")
-    }else if (length(unique(raw_data[idx_ID_col]))==0){
-      shinyalert("Warning","No site ID is detected, please confirm if the loaded data has the SiteID column.",
-                 closeOnClickOutside = TRUE,closeOnEsc = TRUE, confirmButtonText="OK",inputId = "alert_no_siteID")
-    }
-    output$display_quick_summary_table <- renderUI({
-      column(12,align="center",withSpinner(tableOutput("quick_summary_table")))
-    })
-
-    output$display_footnote_text <- renderUI({
-     verbatimTextOutput("quick_summary_table_footnote")
-    })
-
-    ## create a quick metadata summary regarding the raw data file
-    dailyCheck <- ReportMetaData(fun.myFile=NULL
-                                 ,fun.myDir.import=NULL
-                                 ,fun.myParam.Name=input$parameters_to_process
-                                 ,fun.myDateTime.Name=raw_data_columns$date_column_name
-                                 ,fun.myDateTime.Format=input$raw_datetime_format
-                                 ,fun.myThreshold=20
-                                 ,fun.myConfig=""
-                                 ,df.input=raw_data
-    )
-    #save(dailyCheck, file="test_dailyCheck.RData")
-
-    getQuickSummary <- lapply(dailyCheck,myQuickSummary)
-
-    toReport <- as.data.frame(matrix(nrow=length(dailyCheck),ncol=5))
-    colnames(toReport) <- c("Parameters","Number of days with missing data","Number of days with data flagged as fail",
-                            "Number of days with data flagged as suspect","Number of days with data flagged not known")
-    toReport$Parameters <- names(dailyCheck)
-    for (n in 1:length(dailyCheck)){
-      toReport[n,2:5] <-getQuickSummary[[n]]
-    }
-
-
-    output$quick_summary_table <- renderTable({
-      toReport
-
-    },align="c") # #renderTable end
-
-    saveToReport$metadataTable <- toReport
-
-    date_column <- raw_data[,raw_data_columns$date_column_name]
-    max_date <- max(as.POSIXct(date_column,format=input$raw_datetime_format),na.rm = TRUE)
-    min_date <- min(as.POSIXct(date_column,format=input$raw_datetime_format),na.rm = TRUE)
-    total_N_days <- as.integer(difftime(max_date,min_date,units="days"))
-
-
-    if (is.na(total_N_days)){
-      shinyalert("Warning","the selected datetime format does not match what's in the data file, please check.",
-                 closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK",inputId = "alert_datatime_format")
-    }
-
-    output$quick_summary_table_footnote <- renderText({
-      Note_text_line1= paste0("Period of record: ",min_date," to ", max_date)
-      Note_text_line2= paste0("Total number of days in this period: ",total_N_days," days")
-      paste(Note_text_line1,Note_text_line2,sep="\n")
-    })
-
-    check_no_flags <- all(toReport[,3]=="No flag field found") && all(toReport[,4]=="No flag field found")
-    print(paste0("check flags is:",check_no_flags))
-
-    if (!check_no_flags){
-    output$display_checkBoxes_dailyStats_1 <- renderUI({
-      checkboxGroupInput("exclude_flagged"
-                         ,"Select data points to be excluded"
-                         ,choices = c("fail"="fail","suspect"="suspect","flag not known"="flag not known")
-                         ,selected = "fail"
-
-                        )
-    }) # renderUI close
-    } # if loop close
-
-    output$display_radioButtons_dailyStats_2 <- renderUI({
-      radioButtons("how_to_save"
-                   ,"How to save daily statistics"
-                   ,choices = c("Per site Per parameter"="save1","Per site with all parameters"="save2","Multiple sites together"="save3")
-                   ,selected = "save2"
-                   ,inline=FALSE)
-    })
-
-    output$display_actionButton_calculateDailyStatistics <- renderUI({
-      actionButton(inputId="calculateDailyStatistics"
-                   ,label="Calculate daily statistics"
-                   ,style="color:cornflowerblue;background-color:black;font-weight:bold")
-    })
-
-    # output$display_actionButton_saveDailyStatistics <- renderUI({
-    # actionButton(inputId="saveDailyStatistics"
-    #                ,label="Save daily statistics"
-    #                ,style="color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
-    # })
+    tryCatch({
+      
+      raw_data <- uploaded_data()
+      ##save(raw_data,file="test_raw_data.RData")
+      my_colnames <- names(raw_data)
+      idx_ID_col <-
+        str_detect(my_colnames, "SiteID") |
+        str_detect(my_colnames, "SITEID")
+      loaded_data$siteID <- unique(raw_data[idx_ID_col])
+      if (length(unique(raw_data[idx_ID_col])) > 1) {
+        shinyalert(
+          "Warning",
+          "More than one site ID is detected, please confirm if the loaded data is a single site file.",
+          closeOnClickOutside = TRUE,
+          closeOnEsc = TRUE,
+          confirmButtonText = "OK",
+          inputId = "alert_not_single_site"
+        )
+      } else if (length(unique(raw_data[idx_ID_col])) == 0) {
+        shinyalert(
+          "Warning",
+          "No site ID is detected, please confirm if the loaded data has the SiteID column.",
+          closeOnClickOutside = TRUE,
+          closeOnEsc = TRUE,
+          confirmButtonText = "OK",
+          inputId = "alert_no_siteID"
+        )
+      }
+      output$display_quick_summary_table <- renderUI({
+        column(12, align = "center", withSpinner(tableOutput("quick_summary_table")))
+      })
+      
+      output$display_footnote_text <- renderUI({
+        verbatimTextOutput("quick_summary_table_footnote")
+      })
+      if (compositeCols[['flag']] == TRUE) {
+        data.time.cols <-
+          paste(raw_data$Date, raw_data$Time, sep = " ")
+        raw_data$Date.Time <- as.character(data.time.cols)
+      }
+      ## create a quick metadata summary regarding the raw data file
+      dailyCheck <- ReportMetaData(
+        fun.myFile = NULL
+        ,
+        fun.myDir.import = NULL
+        ,
+        fun.myParam.Name = input$parameters_to_process
+        ,
+        fun.myDateTime.Name = raw_data_columns$date_column_name
+        ,
+        fun.myDateTime.Format = input$raw_datetime_format
+        ,
+        fun.myThreshold = 20
+        ,
+        fun.myConfig = ""
+        ,
+        df.input = raw_data
+      )
+      #save(dailyCheck, file="test_dailyCheck.RData")
+      
+      getQuickSummary <- lapply(dailyCheck, myQuickSummary)
+      
+      toReport <-
+        as.data.frame(matrix(nrow = length(dailyCheck), ncol = 5))
+      colnames(toReport) <-
+        c(
+          "Parameters",
+          "Number of days with missing data",
+          "Number of days with data flagged as fail",
+          "Number of days with data flagged as suspect",
+          "Number of days with data flagged not known"
+        )
+      toReport$Parameters <- names(dailyCheck)
+      for (n in 1:length(dailyCheck)) {
+        toReport[n, 2:5] <- getQuickSummary[[n]]
+      }
+      
+      
+      output$quick_summary_table <- renderTable({
+        toReport
+        
+      }, align = "c") # #renderTable end
+      
+      saveToReport$metadataTable <- toReport
+      
+      date_column <- raw_data[, raw_data_columns$date_column_name]
+      max_date <-
+        max(as.POSIXct(date_column, format = input$raw_datetime_format),
+            na.rm = TRUE)
+      min_date <-
+        min(as.POSIXct(date_column, format = input$raw_datetime_format),
+            na.rm = TRUE)
+      total_N_days <-
+        as.integer(difftime(max_date, min_date, units = "days"))
+      
+      
+      if (is.na(total_N_days)) {
+        shinyalert(
+          "Warning",
+          "the selected datetime format does not match what's in the data file, please check.",
+          closeOnClickOutside = TRUE,
+          closeOnEsc = TRUE,
+          confirmButtonText = "OK",
+          inputId = "alert_datatime_format"
+        )
+      }
+      
+      output$quick_summary_table_footnote <- renderText({
+        Note_text_line1 = paste0("Period of record: ", min_date, " to ", max_date)
+        Note_text_line2 = paste0("Total number of days in this period: ", total_N_days, " days")
+        paste(Note_text_line1, Note_text_line2, sep = "\n")
+      })
+      
+      check_no_flags <-
+        all(toReport[, 3] == "No flag field found") &&
+        all(toReport[, 4] == "No flag field found")
+      print(paste0("check flags is:", check_no_flags))
+      
+      if (!check_no_flags) {
+        output$display_checkBoxes_dailyStats_1 <- renderUI({
+          checkboxGroupInput(
+            "exclude_flagged"
+            ,
+            "Select data points to be excluded"
+            ,
+            choices = c(
+              "fail" = "fail",
+              "suspect" = "suspect",
+              "flag not known" = "flag not known"
+            )
+            ,
+            selected = "fail"
+            
+          )
+        }) # renderUI close
+      } # if loop close
+      
+      output$display_radioButtons_dailyStats_2 <- renderUI({
+        radioButtons(
+          "how_to_save"
+          ,
+          "How to save daily statistics"
+          ,
+          choices = c(
+            "Per site Per parameter" = "save1",
+            "Per site with all parameters" = "save2",
+            "Multiple sites together" = "save3"
+          )
+          ,
+          selected = "save2"
+          ,
+          inline = FALSE
+        )
+      })
+      
+      output$display_actionButton_calculateDailyStatistics <-
+        renderUI({
+          actionButton(inputId = "calculateDailyStatistics"
+                       ,
+                       label = "Calculate daily statistics"
+                       ,
+                       style = "color:cornflowerblue;background-color:black;font-weight:bold")
+        })
+      
+      # output$display_actionButton_saveDailyStatistics <- renderUI({
+      # actionButton(inputId="saveDailyStatistics"
+      #                ,label="Save daily statistics"
+      #                ,style="color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
+      # })
+      
+      ## change the actionButton to downloadButton
+      output$display_actionButton_saveDailyStatistics <- renderUI({
+        downloadButton(outputId = "saveDailyStatistics"
+                       ,
+                       label = "Save daily statistics"
+                       ,
+                       style = "color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
+      })
+      
+    },error = function(e){
+      if(!detectDateFormatMismatch(isolate(input$raw_datetime_format))){
+        #R throws different errors each time there is an error with date format
+        shinyalert("Error","Selected datetime format is not matching with the uploaded column values.",
+                   confirmButtonText="OK",inputId = "wrong_date_format")
+      } else {
+        #other errors
+        shinyalert("Error","some data issue occured while performing the task",
+                   confirmButtonText="OK",inputId = "wrong_date_format")
+      }
     
-    ## change the actionButton to downloadButton
-    output$display_actionButton_saveDailyStatistics <- renderUI({
-      downloadButton(outputId="saveDailyStatistics"
-                   ,label="Save daily statistics"
-                   ,style="color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
-    })
+    }) # end of try catch
 
   })  ## observeEvent end
 
@@ -530,6 +671,12 @@ function(input, output, session) {
     #print(input$alert_no_date)
     shinyjs::runjs("swal.close();")
   })
+  
+  observeEvent(input$wrong_date_format,{
+     shinyjs::runjs("swal.close();")
+  })
+  
+  
 
   ### when user clicked actionButton "calculateDailyStatistics"
 
@@ -580,12 +727,12 @@ function(input, output, session) {
 
   ### when user clicked actionButton "saveDailyStatistics"
   # observeEvent(input$saveDailyStatistics,{
-  # 
+  #
   #   if (!file.exists("Output/saved_dailyStats")) dir.create(file.path("Output/saved_dailyStats"),showWarnings = FALSE, recursive = TRUE)
   #   name_in_file <- loaded_data$name
   #   if (endsWith(loaded_data$name,".csv")) name_in_file <- sub(".csv$","",loaded_data$name)
   #   if (endsWith(loaded_data$name,".xlsx")) name_in_file <- sub(".xlsx$","",loaded_data$name)
-  # 
+  #
   #   if (input$how_to_save == "save2"){
   #      filename = paste0("Output/saved_dailyStats/saved_dailyStats_",name_in_file,"_dailyStats.csv")
   #      combined_data <- Reduce(full_join,processed$processed_dailyStats)
@@ -597,24 +744,24 @@ function(input, output, session) {
   #       write.csv(processed$processed_dailyStats[[i]],file=filename,row.names=FALSE)
   #     }
   #   }
-  # 
+  #
   # })
-  
+
   output$saveDailyStatistics <- downloadHandler(
-    
+
     filename = function(){
-    
+
     name_in_file <- loaded_data$name
     if (endsWith(loaded_data$name,".csv")) name_in_file <- sub(".csv$","",loaded_data$name)
     if (endsWith(loaded_data$name,".xlsx")) name_in_file <- sub(".xlsx$","",loaded_data$name)
-    
+
     if (input$how_to_save == "save2"){
       paste0("saved_dailyStats_",name_in_file,"_dailyStats.csv")
     }else if(input$how_to_save == "save1"){
       paste0("saved_dailyStats_",name_in_file,".zip")
     }
     },
-    
+
     content = function(file){
       if (input$how_to_save == "save2"){
         combined_data <- Reduce(full_join,processed$processed_dailyStats)
@@ -633,7 +780,7 @@ function(input, output, session) {
         zip::zip(file,files)
       }
     }
-    
+
   )
 
 
@@ -1268,8 +1415,8 @@ function(input, output, session) {
   })
 
   observeEvent(input$dailyStats_ts_metrics,{
-    if (input$dailyStats_ts_metrics == 'mean' |input$dailyStats_ts_metrics == 'median'){
-      shinyjs::show("cp_shaded_region")
+    if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics == 'mean'|input$dailyStats_ts_metrics == 'median')){
+        shinyjs::show("cp_shaded_region")
     }else{
       shinyjs::hide("cp_shaded_region")
     }
@@ -1336,7 +1483,7 @@ function(input, output, session) {
 
     }
 
-    if ((input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading!="newData"){
+    if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading!="newData"){
        cols_selected = c("Date",mean_col,lower_col,upper_col)
        data_to_plot <- myData[cols_selected]
        if (!all(is.na(data_to_plot[,mean_col]))){
@@ -1366,7 +1513,7 @@ function(input, output, session) {
                          ,inputId = "alert_data_not_avail_for_ts")
        }##inner if else loop close
 
-    }else if ((input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
+    }else if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
       shading_data <- uploaded_newData()
       shading_cols_selected <- c(input$newData_date_col,input$newData_lower_col,input$newData_upper_col)
       data_to_add_as_shading <- shading_data[shading_cols_selected]
@@ -2157,31 +2304,31 @@ function(input, output, session) {
     ) # dataTable end
     print(myTable)
   })  # renderDT end
-  
+
   require(XLConnect)
-  
+
   # Descriptions
   #
-  Desc.freq <- "Frequency metrics indicate numbers of days in months or seasons 
+  Desc.freq <- "Frequency metrics indicate numbers of days in months or seasons
   that key events exceed user-defined temperatures. "
   #
-  Desc.mag <- "Magnitude metrics characterize monthly and seasonal averages and 
+  Desc.mag <- "Magnitude metrics characterize monthly and seasonal averages and
   the maximum and minimum from daily temperatures as well as 3-, 7-, 14-, 21-,
   and 30-day moving averages for mean and maximum daily temperatures."
   #
-  Desc.roc <- "Rate of change metrics include monthly and seasonal rate of 
-  change, which indicates the difference in magnitude of maximum and minimum 
+  Desc.roc <- "Rate of change metrics include monthly and seasonal rate of
+  change, which indicates the difference in magnitude of maximum and minimum
   temperatures divided by number of days between these events."
   #
-  Desc.tim <- "Timing metrics indicate Julian days of key events including 
-  mean, maximum, and minimum temperatures; they also indicate Julian days of 
+  Desc.tim <- "Timing metrics indicate Julian days of key events including
+  mean, maximum, and minimum temperatures; they also indicate Julian days of
   mean, maximum, and minimum values over moving windows of specified size."
   #
-  Desc.var <- "Variability metrics summarize monthly and seasonal range in 
-  daily mean temperatures as well as monthly coefficient of variation of daily 
-  mean, maximum, and minimum temperatures. Variability metrics also include 
-  moving averages for daily ranges and moving variability in extreme 
-  temperatures, calculated from differences in average high and low 
+  Desc.var <- "Variability metrics summarize monthly and seasonal range in
+  daily mean temperatures as well as monthly coefficient of variation of daily
+  mean, maximum, and minimum temperatures. Variability metrics also include
+  moving averages for daily ranges and moving variability in extreme
+  temperatures, calculated from differences in average high and low
   temperatures over various time periods"
   #
   Group.Desc <- c(Desc.freq, Desc.mag, Desc.roc, Desc.tim, Desc.var)
@@ -2190,7 +2337,7 @@ function(input, output, session) {
   SiteID <- processed$ST.freq[1,1]
   myDate <- format(Sys.Date(),"%Y%m%d")
   myTime <- format(Sys.time(),"%H%M%S")
-  
+
   Notes.User <- Sys.getenv("USERNAME")
   Notes.Names <- c("Dataset (SiteID)", "Analysis.Date (YYYYMMDD)"
                    , "Analysis.Time (HHMMSS)", "Analysis.User")
@@ -2230,12 +2377,12 @@ function(input, output, session) {
   to_download$fileName <- fileName
 
   }) #observeEvent end
-  
+
   ## when use actionButton to save thermal statistics to excel file
 
 #   observeEvent(input$save_thermal, {
 #     require(XLConnect)
-# 
+#
 #     # Descriptions
 #     #
 #     Desc.freq <- "Frequency metrics indicate numbers of days in months or seasons
@@ -2267,7 +2414,7 @@ function(input, output, session) {
 #     myDate <- format(Sys.Date(),"%Y%m%d")
 #     myTime <- format(Sys.time(),"%H%M%S")
 #     Notes.User <- Sys.getenv("USERNAME")
-# 
+#
 #     Notes.Names <- c("Dataset (SiteID)", "Analysis.Date (YYYYMMDD)"
 #                      , "Analysis.Time (HHMMSS)", "Analysis.User")
 #     Notes.Data <- c(SiteID, myDate, myTime, Notes.User)
@@ -2306,25 +2453,25 @@ function(input, output, session) {
 #     writeWorksheet(wb, processed$ST.var, sheet = "var")
 #     # save workbook
 #     saveWorkbook(wb, myFile.XLSX)
-# 
+#
 #   }) # observeEvent close
-#   
-  
+#
+
   output$save_thermal <- downloadHandler(
-    
-    
+
+
     filename = function(){
       to_download$fileName
     },
-    
+
     content = function(file){
-    
-    saveWorkbook(to_download$wb,file) 
-    
+
+    saveWorkbook(to_download$wb,file)
+
     }
-    
+
   ) # downloadHandler close
-  
+
 
 
   #################  2: Thermal Sensitivity << Temperature  #################
@@ -2626,7 +2773,7 @@ function(input, output, session) {
       ) # dataTable end
       print(myTable)
     })  # renderDT end
-    
+
     ## create Excel Workbook
     require(XLConnect)
     Group.Desc <- c("Magnitude of monthly water conditions"
@@ -2666,14 +2813,14 @@ function(input, output, session) {
     to_download$fileName_IHA <- myFile.XLSX
 
   }) #observeEvent end
-  
-  
+
+
   ### changed the actionButton "save_IHA" to downloadButton
-  
+
   # observeEvent(input$save_IHA, {
   #   require(XLConnect)
   #   if (!file.exists("Output/saved_IHA/")) dir.create(file.path("Output/saved_IHA"),showWarnings = FALSE, recursive = TRUE)
-  # 
+  #
   #   Group.Desc <- c("Magnitude of monthly water conditions"
   #                   ,"Magnitude of monthly water condition and include 12 parameters"
   #                   ,"Timing of annual extreme water conditions"
@@ -2711,17 +2858,17 @@ function(input, output, session) {
   #   # save workbook
   #   saveWorkbook(wb, myFile.XLSX)
   # })# observeEvent end
-  
+
   output$save_IHA <- downloadHandler(
-    
+
     filename = function(){
       to_download$fileName_IHA
     },
-    
+
     content = function(file){
-      saveWorkbook(to_download$wb_IHA,file) 
+      saveWorkbook(to_download$wb_IHA,file)
     }
-    
+
   )
 
   observeEvent(input$display_IHA_plot_1, {
@@ -2930,11 +3077,11 @@ function(input, output, session) {
 
 
   ################### "Create report"####
-  
+
   observeEvent(input$createReport,{
-    
+
     showModal(modalDialog("Creating the report now...",footer=NULL))
-    
+
     #if (!file.exists("Output/reports")) dir.create(file.path("Output/reports"),showWarnings = FALSE, recursive = TRUE)
     ## copy template file to a temporary directory so that the output file will be saved there
     ## in case user do not have written permission to the app directory when deployed
@@ -2947,26 +3094,25 @@ function(input, output, session) {
                   ,rmd_template=tempRMD
                   ,output_format=input$report_format
                   ,output_file=paste0(input$report_name,".",input$report_format))
-    
+
     to_download$fileName_report <- paste0(tempdir(),"/",input$report_name,".",input$report_format)
-    
+
     print(to_download$fileName_report)
     removeModal()
-    
+
   })
 
 
   output$downloadReport <- downloadHandler(
-    
+
     filename = function(){
       to_download$fileName_report
     },
-    
+
     content = function(file){
       file.copy(to_download$fileName_report,file)
-    
     }
-    
+
   )
 
 }
