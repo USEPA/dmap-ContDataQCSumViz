@@ -30,12 +30,16 @@ shinyUI(fluidPage(
   # main panel for variable selection
   mainPanel(width = 12,
 
-            css_tabPanels <- '.nav-tabs>li>a{
+            # css_tabPanels <- '.nav-tabs>li>a{
+            #                        color: cornflowerblue;
+            #                        font-size: 18px;
+            #                        font-weight: bold;
+            #                        }',
+            tags$head(tags$style(HTML(".nav-tabs>li>a{
                                    color: cornflowerblue;
                                    font-size: 18px;
                                    font-weight: bold;
-                                   }',
-            tags$head(tags$style(HTML(css_tabPanels))),
+                                   }"))),
 
             tags$style("#big-heading {font-size:15px;color:black;font-style:bold;display:block; }"),
 
@@ -71,7 +75,6 @@ shinyUI(fluidPage(
                                   fluidRow(
 
                                     column(width = 12,
-
                                            sidebarLayout(
                                              sidebarPanel(width=3,
                                                           fileInput("uploaded_data_file",
@@ -173,7 +176,7 @@ shinyUI(fluidPage(
                                                                                          div(
                                                                                            id = "cp_shaded_region",
                                                                                            conditionalPanel(
-                                                                                             condition = "input$dailyStats_ts_metrics == 'mean'|input$dailyStats_ts_metrics == 'median'",
+                                                                                             condition = "(!is.null(input$dailyStats_ts_metrics))&(input$dailyStats_ts_metrics == 'mean'|input$dailyStats_ts_metrics == 'median')",
                                                                                              hr(),
                                                                                              uiOutput("time_series_input_3"),
                                                                                            ), #conditionalPanel end
@@ -401,26 +404,26 @@ shinyUI(fluidPage(
                                                           ), #tabPanel 6 end Raster
 
                                                           ### DE, All, Climate Spiral ----
-                                                          tabPanel("Climate spiral", value="tab_climate",br(),
-                                                                   column(width = 12,
-                                                                          sidebarLayout(
-                                                                            sidebarPanel(width=3,
-                                                                                         hr(),
-                                                                                         uiOutput("climate_input_1"),
-                                                                                         hr(),
-                                                                                         uiOutput("climate_input_2"),
-
-                                                                            ),
-                                                                            mainPanel(width=9,
-                                                                                      column(width=9,uiOutput("display_climate_spiral"))
-
-                                                                            ) # mainPanel end
-
-                                                                          ) # sidebarLayout end
-
-                                                                   ), #column close
-
-                                                          ), #tabPanel 7 end Climate Spiral
+                                                          # tabPanel("Climate spiral", value="tab_climate",br(),
+                                                          #          column(width = 12,
+                                                          #                 sidebarLayout(
+                                                          #                   sidebarPanel(width=3,
+                                                          #                                hr(),
+                                                          #                                uiOutput("climate_input_1"),
+                                                          #                                hr(),
+                                                          #                                uiOutput("climate_input_2"),
+                                                          #
+                                                          #                   ),
+                                                          #                   mainPanel(width=9,
+                                                          #                             column(width=9,uiOutput("display_climate_spiral"))
+                                                          #
+                                                          #                   ) # mainPanel end
+                                                          #
+                                                          #                 ) # sidebarLayout end
+                                                          #
+                                                          #          ), #column close
+                                                          #
+                                                          # ), #tabPanel 7 end Climate Spiral
 
                                                           ) #inner tabsetPanel end
 

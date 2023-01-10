@@ -21,6 +21,7 @@ knitr::opts_chunk$set(echo = FALSE, results = 'asis', warning = FALSE)
 ```
 
 # Site Information
+
 ```{r head}
 cat(paste0("**Site ID**\n\n"
            , df_merge[df_merge$Type == "id", "Caption"]

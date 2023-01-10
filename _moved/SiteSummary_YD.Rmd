@@ -1,7 +1,7 @@
 ---
 title: "Site Summary"
 date: "`r format(Sys.time(), '%Y-%m-%d %H:%M:%S')`"
-output: 
+output:
   html_document:
     toc: yes
     toc_depth: 3
@@ -11,8 +11,8 @@ output:
   pdf_document:
     toc: yes
     toc_depth: 3
-    fig_caption: true 
-runtime: shiny        
+    fig_caption: true
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}

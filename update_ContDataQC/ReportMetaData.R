@@ -69,20 +69,29 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #' @export
 ReportMetaData <- function(fun.myFile
-                        , fun.myDir.import = getwd()
-                        , fun.myParam.Name
-                        , fun.myDateTime.Name = "Date.Time"
-                        , fun.myDateTime.Format = NA
-                        , fun.myThreshold = NA
-                        , fun.myConfig = ""
-                        , df.input = NULL
-)
-{##FUN.fun.Stats.START
+                           ,
+                           fun.myDir.import = getwd()
+                           ,
+                           fun.myParam.Name
+                           ,
+                           fun.myDateTime.Name = "Date.Time"
+                           ,
+                           fun.myDateTime.Format = NA
+                           ,
+                           fun.myThreshold = NA
+                           ,
+                           fun.myConfig = ""
+                           ,
+                           df.input = NULL)
+{
+  ##FUN.fun.Stats.START
   # 00. Debugging Variables####
   boo_DEBUG <- FALSE
-  if(boo_DEBUG==TRUE) {##IF.boo_DEBUG.START
+  userDateFormat <- NULL
+  if (boo_DEBUG == TRUE) {
+    ##IF.boo_DEBUG.START
     fun.myFile <- "DATA_test2_Aw_20130101_20141231.csv"
-    fun.myDir.import <- file.path(".","data-raw")
+    fun.myDir.import <- file.path(".", "data-raw")
     fun.myParam.Name <- c("Water.Temp.C", "Sensor.Depth.ft")
     fun.myDateTime.Name <- "Date.Time"
     fun.myDateTime.Format <- NA
@@ -91,57 +100,84 @@ ReportMetaData <- function(fun.myFile
     df.input <- NULL
     # Load environment
     #ContData.env <- new.env(parent = emptyenv()) # in config.R
-    source(file.path(getwd(),"R","config.R"), local=TRUE)
+    source(file.path(getwd(), "R", "config.R"), local = TRUE)
     # might have to load manually
   }##IF.boo_DEBUG.END
   
   # 0a.0. Load environment
   # config file load, 20170517
-  if (fun.myConfig!="") {##IF.fun.myConfig.START
+  if (fun.myConfig != "") {
+    ##IF.fun.myConfig.START
     config.load(fun.myConfig)
   }##IF.fun.myConfig.START
   
   # change the default settings in Environment if needed
-   # ContData.env$myName.Flag        <- "Flag" # flag prefix
-   # ContData.env$myStats.Fails.Exclude <- TRUE  #FALSE #TRUE
-   # ContData.env$myFlagVal.Fail    <- "F"
+  # ContData.env$myName.Flag        <- "Flag" # flag prefix
+  # ContData.env$myStats.Fails.Exclude <- TRUE  #FALSE #TRUE
+  # ContData.env$myFlagVal.Fail    <- "F"
   # 0b.2. Format, DateTime
-  if (is.na(fun.myDateTime.Format)) {##IF.fun.myConfig.START
+  if (is.na(fun.myDateTime.Format)) {
+    ##IF.fun.myConfig.START
     fun.myDateTime.Format <- ContData.env$myFormat.DateTime
   }
+  
+  # remove the time part if exist for display do not need time
+  userDateFormat <- removeTimeFormat(fun.myDateTime.Format)
+  
   # 2.0. Load File
   # load data (data.frame or from CSV)
   # if no data frame then import file.
-  if (!is.null(df.input)) {##IF.START
+  if (!is.null(df.input)) {
+    ##IF.START
     df.load <- df.input
   } else {
     # 2.1. Error Checking, make sure file exists
-    if(fun.myFile %in% list.files(path=fun.myDir.import)==FALSE) {##IF.file.START
+    if (fun.myFile %in% list.files(path = fun.myDir.import) == FALSE) {
+      ##IF.file.START
       #
-      myMsg <- paste0("Provided file ("
-                      ,fun.myFile
-                      ,") does not exist in the provided import directory ("
-                      ,fun.myDir.import
-                      ,").")
+      myMsg <- paste0(
+        "Provided file ("
+        ,
+        fun.myFile
+        ,
+        ") does not exist in the provided import directory ("
+        ,
+        fun.myDir.import
+        ,
+        ")."
+      )
       stop(myMsg)
       #
     }##IF.file.END
     
-    df.load <- utils::read.csv(file.path(fun.myDir.import, fun.myFile)
-                               ,as.is=TRUE,na.strings=c("","NA"))
+    df.load <-
+      utils::read.csv(
+        file.path(fun.myDir.import, fun.myFile)
+        ,
+        as.is = TRUE,
+        na.strings = c("", "NA")
+      )
   }##IF.END
   
   # 2.3. Error Checking, data field names
   param.len <- length(fun.myParam.Name)
   myNames2Match <- c(fun.myParam.Name, fun.myDateTime.Name)
   #myNames2Match %in% names(df.load)
-  if(sum(myNames2Match %in% names(df.load))!= (param.len + 1)){##IF.match.START
+  if (sum(myNames2Match %in% names(df.load)) != (param.len + 1)) {
+    ##IF.match.START
     # find non match
-    Names.NonMatch <- myNames2Match[is.na(match(myNames2Match, names(df.load)))]
-    myMsg <- paste0("Provided data file ("
-                    ,fun.myFile
-                    ,") does not contain the column name ("
-                    ,Names.NonMatch,").")
+    Names.NonMatch <-
+      myNames2Match[is.na(match(myNames2Match, names(df.load)))]
+    myMsg <- paste0(
+      "Provided data file ("
+      ,
+      fun.myFile
+      ,
+      ") does not contain the column name ("
+      ,
+      Names.NonMatch,
+      ")."
+    )
     stop(myMsg)
   }##IF.match.END
   # 2.4.  Error Checking, DateTime format
@@ -152,29 +188,37 @@ ReportMetaData <- function(fun.myFile
   param.len <- length(fun.myParam.Name)
   
   # Loop, Stats ####
-  if(boo_DEBUG==TRUE) {##IF.boo_DEBUG.START
+  if (boo_DEBUG == TRUE) {
+    ##IF.boo_DEBUG.START
     i <- fun.myParam.Name[1]
   }##IF.boo_DEBUG.END
   # 20181114, added for 2nd parameter
   df.list <- list()
-  for (i in fun.myParam.Name){##FOR.i.START
+  for (i in fun.myParam.Name) {
+    ##FOR.i.START
     #
     i.num <- match(i, fun.myParam.Name)
-    print(paste0("WORKING on parameter (", i.num,"/",param.len,"); ", i))
+    print(paste0("WORKING on parameter (", i.num, "/", param.len, "); ", i))
     utils::flush.console()
     myCol <- c(fun.myDateTime.Name, i)
     
     # check NA for each parameter
     # Subset Fields
-    df.param <- df.load[,myCol]
+    df.param <- df.load[, myCol]
+    
     # 3.2. Add "Date" field
-    fd01 <- ContData.env$myFormat.Date
+    #fd01 <- ContData.env$myFormat.Date
     myDate.Name <- "Date"
-    df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name], fd01)
+    
+    #df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name], fd01)
+    df.param[, myDate.Name] <-
+      as.Date(df.param[, fun.myDateTime.Name], userDateFormat)
+    
     # 3.3. Data column to numeric
-    df.param[,i] <- suppressWarnings(as.numeric(df.param[,i]))
-    df.toCheck <- df.param[,c(myDate.Name,i)]
-    df.summaryNA <- df.toCheck %>% group_by(Date) %>% summarise(sumNA=sum(is.na(!!rlang::sym(i))))
+    df.param[, i] <- suppressWarnings(as.numeric(df.param[, i]))
+    df.toCheck <- df.param[, c(myDate.Name, i)]
+    df.summaryNA <-
+      df.toCheck %>% group_by(Date) %>% summarise(sumNA = sum(is.na(!!rlang::sym(i))))
     # check if flag field is in data
     # if yes, summarise the fail and suspect data points
     # Default values from config.R
@@ -183,34 +227,66 @@ ReportMetaData <- function(fun.myFile
     # ContData.env$myName.Flag       <- "Flag" # flag prefix
     
     ## If flag parameter names is different from config then it won't be found
-    myParam.Name.Flag <- paste(ContData.env$myName.Flag, i, sep=".")
+    myParam.Name.Flag <- paste(ContData.env$myName.Flag, i, sep = ".")
     # Modify columns to keep based on presence of "flag" field
-    if (myParam.Name.Flag %in% names(df.load)) {##IF.flagINnames.START
+    if (myParam.Name.Flag %in% names(df.load)) {
+      ##IF.flagINnames.START
       # Flag field present in data
       myCol <- c(fun.myDateTime.Name, myParam.Name.Flag)
-      df.param.flag <- df.load[,myCol]
-      df.param.flag[,myDate.Name] <- as.Date(df.param.flag[,fun.myDateTime.Name], fd01)
-      df.toCheck.flag <- df.param.flag[,c(myDate.Name,myParam.Name.Flag)]
-      # summarise the fail and suspect data points 
-      df.summaryFlag <- df.toCheck.flag %>% group_by(Date) %>% summarise(sumFail=sum(!!rlang::sym(myParam.Name.Flag)==ContData.env$myFlagVal.Fail),
-                                                                         sumSuspect=sum(!!rlang::sym(myParam.Name.Flag)==ContData.env$myFlagVal.Suspect),
-                                                                         sumNoFlagData=sum(!!rlang::sym(myParam.Name.Flag)==ContData.env$myFlagVal.NoData))
+      df.param.flag <- df.load[, myCol]
+      #df.param.flag[,myDate.Name] <- as.Date(df.param.flag[,fun.myDateTime.Name], fd01)
+      df.param.flag[, myDate.Name] <-
+        as.Date(df.param.flag[, fun.myDateTime.Name], userDateFormat)
+      
+      df.toCheck.flag <-
+        df.param.flag[, c(myDate.Name, myParam.Name.Flag)]
+      # summarise the fail and suspect data points
+      df.summaryFlag <-
+        df.toCheck.flag %>% group_by(Date) %>% summarise(
+          sumFail = sum(
+            !!rlang::sym(myParam.Name.Flag) == ContData.env$myFlagVal.Fail
+          ),
+          sumSuspect =
+            sum(
+              !!rlang::sym(myParam.Name.Flag) == ContData.env$myFlagVal.Suspect
+            ),
+          sumNoFlagData =
+            sum(
+              !!rlang::sym(myParam.Name.Flag) == ContData.env$myFlagVal.NoData
+            )
+        )
     } else {
       # No Flag column
       df.summaryFlag <- data.frame()
       myMsg <- "No QC Flag field was found so no summary on flags"
       cat(paste0(myMsg, "\n"))
     }##IF.flagINnames.END
-    if (length(df.summaryFlag)>0){
-      df.summary <- merge(df.summaryNA,df.summaryFlag,by="Date")
-    }else{
+    if (length(df.summaryFlag) > 0) {
+      df.summary <- merge(df.summaryNA, df.summaryFlag, by = "Date")
+    } else{
       df.summary <- df.summaryNA
     }
-    new.list <- list(df=df.summary)
+    new.list <- list(df = df.summary)
     names(new.list) <- i
-    df.list <- c(df.list,new.list)
+    df.list <- c(df.list, new.list)
   }##FOR.i.END
   return(df.list)
   
 }##FUNCTION.END
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+removeTimeFormat <- function (userFormatString) {
+  if (!is.na (userFormatString)) {
+    dateFormat <- str_split(userFormatString, " ")
+    return(dateFormat[[1]][1])
+  }
+}
+
+checkIgnoreCaseColExist <- function (userColNames, pattern) {
+    #not working with "Date.time", it comes back possitive for "Date"
+   colStatus <- str_detect(userColNames, fixed(pattern, ignore_case = TRUE))
+    if(any(colStatus, TRUE) == TRUE) {
+        return(TRUE)
+    }
+  return(FALSE)
+}
