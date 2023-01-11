@@ -682,6 +682,12 @@ function(input, output, session) {
 
     raw_data <- uploaded_data()
     showModal(modalDialog("Calculating the daily statistics now...",footer=NULL))
+    
+    if (compositeCols[['flag']] == TRUE) {
+      data.time.cols <-
+        paste(raw_data$Date, raw_data$Time, sep = " ")
+      raw_data$Date.Time <- as.character(data.time.cols)
+    }
 
     variables_to_calculate <- input$parameters_to_process
 
