@@ -6037,6 +6037,9 @@
     ".lintr": {
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
+    ".RData": {
+      "checksum": "cd6d2bf923f9dc9b759ca7924a560c48"
+    },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
     },
@@ -6191,7 +6194,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "bea5164720e9ffbef7e21536d53ff527"
+      "checksum": "23ff5708cd0772a1acac6bc2a312ecb2"
     },
     "test.xlsx": {
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
