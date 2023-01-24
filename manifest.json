@@ -3402,6 +3402,37 @@
         "Archs": "x64"
       }
     },
+    "packrat": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "packrat",
+        "Type": "Package",
+        "Title": "A Dependency Management System for Projects and their R Package\nDependencies",
+        "Version": "0.8.1",
+        "Author": "Kevin Ushey, Jonathan McPherson, Joe Cheng, Aron Atkins, JJ Allaire,\n    Toph Allen",
+        "Maintainer": "Aron Atkins <aron@rstudio.com>",
+        "Description": "Manage the R packages your project depends\n    on in an isolated, portable, and reproducible way.",
+        "License": "GPL-2",
+        "Depends": "R (>= 3.0.0)",
+        "Imports": "tools, utils",
+        "Suggests": "testthat (>= 3.0.0), devtools, httr, knitr, rmarkdown",
+        "URL": "https://github.com/rstudio/packrat/",
+        "BugReports": "https://github.com/rstudio/packrat/issues",
+        "RoxygenNote": "7.1.2",
+        "Encoding": "UTF-8",
+        "Config/testthat/edition": "3",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-06-29 19:15:34 UTC; aron",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-06-29 20:00:02 UTC",
+        "Built": "R 4.2.2; ; 2022-12-20 01:43:30 UTC; windows"
+      }
+    },
     "pbkrtest": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -4418,6 +4449,37 @@
         "Built": "R 4.2.2; ; 2022-12-15 01:48:15 UTC; windows"
       }
     },
+    "rsconnect": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "rsconnect",
+        "Type": "Package",
+        "Title": "Deployment Interface for R Markdown Documents and Shiny\nApplications",
+        "Version": "0.8.29",
+        "Authors@R": "c(\n    person(\"Aron\", \"Atkins\", role = c(\"aut\", \"cre\"), email = \"aron@posit.co\"),\n    person(\"Jonathan\", \"McPherson\", role = \"aut\", email = \"jonathan@posit.co\"),\n    person(\"JJ\", \"Allaire\", role = \"aut\"),\n    person(\"Posit Software\", role = c(\"cph\", \"fnd\"))\n    )",
+        "Description": "Programmatic deployment interface for 'RPubs', 'shinyapps.io', and\n    'Posit Connect'. Supported content types include R Markdown documents,\n    Shiny applications, Plumber APIs, plots, and static web content.",
+        "Depends": "R (>= 3.0.0)",
+        "Imports": "curl, digest, jsonlite, openssl (>= 2.0.0), packrat (>= 0.6),\nrstudioapi (>= 0.5), tools, yaml (>= 2.1.5)",
+        "Suggests": "MASS, RCurl, callr, httpuv, knitr, plumber (>= 0.3.2),\nreticulate, rmarkdown (>= 1.1), shiny, sourcetools, testthat,\nxtable",
+        "License": "GPL-2",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.2.1",
+        "URL": "https://github.com/rstudio/rsconnect",
+        "BugReports": "https://github.com/rstudio/rsconnect/issues",
+        "NeedsCompilation": "no",
+        "Packaged": "2023-01-09 19:03:45 UTC; aron",
+        "Author": "Aron Atkins [aut, cre],\n  Jonathan McPherson [aut],\n  JJ Allaire [aut],\n  Posit Software [cph, fnd]",
+        "Maintainer": "Aron Atkins <aron@posit.co>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-01-09 22:50:10 UTC",
+        "Built": "R 4.2.2; ; 2023-01-22 03:06:14 UTC; windows"
+      }
+    },
     "rstudioapi": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -4673,7 +4735,7 @@
         "Maintainer": "Winston Chang <winston@rstudio.com>",
         "Repository": "CRAN",
         "Date/Publication": "2022-12-15 13:10:02 UTC",
-        "Built": "R 4.2.2; ; 2023-01-08 04:41:52 UTC; windows"
+        "Built": "R 4.2.2; ; 2023-01-12 04:35:18 UTC; windows"
       }
     },
     "shinyBS": {
@@ -6038,16 +6100,16 @@
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
     ".RData": {
-      "checksum": "cd6d2bf923f9dc9b759ca7924a560c48"
+      "checksum": "18fc69874cd9b71d2ae5b834f3bd6a3b"
     },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
     },
     "_moved/import_raw_data.R": {
-      "checksum": "6368f93e163ccdfd0df85a93aa1b9b72"
+      "checksum": "9433bd8a71a1aa94c1a382544a520676"
     },
     "_moved/install_packages_for_app.R": {
-      "checksum": "8d3ea609d55b4aa9fa0a8c599f311188"
+      "checksum": "cb7c04852f50066a986368dd9458d76a"
     },
     "_moved/myReport.html": {
       "checksum": "0fda7d5c154e04ea4515346fba73b586"
@@ -6106,8 +6168,14 @@
     "ContDataQC_test_data/VT_Ranch_AW_20180412_20210427_composite.csv": {
       "checksum": "b500117e78009a153f09be5635c70fb2"
     },
+    "external/App_USGSgage.html": {
+      "checksum": "376e0086aa3b41aec3e9114cc238b7e8"
+    },
+    "external/tab_USGSgage_ui.R": {
+      "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
+    },
     "global.R": {
-      "checksum": "fc91858eb1f9397e75f34bc172df0b8d"
+      "checksum": "3a47278de90a00d4370359fb3f3009f6"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -6126,6 +6194,9 @@
     },
     "help_text_files/Temperature_ThermalStatistics.txt": {
       "checksum": "34167516986ec25ae610428105d51a7c"
+    },
+    "log/contDataSumViz.log": {
+      "checksum": "71c77232b18888e0a7b07a5567b9b81f"
     },
     "Output/reports/myReport.html": {
       "checksum": "409c923b7b56ece270a890064d734b9a"
@@ -6194,13 +6265,13 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "23ff5708cd0772a1acac6bc2a312ecb2"
+      "checksum": "d8a4ecb4b50f29dd0b92ea69961ca978"
     },
     "test.xlsx": {
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "ui.R": {
-      "checksum": "566bb997422c995a7110c668cdc20d85"
+      "checksum": "f45e5123f717c2f3d50661f8f24507aa"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -6210,6 +6281,12 @@
     },
     "update_ContDataQC/config.R": {
       "checksum": "9afdf8b704b4a07156378c74c8eacd6d"
+    },
+    "update_ContDataQC/download_usgs_gage_data.R": {
+      "checksum": "fc07a28f5b5cd5c5ffad617ad3f9cb55"
+    },
+    "update_ContDataQC/fun.GageData.R": {
+      "checksum": "18f28a9125e655be9c2c92f620c5473f"
     },
     "update_ContDataQC/ReportMetaData.R": {
       "checksum": "8add92a237cae0d8bfde092d560adbdf"
