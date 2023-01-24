@@ -28,3 +28,4 @@ import_raw_data<-function(fileName,formatType,has_header=T){
     return(mydata)
   
 }
+

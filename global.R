@@ -52,6 +52,10 @@ library("ContDataSumViz")
 library("StreamThermal")
 library("IHA")
 library("XLConnect")
+#library("ggiraph")
+library("logr")
+library("gridExtra")
+
 # fails without dplyr and stringr from tidyverse
 
 # Functions ----
@@ -60,6 +64,8 @@ source("update_ContDataQC/config.R")
 source("update_ContDataQC/CompSiteCDF.updated.R")
 source("update_ContDataQC/SumStats.updated.R")
 source("update_ContDataQC/ReportMetaData.R")
+source("update_ContDataQC/download_usgs_gage_data.R")
+source("update_ContDataQC/fun.GageData.R")
 
 # Other ----
 options(shiny.maxRequestSize = 100*1024^2)

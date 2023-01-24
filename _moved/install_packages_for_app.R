@@ -39,6 +39,7 @@ packages <- c("devtools"        # install helper for non CRAN libraries
          , "shinythemes"    # more Shiny
          , "XLConnect"      # read Excel files
          , "zip"            # read/save zip files
+         , "logr"
          
 )
 
