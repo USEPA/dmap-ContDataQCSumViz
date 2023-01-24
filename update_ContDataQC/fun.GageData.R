@@ -224,10 +224,12 @@ fun.GageData <- function(fun.myData.SiteID
     #utils::flush.console()
     #write.csv(data.myGage,file=paste(myDir.data.export,"/",strFile.Out,sep="")
     # ,quote=FALSE,row.names=FALSE)
-    utils::write.csv(data.myGage
-                     ,file.path(myDir.data.export,strFile.Out)
-                     ,quote=FALSE
-                     ,row.names=FALSE)
+    
+    # No need to save in this updated function
+    # utils::write.csv(data.myGage
+    #                  ,file.path(myDir.data.export,strFile.Out)
+    #                  ,quote=FALSE
+    #                  ,row.names=FALSE)
 
 
     #
