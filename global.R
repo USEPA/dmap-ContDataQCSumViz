@@ -53,8 +53,8 @@ library("StreamThermal")
 library("IHA")
 library("XLConnect")
 #library("ggiraph")
-library("logr")
-library("gridExtra")
+#library("logr")
+#library("gridExtra")
 
 # fails without dplyr and stringr from tidyverse
 
