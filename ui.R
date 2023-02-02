@@ -20,11 +20,13 @@
 # #library(shinycustomloader)
 # library(shinycssloaders)
 
+
 # Define UI for application
 options(spinner.color.background = "#ffffff", spinner.size = 1)
 shinyUI(fluidPage(
   theme = "styles.css",
   useShinyjs(),
+  tags$head(tags$script(src="script.js")),
 
   # main panel for variable selection
   mainPanel(
@@ -177,7 +179,9 @@ shinyUI(fluidPage(
                             hr(),
                             uiOutput("time_series_input_7"),
                             uiOutput("usgs_gaze_options"),
-                            uiOutput("time_series_input_10"),
+                            #uiOutput("time_series_input_10"),
+                            hr(),
+                            uiOutput("day_met_section"),
                             hr(),
                             uiOutput("time_series_input_2"),
                             div(
@@ -247,7 +251,11 @@ shinyUI(fluidPage(
                             fluidRow(column(width = 9, uiOutput("display_time_series"))),
                             br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_1"))),
-                            br()
+                            br(),
+                            fluidRow(column(width = 9, uiOutput("display_time_series_2"))),
+                            br(),
+                            fluidRow(column(width = 9, uiOutput("display_time_series_3"))),
+
                           ) # mainPanel end
                         ) # sidebarLayout end
                       ), # column close

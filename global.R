@@ -14,6 +14,8 @@ library(shinyjs) # fails without it
 library(shinyalert)
 library(shinythemes)
 library(shinydashboard)
+library(dplyr)
+library(tidyr)
 library(ggplot2)
 library(ggthemes)
 library(DT)
@@ -52,9 +54,8 @@ library("ContDataSumViz")
 library("StreamThermal")
 library("IHA")
 library("XLConnect")
-#library("ggiraph")
-#library("logr")
-#library("gridExtra")
+library("daymetr")
+
 
 # fails without dplyr and stringr from tidyverse
 
@@ -66,6 +67,8 @@ source("update_ContDataQC/SumStats.updated.R")
 source("update_ContDataQC/ReportMetaData.R")
 source("update_ContDataQC/download_usgs_gage_data.R")
 source("update_ContDataQC/fun.GageData.R")
+source("update_ContDataQC/fun.DayMetData.R")
+
 
 # Other ----
 options(shiny.maxRequestSize = 100*1024^2)

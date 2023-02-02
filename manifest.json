@@ -220,6 +220,37 @@
         "Built": "R 4.2.2; ; 2023-01-09 18:54:58 UTC; windows"
       }
     },
+    "KernSmooth": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "KernSmooth",
+        "Priority": "recommended",
+        "Version": "2.23-20",
+        "Date": "2021-05-03",
+        "Title": "Functions for Kernel Smoothing Supporting Wand & Jones (1995)",
+        "Authors@R": "c(person(\"Matt\", \"Wand\", role = \"aut\",\n\t             email = \"Matt.Wand@uts.edu.au\"),\n\t     person(\"Cleve\", \"Moler\", role = \"ctb\",\n\t            comment = \"LINPACK routines in src/d*\"),\n             person(\"Brian\", \"Ripley\", role = c(\"trl\", \"cre\", \"ctb\"),\n                    email = \"ripley@stats.ox.ac.uk\",\n\t\t    comment = \"R port and updates\"))",
+        "Note": "Maintainers are not available to give advice on using a package\nthey did not author.",
+        "Depends": "R (>= 2.5.0), stats",
+        "Suggests": "MASS, carData",
+        "Description": "Functions for kernel smoothing (and density estimation)\n  corresponding to the book: \n  Wand, M.P. and Jones, M.C. (1995) \"Kernel Smoothing\".",
+        "License": "Unlimited",
+        "ByteCompile": "yes",
+        "NeedsCompilation": "yes",
+        "Packaged": "2021-05-03 08:46:19 UTC; ripley",
+        "Author": "Matt Wand [aut],\n  Cleve Moler [ctb] (LINPACK routines in src/d*),\n  Brian Ripley [trl, cre, ctb] (R port and updates)",
+        "Maintainer": "Brian Ripley <ripley@stats.ox.ac.uk>",
+        "Repository": "CRAN",
+        "Date/Publication": "2021-05-03 14:06:33 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2022-10-31 14:46:49 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "MASS": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -1007,6 +1038,71 @@
         "Built": "R 4.2.2; ; 2022-12-20 04:11:58 UTC; windows"
       }
     },
+    "class": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "class",
+        "Priority": "recommended",
+        "Version": "7.3-20",
+        "Date": "2022-01-12",
+        "Depends": "R (>= 3.0.0), stats, utils",
+        "Imports": "MASS",
+        "Authors@R": "c(person(\"Brian\", \"Ripley\", role = c(\"aut\", \"cre\", \"cph\"),\n                    email = \"ripley@stats.ox.ac.uk\"),\n             person(\"William\", \"Venables\", role = \"cph\"))",
+        "Description": "Various functions for classification, including k-nearest\n  neighbour, Learning Vector Quantization and Self-Organizing Maps.",
+        "Title": "Functions for Classification",
+        "ByteCompile": "yes",
+        "License": "GPL-2 | GPL-3",
+        "URL": "http://www.stats.ox.ac.uk/pub/MASS4/",
+        "NeedsCompilation": "yes",
+        "Packaged": "2022-01-13 05:06:38 UTC; ripley",
+        "Author": "Brian Ripley [aut, cre, cph],\n  William Venables [cph]",
+        "Maintainer": "Brian Ripley <ripley@stats.ox.ac.uk>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-01-16 10:24:56 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2022-10-31 14:47:08 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
+    "classInt": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "classInt",
+        "Version": "0.4-8",
+        "Date": "2022-09-22",
+        "Title": "Choose Univariate Class Intervals",
+        "Authors@R": "c(\n  person(\"Roger\", \"Bivand\", role=c(\"aut\", \"cre\"), email=\"Roger.Bivand@nhh.no\", comment=c(ORCID=\"0000-0003-2392-6140\")),\n  person(\"Bill\", \"Denney\", role=\"ctb\", comment=c(ORCID=\"0000-0002-5759-428X\")),\n  person(\"Richard\", \"Dunlap\", role=\"ctb\"),\n  person(\"Diego\", \"Hernangómez\", role=\"ctb\", comment=c(ORCID=\"0000-0001-8457-4658\")),\n  person(\"Hisaji\", \"Ono\", role=\"ctb\"),\n  person(\"Josiah\", \"Parry\", role = \"ctb\", comment = c(ORCID = \"0000-0001-9910-865X\")),\n  person(\"Matthieu\", \"Stigler\", role=\"ctb\", comment =c(ORCID=\"0000-0002-6802-4290\")))",
+        "Depends": "R (>= 2.2)",
+        "Imports": "grDevices, stats, graphics, e1071, class, KernSmooth",
+        "Suggests": "spData (>= 0.2.6.2), units, knitr, rmarkdown",
+        "NeedsCompilation": "yes",
+        "Description": "Selected commonly used methods for choosing univariate class intervals for mapping or other graphics purposes.",
+        "License": "GPL (>= 2)",
+        "URL": "https://r-spatial.github.io/classInt/,\nhttps://github.com/r-spatial/classInt/",
+        "BugReports": "https://github.com/r-spatial/classInt/issues/",
+        "RoxygenNote": "6.1.1",
+        "Encoding": "UTF-8",
+        "VignetteBuilder": "knitr",
+        "Packaged": "2022-09-28 10:29:45 UTC; rsb",
+        "Author": "Roger Bivand [aut, cre] (<https://orcid.org/0000-0003-2392-6140>),\n  Bill Denney [ctb] (<https://orcid.org/0000-0002-5759-428X>),\n  Richard Dunlap [ctb],\n  Diego Hernangómez [ctb] (<https://orcid.org/0000-0001-8457-4658>),\n  Hisaji Ono [ctb],\n  Josiah Parry [ctb] (<https://orcid.org/0000-0001-9910-865X>),\n  Matthieu Stigler [ctb] (<https://orcid.org/0000-0002-6802-4290>)",
+        "Maintainer": "Roger Bivand <Roger.Bivand@nhh.no>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-09-29 08:10:15 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 03:51:22 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "cli": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -1399,6 +1495,38 @@
         "Built": "R 4.2.2; ; 2023-01-08 05:39:16 UTC; windows"
       }
     },
+    "daymetr": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "daymetr",
+        "Title": "Interface to the 'Daymet' Web Services",
+        "Version": "1.7",
+        "Authors@R": "c(person(\n               family = \"Hufkens\",\n               given = \"Koen\",\n               email = \"koen.hufkens@gmail.com\",\n               role = c(\"aut\", \"cre\"),\n               comment = c(ORCID = \"0000-0002-5070-8109\")),\n              person(given = \"BlueGreen Labs\",\n                role = c(\"cph\", \"fnd\")))",
+        "Description": "Programmatic interface to the 'Daymet' web services\n    (<http://daymet.ornl.gov>). Allows for easy downloads of\n    'Daymet' climate data directly to your R workspace or your computer.\n    Routines for both single pixel data downloads and\n    gridded (netCDF) data are provided.",
+        "Depends": "R (>= 3.6)",
+        "Imports": "sf, terra, ncdf4, httr, tidyr, tibble, tools, utils",
+        "License": "AGPL-3",
+        "LazyData": "true",
+        "ByteCompile": "true",
+        "RoxygenNote": "7.2.1",
+        "Suggests": "ggplot2, dplyr, knitr, markdown, covr, testthat",
+        "VignetteBuilder": "knitr",
+        "URL": "https://github.com/bluegreen-labs/daymetr",
+        "BugReports": "https://github.com/bluegreen-labs/daymetr/issues",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-12-28 17:02:00 UTC; khufkens",
+        "Author": "Koen Hufkens [aut, cre] (<https://orcid.org/0000-0002-5070-8109>),\n  BlueGreen Labs [cph, fnd]",
+        "Maintainer": "Koen Hufkens <koen.hufkens@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-01-05 21:50:47 UTC",
+        "Built": "R 4.2.2; ; 2023-01-29 05:25:02 UTC; windows"
+      }
+    },
     "dbplyr": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -1699,6 +1827,34 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-08-20 13:20:02 UTC",
         "Built": "R 4.2.2; ; 2022-12-20 04:39:34 UTC; windows"
+      }
+    },
+    "e1071": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "e1071",
+        "Version": "1.7-12",
+        "Title": "Misc Functions of the Department of Statistics, Probability\nTheory Group (Formerly: E1071), TU Wien",
+        "Imports": "graphics, grDevices, class, stats, methods, utils, proxy",
+        "Suggests": "cluster, mlbench, nnet, randomForest, rpart, SparseM, xtable,\nMatrix, MASS, slam",
+        "Authors@R": "c(person(given = \"David\", family = \"Meyer\", role = c(\"aut\", \"cre\"), email = \"David.Meyer@R-project.org\"),\n             person(given = \"Evgenia\", family = \"Dimitriadou\", role = c(\"aut\",\"cph\")),\n             person(given = \"Kurt\", family = \"Hornik\", role = \"aut\"),\n             person(given = \"Andreas\", family = \"Weingessel\", role = \"aut\"),\n             person(given = \"Friedrich\", family = \"Leisch\", role = \"aut\"),\n             person(given = \"Chih-Chung\", family = \"Chang\", role = c(\"ctb\",\"cph\"), comment = \"libsvm C++-code\"),\n             person(given = \"Chih-Chen\", family = \"Lin\", role = c(\"ctb\",\"cph\"), comment = \"libsvm C++-code\"))",
+        "Description": "Functions for latent class analysis, short time Fourier\n\t     transform, fuzzy clustering, support vector machines,\n\t     shortest path computation, bagged clustering, naive Bayes\n\t     classifier, generalized k-nearest neighbour ...",
+        "License": "GPL-2 | GPL-3",
+        "LazyLoad": "yes",
+        "NeedsCompilation": "yes",
+        "Packaged": "2022-10-23 08:51:14 UTC; meyer",
+        "Author": "David Meyer [aut, cre],\n  Evgenia Dimitriadou [aut, cph],\n  Kurt Hornik [aut],\n  Andreas Weingessel [aut],\n  Friedrich Leisch [aut],\n  Chih-Chung Chang [ctb, cph] (libsvm C++-code),\n  Chih-Chen Lin [ctb, cph] (libsvm C++-code)",
+        "Maintainer": "David Meyer <David.Meyer@R-project.org>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-10-24 11:30:25 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 03:16:02 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
       }
     },
     "ellipsis": {
@@ -3269,6 +3425,33 @@
         "Built": "R 4.2.2; ; 2022-12-20 02:32:18 UTC; windows"
       }
     },
+    "ncdf4": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "ncdf4",
+        "Version": "1.21",
+        "Date": "2023-01-05",
+        "Title": "Interface to Unidata netCDF (Version 4 or Earlier) Format Data\nFiles",
+        "Author": "David Pierce <dpierce@ucsd.edu>",
+        "Maintainer": "David Pierce <dpierce@ucsd.edu>",
+        "Description": "Provides a high-level R interface to data files written using Unidata's netCDF library (version 4 or earlier), which are binary data files that are portable across platforms and include metadata information in addition to the data sets.  Using this package, netCDF files (either version 4 or \"classic\" version 3) can be opened and data sets read in easily.  It is also easy to create new netCDF dimensions, variables, and files, in either version 3 or 4 format, and manipulate existing netCDF files.  This package replaces the former ncdf package, which only worked with netcdf version 3 files.  For various reasons the names of the functions have had to be changed from the names in the ncdf package.  The old ncdf package is still available at the URL given below, if you need to have backward compatibility.  It should be possible to have both the ncdf and ncdf4 packages installed simultaneously without a problem.  However, the ncdf package does not provide an interface for netcdf version 4 files.",
+        "SystemRequirements": "netcdf library version 4.1 or later",
+        "License": "GPL (>= 3)",
+        "URL": "https://cirrus.ucsd.edu/~pierce/ncdf/",
+        "NeedsCompilation": "yes",
+        "Packaged": "2023-01-05 20:30:06 UTC; pierce",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-01-07 00:30:06 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-08 00:52:04 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "nlme": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -3878,6 +4061,36 @@
         "Archs": "x64"
       }
     },
+    "proxy": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "proxy",
+        "Type": "Package",
+        "Title": "Distance and Similarity Measures",
+        "Version": "0.4-27",
+        "Authors@R": "c(person(given = \"David\", family = \"Meyer\", role = c(\"aut\", \"cre\"), email = \"David.Meyer@R-project.org\"),\n             person(given = \"Christian\", family = \"Buchta\", role = \"aut\"))",
+        "Description": "Provides an extensible framework for the efficient calculation of auto- and cross-proximities, along with implementations of the most popular ones. ",
+        "Depends": "R (>= 3.4.0)",
+        "Imports": "stats, utils",
+        "Suggests": "cba",
+        "Collate": "registry.R database.R dist.R similarities.R dissimilarities.R\nutil.R seal.R",
+        "License": "GPL-2",
+        "NeedsCompilation": "yes",
+        "Packaged": "2022-06-08 21:36:02 UTC; meyer",
+        "Author": "David Meyer [aut, cre],\n  Christian Buchta [aut]",
+        "Maintainer": "David Meyer <David.Meyer@R-project.org>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-06-09 06:15:32 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 01:51:50 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "ps": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -4477,7 +4690,7 @@
         "Maintainer": "Aron Atkins <aron@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2023-01-09 22:50:10 UTC",
-        "Built": "R 4.2.2; ; 2023-01-22 03:06:14 UTC; windows"
+        "Built": "R 4.2.2; ; 2023-01-29 03:21:08 UTC; windows"
       }
     },
     "rstudioapi": {
@@ -4570,6 +4783,42 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-08-19 22:30:08 UTC",
         "Built": "R 4.2.2; ; 2022-12-20 04:12:09 UTC; windows"
+      }
+    },
+    "s2": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "s2",
+        "Title": "Spherical Geometry Operators Using the S2 Geometry Library",
+        "Version": "1.1.2",
+        "Authors@R": "c(\n     person(given = \"Dewey\",\n           family = \"Dunnington\",\n           role = c(\"aut\"),\n           email = \"dewey@fishandwhistle.net\",\n           comment = c(ORCID = \"0000-0002-9415-4582\")),\n     person(given = \"Edzer\",\n             family = \"Pebesma\",\n             role = c(\"aut\", \"cre\"),\n             email = \"edzer.pebesma@uni-muenster.de\",\n             comment = c(ORCID = \"0000-0001-8049-7069\")),\n    person(\"Ege\", \"Rubak\", email=\"rubak@math.aau.dk\", role = c(\"aut\")),\n    person(\"Jeroen\", \"Ooms\", , \"jeroen.ooms@stat.ucla.edu\", role = \"ctb\", comment = \"configure script\"),\n    person(family = \"Google, Inc.\", role = \"cph\", comment = \"Original s2geometry.io source code\")\n  )",
+        "Description": "Provides R bindings for Google's s2 library for geometric calculations on\n    the sphere. High-performance constructors and exporters provide high compatibility\n    with existing spatial packages, transformers construct new geometries from existing\n    geometries, predicates provide a means to select geometries based on spatial \n    relationships, and accessors extract information about geometries.",
+        "License": "Apache License (== 2.0)",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "RoxygenNote": "7.2.3",
+        "SystemRequirements": "OpenSSL >= 1.0.1",
+        "LinkingTo": "Rcpp, wk",
+        "Imports": "Rcpp, wk (>= 0.6.0)",
+        "Suggests": "testthat (>= 3.0.0), vctrs",
+        "URL": "https://r-spatial.github.io/s2/, https://github.com/r-spatial/s2,\nhttps://s2geometry.io/",
+        "BugReports": "https://github.com/r-spatial/s2/issues",
+        "Depends": "R (>= 3.0.0)",
+        "Config/testthat/edition": "3",
+        "NeedsCompilation": "yes",
+        "Packaged": "2023-01-11 14:23:27 UTC; edzer",
+        "Author": "Dewey Dunnington [aut] (<https://orcid.org/0000-0002-9415-4582>),\n  Edzer Pebesma [aut, cre] (<https://orcid.org/0000-0001-8049-7069>),\n  Ege Rubak [aut],\n  Jeroen Ooms [ctb] (configure script),\n  Google, Inc. [cph] (Original s2geometry.io source code)",
+        "Maintainer": "Edzer Pebesma <edzer.pebesma@uni-muenster.de>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-01-12 13:00:02 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 02:50:38 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
       }
     },
     "sass": {
@@ -4701,6 +4950,42 @@
         "Repository": "CRAN",
         "Date/Publication": "2021-12-06 11:50:02 UTC",
         "Built": "R 4.2.2; ; 2022-12-20 02:33:08 UTC; windows"
+      }
+    },
+    "sf": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "sf",
+        "Version": "1.0-9",
+        "Title": "Simple Features for R",
+        "Authors@R": "\n    c(person(given = \"Edzer\",\n             family = \"Pebesma\",\n             role = c(\"aut\", \"cre\"),\n             email = \"edzer.pebesma@uni-muenster.de\",\n             comment = c(ORCID = \"0000-0001-8049-7069\")),\n      person(given = \"Roger\",\n             family = \"Bivand\",\n             role = \"ctb\",\n             comment = c(ORCID = \"0000-0003-2392-6140\")),\n      person(given = \"Etienne\",\n             family = \"Racine\",\n             role = \"ctb\"),\n      person(given = \"Michael\",\n             family = \"Sumner\",\n             role = \"ctb\"),\n      person(given = \"Ian\",\n             family = \"Cook\",\n             role = \"ctb\"),\n      person(given = \"Tim\",\n             family = \"Keitt\",\n             role = \"ctb\"),\n      person(given = \"Robin\",\n             family = \"Lovelace\",\n             role = \"ctb\"),\n      person(given = \"Hadley\",\n             family = \"Wickham\",\n             role = \"ctb\"),\n      person(given = \"Jeroen\",\n             family = \"Ooms\",\n             role = \"ctb\",\n             comment = c(ORCID = \"0000-0002-4035-0289\")),\n      person(given = \"Kirill\",\n             family = \"M\\u00fcller\",\n             role = \"ctb\"),\n      person(given = \"Thomas Lin\",\n             family = \"Pedersen\",\n             role = \"ctb\"),\n      person(given = \"Dan\",\n             family = \"Baston\",\n             role = \"ctb\"),\n      person(given = \"Dewey\",\n             family = \"Dunnington\",\n             role = \"ctb\",\n             comment = c(ORCID = \"0000-0002-9415-4582\"))\n\t\t\t )",
+        "Description": "Support for simple features, a standardized way to\n    encode spatial vector data. Binds to 'GDAL' for reading and writing\n    data, to 'GEOS' for geometrical operations, and to 'PROJ' for\n    projection conversions and datum transformations. Uses by default the 's2'\n    package for spherical geometry operations on ellipsoidal (long/lat) coordinates.",
+        "License": "GPL-2 | MIT + file LICENSE",
+        "URL": "https://r-spatial.github.io/sf/, https://github.com/r-spatial/sf/",
+        "BugReports": "https://github.com/r-spatial/sf/issues/",
+        "Depends": "methods, R (>= 3.3.0)",
+        "Imports": "classInt (>= 0.4-1), DBI (>= 0.8), graphics, grDevices, grid,\nmagrittr, Rcpp (>= 0.12.18), s2 (>= 1.1.0), stats, tools, units\n(>= 0.7-0), utils",
+        "Suggests": "blob, covr, dplyr (>= 0.8-3), ggplot2, knitr, lwgeom (>=\n0.2-1), maps, mapview, Matrix, microbenchmark, odbc, pbapply,\npillar, pool, raster, rlang, rmarkdown, RPostgres (>= 1.1.0),\nRPostgreSQL, RSQLite, sp (>= 1.2-4), spatstat (>= 2.0-1),\nspatstat.geom, spatstat.random, spatstat.linnet,\nspatstat.utils, stars (>= 0.2-0), terra, testthat, tibble (>=\n1.4.1), tidyr (>= 1.2.0), tidyselect (>= 1.0.0), tmap (>= 2.0),\nvctrs, wk",
+        "LinkingTo": "Rcpp",
+        "VignetteBuilder": "knitr",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.2.1",
+        "SystemRequirements": "C++11, GDAL (>= 2.0.1), GEOS (>= 3.4.0), PROJ (>=\n4.8.0), sqlite3",
+        "Collate": "'RcppExports.R' 'init.R' 'crs.R' 'bbox.R' 'read.R' 'db.R'\n'sfc.R' 'sfg.R' 'sf.R' 'bind.R' 'wkb.R' 'wkt.R' 'plot.R'\n'geom-measures.R' 'geom-predicates.R' 'geom-transformers.R'\n'transform.R' 'proj.R' 'sp.R' 'grid.R' 'arith.R' 'tidyverse.R'\n'tidyverse-vctrs.R' 'cast_sfg.R' 'cast_sfc.R' 'graticule.R'\n'datasets.R' 'aggregate.R' 'agr.R' 'maps.R' 'join.R' 'sample.R'\n'valid.R' 'collection_extract.R' 'jitter.R' 'sgbp.R'\n'spatstat.R' 'stars.R' 'crop.R' 'gdal_utils.R' 'nearest.R'\n'normalize.R' 'defunct.R' 'z_range.R' 'm_range.R'\n'shift_longitude.R' 'make_grid.R' 's2.R' 'terra.R'\n'geos-overlayng.R' 'break_antimeridian.R'",
+        "NeedsCompilation": "yes",
+        "Packaged": "2022-11-08 08:12:50 UTC; edzer",
+        "Author": "Edzer Pebesma [aut, cre] (<https://orcid.org/0000-0001-8049-7069>),\n  Roger Bivand [ctb] (<https://orcid.org/0000-0003-2392-6140>),\n  Etienne Racine [ctb],\n  Michael Sumner [ctb],\n  Ian Cook [ctb],\n  Tim Keitt [ctb],\n  Robin Lovelace [ctb],\n  Hadley Wickham [ctb],\n  Jeroen Ooms [ctb] (<https://orcid.org/0000-0002-4035-0289>),\n  Kirill Müller [ctb],\n  Thomas Lin Pedersen [ctb],\n  Dan Baston [ctb],\n  Dewey Dunnington [ctb] (<https://orcid.org/0000-0002-9415-4582>)",
+        "Maintainer": "Edzer Pebesma <edzer.pebesma@uni-muenster.de>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-11-08 14:20:02 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 04:20:37 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
       }
     },
     "shiny": {
@@ -5142,6 +5427,43 @@
         "Archs": "x64"
       }
     },
+    "terra": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "terra",
+        "Type": "Package",
+        "Title": "Spatial Data Analysis",
+        "Version": "1.7-3",
+        "Date": "2023-01-23",
+        "Depends": "R (>= 3.5.0)",
+        "Suggests": "parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML,\nleaflet",
+        "LinkingTo": "Rcpp",
+        "Imports": "methods, Rcpp",
+        "SystemRequirements": "C++11, GDAL (>= 2.2.3), GEOS (>= 3.4.0), PROJ (>=\n4.9.3), sqlite3",
+        "Encoding": "UTF-8",
+        "Language": "en-US",
+        "Maintainer": "Robert J. Hijmans <r.hijmans@gmail.com>",
+        "Description": "Methods for spatial data analysis with vector (points, lines, polygons) and raster (grid) data. Methods for vector data include standard operations such as intersect and buffer. Raster methods include global, local, zonal, and focal computations. The predict and interpolate methods facilitate the use of regression type (interpolation, machine learning) models for spatial prediction, including with satellite remote sensing data. Processing of very large files is supported. See the manual and tutorials on <https://rspatial.org/terra/> to get started. 'terra' is a replacement for the 'raster' package ('terra' can do more, and it is faster and easier to use).",
+        "License": "GPL (>= 3)",
+        "URL": "https://rspatial.org/terra/",
+        "BugReports": "https://github.com/rspatial/terra/issues/",
+        "LazyLoad": "yes",
+        "Authors@R": "c(\n\tperson(\"Robert J.\", \"Hijmans\", role = c(\"cre\", \"aut\"),  \n\t\t\temail = \"r.hijmans@gmail.com\", comment = c(ORCID = \"0000-0001-5872-2872\")),\n    person(\"Roger\", \"Bivand\",  role = \"ctb\", comment = c(ORCID = \"0000-0003-2392-6140\")),\n    person(\"Edzer\", \"Pebesma\", role = \"ctb\", comment = c(ORCID = \"0000-0001-8049-7069\")),\n    person(\"Michael D.\", \"Sumner\", role = \"ctb\"))",
+        "NeedsCompilation": "yes",
+        "Packaged": "2023-01-24 02:34:48 UTC; rhijm",
+        "Author": "Robert J. Hijmans [cre, aut] (<https://orcid.org/0000-0001-5872-2872>),\n  Roger Bivand [ctb] (<https://orcid.org/0000-0003-2392-6140>),\n  Edzer Pebesma [ctb] (<https://orcid.org/0000-0001-8049-7069>),\n  Michael D. Sumner [ctb]",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-01-24 13:40:02 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 02:50:14 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "testthat": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -5491,6 +5813,42 @@
         "Archs": "x64"
       }
     },
+    "units": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "units",
+        "Version": "0.8-1",
+        "Title": "Measurement Units for R Vectors",
+        "Authors@R": "c(person(\"Edzer\", \"Pebesma\", role = c(\"aut\", \"cre\"), email = \"edzer.pebesma@uni-muenster.de\", comment = c(ORCID = \"0000-0001-8049-7069\")),\n    person(\"Thomas\", \"Mailund\", role = \"aut\", email = \"mailund@birc.au.dk\"),\n    person(\"Tomasz\", \"Kalinowski\", role = \"aut\"),\n    person(\"James\", \"Hiebert\", role = \"ctb\"),\n    person(\"Iñaki\", \"Ucar\", role = \"aut\", email = \"iucar@fedoraproject.org\", comment = c(ORCID = \"0000-0001-6403-5550\")),\n    person(\"Thomas Lin\", \"Pedersen\", role = \"ctb\")\n    )",
+        "Depends": "R (>= 3.0.2)",
+        "Imports": "Rcpp",
+        "LinkingTo": "Rcpp (>= 0.12.10)",
+        "Suggests": "NISTunits, measurements, xml2, magrittr, pillar (>= 1.3.0),\ndplyr (>= 1.0.0), vctrs (>= 0.3.1), ggplot2 (> 3.2.1), testthat\n(>= 3.0.0), vdiffr, knitr, rmarkdown",
+        "VignetteBuilder": "knitr",
+        "Description": "Support for measurement units in R vectors, matrices\n    and arrays: automatic propagation, conversion, derivation\n    and simplification of units; raising errors in case of unit\n    incompatibility. Compatible with the POSIXct, Date and difftime \n    classes. Uses the UNIDATA udunits library and unit database for \n    unit compatibility checking and conversion.\n    Documentation about 'units' is provided in the paper by Pebesma, Mailund &\n    Hiebert (2016, <doi:10.32614/RJ-2016-061>), included in this package as a\n    vignette; see 'citation(\"units\")' for details.",
+        "SystemRequirements": "udunits-2",
+        "License": "GPL-2",
+        "URL": "https://github.com/r-quantities/units",
+        "BugReports": "https://github.com/r-quantities/units/issues",
+        "RoxygenNote": "7.2.2",
+        "Encoding": "UTF-8",
+        "Config/testthat/edition": "3",
+        "NeedsCompilation": "yes",
+        "Packaged": "2022-12-04 20:03:11 UTC; edzer",
+        "Author": "Edzer Pebesma [aut, cre] (<https://orcid.org/0000-0001-8049-7069>),\n  Thomas Mailund [aut],\n  Tomasz Kalinowski [aut],\n  James Hiebert [ctb],\n  Iñaki Ucar [aut] (<https://orcid.org/0000-0001-6403-5550>),\n  Thomas Lin Pedersen [ctb]",
+        "Maintainer": "Edzer Pebesma <edzer.pebesma@uni-muenster.de>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-12-10 15:10:02 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 02:48:52 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "urlchecker": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -5810,6 +6168,40 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-03-03 21:50:02 UTC",
         "Built": "R 4.2.2; ; 2022-12-15 01:47:54 UTC; windows"
+      }
+    },
+    "wk": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "wk",
+        "Title": "Lightweight Well-Known Geometry Parsing",
+        "Version": "0.7.1",
+        "Authors@R": "\n    c(\n      person(given = \"Dewey\",\n             family = \"Dunnington\",\n             role = c(\"aut\", \"cre\"),\n             email = \"dewey@fishandwhistle.net\",\n             comment = c(ORCID = \"0000-0002-9415-4582\")),\n       person(given = \"Edzer\",\n              family = \"Pebesma\",\n              role = c(\"aut\"),\n              email = \"edzer.pebesma@uni-muenster.de\",\n              comment = c(ORCID = \"0000-0001-8049-7069\"))\n    )",
+        "Maintainer": "Dewey Dunnington <dewey@fishandwhistle.net>",
+        "Description": "Provides a minimal R and C++ API for parsing\n  well-known binary and well-known text representation of\n  geometries to and from R-native formats. \n  Well-known binary is compact\n  and fast to parse; well-known text is human-readable\n  and is useful for writing tests. These formats are\n  useful in R only if the information they contain can be \n  accessed in R, for which high-performance functions \n  are provided here.",
+        "License": "MIT + file LICENSE",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.2.1",
+        "SystemRequirements": "C++11",
+        "Suggests": "testthat (>= 3.0.0), vctrs (>= 0.3.0), sf, tibble, readr",
+        "URL": "https://paleolimbot.github.io/wk/,\nhttps://github.com/paleolimbot/wk",
+        "BugReports": "https://github.com/paleolimbot/wk/issues",
+        "Config/testthat/edition": "3",
+        "Depends": "R (>= 2.10)",
+        "LazyData": "true",
+        "NeedsCompilation": "yes",
+        "Packaged": "2022-12-09 16:47:20 UTC; deweydunnington",
+        "Author": "Dewey Dunnington [aut, cre] (<https://orcid.org/0000-0002-9415-4582>),\n  Edzer Pebesma [aut] (<https://orcid.org/0000-0001-8049-7069>)",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-12-09 19:20:02 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 01:52:33 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
       }
     },
     "writexl": {
@@ -6135,6 +6527,9 @@
     "ContDataQC_test_data/DATA_two_columns_two_digits_years.csv": {
       "checksum": "33505e96a7cc2ca26a80117375a16638"
     },
+    "ContDataQC_test_data/dayMetDataReview.csv": {
+      "checksum": "4a5d9ea15960d1c5dfc3bb778af58ad0"
+    },
     "ContDataQC_test_data/MA_ParkersBrook_StageDischargeTemp_20121205_20210930.xlsx": {
       "checksum": "eea161aee62248811d444ab82ff56c51"
     },
@@ -6162,11 +6557,26 @@
     "ContDataQC_test_data/Ranch_OverallSumStats_2001_2022_mod.csv": {
       "checksum": "9e58133d544630f1f62ba1d3929de6b5"
     },
+    "ContDataQC_test_data/saved_dailyStats_VT_Ranch_AW_20180412_20210427_dailyStats.csv": {
+      "checksum": "11bfeef352c330b42c3dbe1ac91e87d3"
+    },
     "ContDataQC_test_data/VT_Ranch_AW_20180412_20210427.csv": {
       "checksum": "9350038e9907fad27feadc5777215c0f"
     },
     "ContDataQC_test_data/VT_Ranch_AW_20180412_20210427_composite.csv": {
       "checksum": "b500117e78009a153f09be5635c70fb2"
+    },
+    "data/2129_daymet_v4_daily_na_tmin_2020.nc": {
+      "checksum": "39f5a363ecbcf2cfb6853de04327e70d"
+    },
+    "data/daymet_v4_daily_pr_vp_2021.nc": {
+      "checksum": "8d6175b96550f2f0af425d4ff2643824"
+    },
+    "daymet_v4_daily_pr_vp_2021.nc": {
+      "checksum": "8d6175b96550f2f0af425d4ff2643824"
+    },
+    "daymetdata_metadata.txt": {
+      "checksum": "2ce9b72ed12b95789bb625bca6aa740f"
     },
     "external/App_USGSgage.html": {
       "checksum": "376e0086aa3b41aec3e9114cc238b7e8"
@@ -6175,7 +6585,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "04a2c320d8dbbc169c3e847d78125ae9"
+      "checksum": "ceecd04bd0c2dfd75399671f155b8181"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -6265,13 +6675,13 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "d8a4ecb4b50f29dd0b92ea69961ca978"
+      "checksum": "415f2d7c4534b429a1b7264748b85016"
     },
     "test.xlsx": {
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "ui.R": {
-      "checksum": "f45e5123f717c2f3d50661f8f24507aa"
+      "checksum": "f8edf13c5504bb61f50038311d581e47"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -6285,8 +6695,17 @@
     "update_ContDataQC/download_usgs_gage_data.R": {
       "checksum": "fc07a28f5b5cd5c5ffad617ad3f9cb55"
     },
+    "update_ContDataQC/fun.DayMetData.R": {
+      "checksum": "ad42686b321f273b8a90e62597fab91d"
+    },
     "update_ContDataQC/fun.GageData.R": {
-      "checksum": "3189b9e6c9b5be506d0d7aa54ab3969c"
+      "checksum": "26bd9c781bdb8af0057842ba248cac84"
+    },
+    "update_ContDataQC/fun.GageTest.R": {
+      "checksum": "bc3b63763f42afa28e0448dd949263f6"
+    },
+    "update_ContDataQC/fun.GageTest2.R": {
+      "checksum": "df82669b5ae0034e9abe5ae9aca2e6b6"
     },
     "update_ContDataQC/ReportMetaData.R": {
       "checksum": "8add92a237cae0d8bfde092d560adbdf"
@@ -6305,6 +6724,9 @@
     },
     "www/GDD.R": {
       "checksum": "ed8341d5bbf0eeb3ec8a577287112165"
+    },
+    "www/script.js": {
+      "checksum": "5deee33094751ab700b9db8190fae160"
     },
     "www/styles.css": {
       "checksum": "fdd7652ef99d13c3de28525cf87a2cca"

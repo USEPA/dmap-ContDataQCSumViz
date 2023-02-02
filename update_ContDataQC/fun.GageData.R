@@ -273,6 +273,8 @@ fun.GageData <- function(fun.myData.SiteID
   utils::flush.console()
 
   # encase in loop so can handle multiple SiteIDs
+  #remove all columns ending with _cd, cannot be used
+  data.myGage <- data.myGage %>% select(-ends_with("_cd")) 
 
   return(data.myGage)
 
