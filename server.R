@@ -71,10 +71,12 @@ function(input, output, session) {
   useShinyjs()
   conflict_prefer("box", "shinydashboard")
   conflict_prefer("dataTableOutput", "DT")
+  conflict_prefer("yday", "data.table")
   loaded_data <- reactiveValues()
   raw_data_columns<-reactiveValues()
   compositeCols <- reactiveValues()
   dateRange <- reactiveValues()
+  dateButtonClicked <- reactiveValues(activeBtn = "combined")
   currentOutPutId <- reactiveValues()
   gageColNames  <- NULL
   consoleUSGS <- NULL
@@ -114,32 +116,14 @@ function(input, output, session) {
                                  return(my_data)
                                })
 
-
-
   observeEvent(input$alert_data_not_valid,{
     shinyjs::runjs("swal.close();")
   })
 
+
   ## Copy uploaded files to local folder
   observeEvent(input$uploadId,{
 
-    
-    ## this part is for copying multiple files and saving them in a reactive datasetlist()
-    # if (!file.exists("Selected_Files")) dir.create(file.path("","Selected_Files"),showWarnings = FALSE, recursive = TRUE)
-    # #print(is.null(input$uploaded_data_file))
-    # if (is.null(input$uploaded_data_file) ) {    return(NULL)  }
-    # file.copy(from = input$uploaded_data_file$datapath, to =  paste0('Selected_Files/',input$uploaded_data_file$name )  )
-    # df <- list(file = input$uploaded_data_file$name , header= TRUE,
-    #            sep = ",",dec = input$dec,
-    #            quote = '',
-    #            index = input$uploadId)
-    # if(input$uploadId > 1){
-    #   old_df <- readRDS("File_Format.rds")
-    #   df <- sapply(names(old_df),function(n){c(old_df[[n]],df[[n]])},simplify=FALSE)
-    # }
-    # saveRDS2 <- function(object,file){str(object);saveRDS(object,file)}
-    # saveRDS2(df, "File_Format.rds")
-    ## update the line choices in the raw time series plot
     my_data <- uploaded_data()
     compositeCols$flag <- FALSE
     output$display_raw_ts <- renderUI({
@@ -179,81 +163,72 @@ function(input, output, session) {
         idx_no_ID_Flag <- !str_detect(my_colnames,"ID") & !str_detect(my_colnames,"SITE") & !str_detect(my_colnames,"Flag") & !str_detect(my_colnames,"Comment")
         not_ID_or_Flag_cols <- my_colnames[idx_no_ID_Flag]
         parameters_cols_best_guess <- not_ID_or_Flag_cols[!not_ID_or_Flag_cols %in% all_date_columns]
+        parmsToProcess <- parameters_cols_best_guess
         print(parameters_cols_best_guess)
+       
 
-        sidebarLayout(
-          sidebarPanel(h4(id="big-heading","Plot Raw Data"),width=2,
-                       div(style="display: inline-block;vertical-align:top; width: 95%;",selectInput("line1_1sec",label="","choose a column")),
-                       div(style="display: inline-block;vertical-align:top; width: 95%;",selectInput("line2_1sec",label="","choose a column")),
-                       div(style="display: inline-block;vertical-align:top; width: 95%;",selectInput("line3_1sec",label="","choose a column")),
-                       div(style="display: inline-block;vertical-align:top; width: 95%;",selectInput("line4_1sec",label="","choose a column")),
-                       hr(),
-                       radioButtons("raw_datetime_format", "Select datetime format", choices = c("%Y-%m-%d %H:%M:%S"="%Y-%m-%d %H:%M:%S",
-                                                                                                 "%Y-%m-%d %H:%M"="%Y-%m-%d %H:%M",
-                                                                                                 "%Y-%m-%d %H:%M:%S"="%Y-%m-%d %H:%M:%S",
-                                                                                                 "%d-%m-%Y %H:%M:%S"="%d-%m-%Y %H:%M:%S",
-                                                                                                 "%Y-%m-%d"="%Y-%m-%d",
-                                                                                                 "%d-%m-%Y"="%d-%m-%Y",
-                                                                                                 "%m-%d-%Y"="%m-%d-%Y",
-                                                                                                 "%m/%d/%Y %H:%M:%S"="%m/%d/%Y %H:%M:%S",
-                                                                                                 "%d-%h-%Y %H:%M:%S"="%d-%h-%Y %H:%M:%S",
-                                                                                                 "%m/%d/%y %H:%M:%S"="%m/%d/%y %H:%M:%S",
-                                                                                                 "%m%d"="%m%d"
-                                                                                                 ),
-                                    selected = "%Y-%m-%d %H:%M:%S"),
-                       hr(),
-                       actionButton(inputId="showrawTS", label="Display time series",style="color:cornflowerblue;background-color:black;font-weight:bold"),
-                       hr(),
-                       #EWL, start
-                       p("Must selet at least one parameter before 'run' (or crashes)"),
-                       # EWL, end
-                       selectizeInput("parameters_to_process",label ="Select parameters to process",
-                                      choices=parameters_cols_best_guess,
-                                      multiple = TRUE,
-                                      options = list(hideSelected = FALSE,plugins=list('remove_button'))
-                                      ), # selectizeInput close
-                       br(),
-                       actionButton(inputId="runQS", label="Run meta summary",style="color:cornflowerblue;background-color:black;font-weight:bold"),
-
-          ), # sidebarPanel close
-          mainPanel(width=10,
-                    tags$head(tags$style(HTML(".radio-inline {margin-left: 10px;}"))),
-                    tags$head(tags$style("#calculateDailyStatistics,#saveDailyStatistics{
-                                                                                    font-size: 14px;
-                                                                                    }
-                                                                                    ")),
-                    tags$head(tags$style(HTML("#quick_summary_table {
+        div(id="mainBox",
+        fluidRow(
+          column(width=12, actionButton(inputId = "dateTimeBoxButton", style="float:right;background-color:#178acc;", class="active", label="", icon= icon("arrow-down")))
+        ),
+        box(width="100%",class="well",id="dateBox",
+            fluidRow(
+              column(width=3,
+                     actionGroupButtons(
+                       inputIds = c("combinedBtn", "separateBtn"),
+                       labels = list("Combined", "Separate"),
+                       status = c("primary active", "primary"),
+                       size="sm"
+                     )
+              )
+            ),
+            fluidRow(
+              column(width=4, selectizeInput("parameters_to_process2",label ="Select parameters to process",
+                                             choices=parmsToProcess,
+                                             multiple = TRUE,
+                                             options = list(hideSelected = FALSE,plugins=list('remove_button'))
+              )),
+              column(width=4,selectInput("selectedDateFieldName",label="Date Field Name","choose a column")),
+              tags$div(id="timeFieldDiv", style="display:none", column(width=4,selectInput("selectedTimeFieldName",label="Time Field Name","choose a column"))),
+            ),
+            fluidRow(
+              column(width=4,uiOutput("display_dateFormat")),
+              column(width=4,uiOutput("display_timeFormat")),
+              column(width=4,uiOutput("display_timeZone"))
+            ),
+            hr(),
+            fluidRow(
+              column(width=2, actionButton(inputId="runQS", label="Run meta summary",style="color:cornflowerblue;background-color:black;font-weight:bold")),
+              column(width=2, actionButton(inputId="showrawTS", label="Display time series",style="color:cornflowerblue;background-color:black;font-weight:bold")),
+              column(width=8, div(id="dummy"))
+            )
+            ),
+            box(width="100%", id="statsBox", class="well",
+             tags$head(tags$style(HTML("#quick_summary_table {
                                               text-align: center;
                                               font-size: 16px;
                                               font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;}
                                               "))),
-                    tags$head(tags$style("#quick_summary_table_footnote{
-                                        text-align:center;
-                                        color: black;
-                                        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-                                        font-size: 16px;
-                                        font-weight: bold;}
-                                        ")),
-                    fluidRow(column(width=12,uiOutput("display_all_raw_ts"),
-                                    hr()
-                                     ), # column close
-                                     ), #fluidRow end
-                    fluidRow(column(width=12,uiOutput("display_quick_summary_table"),
-                                     uiOutput("display_footnote_text")), # column close
-                                     ), #fluidRow end
+              fluidRow(column(width=12,uiOutput("display_all_raw_ts"),
+                              hr()
+                               ), # column close
+                               ), #fluidRow end
+              fluidRow(column(width=12,uiOutput("display_quick_summary_table"), uiOutput("display_footnote_text")), # column close
+                               ), #fluidRow end
 
-                            fluidRow(column(width=8,style="padding:20px;",
-                                                    uiOutput("display_checkBoxes_dailyStats_1"),
-                                                    uiOutput("display_radioButtons_dailyStats_2")
-                                           ), # column close
-                                     column(width=4,style="padding:25px;",uiOutput("display_actionButton_calculateDailyStatistics")
-                                           ), # column close
-                                     column(width=4,div(style="margin-bottom:20px")),
-                                     column(width=4,style="padding:30px;",uiOutput("display_actionButton_saveDailyStatistics")
-                                     ), # column close
-                                   ) #fluidRow end
-                                   ) # mainPanel end
-        ) # sidebarLayout end
+              fluidRow(column(width=8,style="padding:20px;",
+                        uiOutput("display_checkBoxes_dailyStats_1"),
+                        uiOutput("display_radioButtons_dailyStats_2")
+                     ), # column close
+                     column(width=4,style="padding:25px;",uiOutput("display_actionButton_calculateDailyStatistics")
+                     ), # column close
+                     column(width=4,div(style="margin-bottom:20px")),
+                     column(width=4,style="padding:30px;",uiOutput("display_actionButton_saveDailyStatistics")
+                     ), # column close
+             ) #fluidRow end
+
+            ) # end of statsBox
+        ) # end of main div
 
       }
 
@@ -261,16 +236,34 @@ function(input, output, session) {
 
     my_data_continuous <- my_data %>% select(where(is.numeric))
     all_continuous_col_names <- colnames(my_data_continuous)
+    uploadedCols <- colnames(my_data)
+ 
 
-    updateSelectInput(session,"line1_1sec",choices = c("",all_continuous_col_names),selected=NULL)
-    updateSelectInput(session,"line2_1sec",choices = c("",all_continuous_col_names),selected=NULL)
-    updateSelectInput(session,"line3_1sec",choices = c("",all_continuous_col_names),selected=NULL)
-    updateSelectInput(session,"line4_1sec",choices = c("",all_continuous_col_names),selected=NULL)
-    updateSelectInput(session,"line5_1sec",choices = c("",all_continuous_col_names),selected=NULL)
-    updateSelectInput(session,"line6_1sec",choices = c("",all_continuous_col_names),selected=NULL)
+    # updateSelectInput(session,"line1_1sec",choices = c("",all_continuous_col_names),selected=NULL)
+    # updateSelectInput(session,"line2_1sec",choices = c("",all_continuous_col_names),selected=NULL)
+    # updateSelectInput(session,"line3_1sec",choices = c("",all_continuous_col_names),selected=NULL)
+    # updateSelectInput(session,"line4_1sec",choices = c("",all_continuous_col_names),selected=NULL)
+    # updateSelectInput(session,"line5_1sec",choices = c("",all_continuous_col_names),selected=NULL)
+    # updateSelectInput(session,"line6_1sec",choices = c("",all_continuous_col_names),selected=NULL)
+    updateSelectInput(session,"selectedDateFieldName",choices = c("", uploadedCols),selected=NULL)
+    updateSelectInput(session,"selectedTimeFieldName",choices = c("", uploadedCols),selected=NULL)
+    updateSelectizeInput(session, 'rawDataToPlot', choices = c("",all_continuous_col_names), server = TRUE)
+    #updateSelectizeInput(session, 'parameters_to_process2', choices = c("",all_continuous_col_names), server = TRUE)
+    
 
   })  # observeEvent end
+  
+  observeEvent(input$dateTimeBoxButton,{
+    if(input$dateTimeBoxButton %% 2 == 1){
+      shinyjs::hide(id = "dateBox")
+      updateActionButton(session, "dateTimeBoxButton", icon = icon("arrow-up"))
+    }else{
+      shinyjs::show(id = "dateBox")
+      updateActionButton(session, "dateTimeBoxButton", icon = icon("arrow-down"))
 
+    }
+  })
+  
   observeEvent(input$alert_no_date,{
     #print(input$alert_no_date)
     shinyjs::runjs("swal.close();")
@@ -298,8 +291,48 @@ function(input, output, session) {
     data <- uploaded_data() ## datasetlist()
     print(length(data))
     selectInput("dataset", "Dataset", choices = loaded_data$name, selected = loaded_data$name)  ## names(data) if use datasetlist()
-
   })
+  
+  output$display_dateFormat <- renderUI({
+    selectizeInput(
+      "selectedDateFormat",
+      label = "Date Format",
+      choices = c(c('Year, Month, Day'),c('Year, Day, Month'),c('Month, Day, Year'),
+                  c('Day, Month, Year'),c('Year, Month, Day'),
+                  c('Abbreviated month, Day of the month, Year')),
+      multiple = FALSE,
+      options = list(
+        hideSelected = FALSE,
+        plugins = list('remove_button')
+      )
+    )
+  })
+  output$display_timeFormat <- renderUI({
+    selectizeInput(
+      "selectedTimeFormat",
+      label = "Time Format",
+      choices = c('Hour, Minute, Second','Hour, Minute','Hour in 12-hour format, Minute, AM/PM','Hour in 12-hour format, Minute, Second, AM/PM', 'None'),
+      multiple = FALSE,
+      options = list(
+        hideSelected = FALSE,
+        plugins = list('remove_button')
+      )
+    )
+  })
+
+  output$display_timeZone <- renderUI({
+    selectizeInput(
+      "selectedTimeZone",
+      label = "Time Zone",
+      choices = c('UTC','HST', 'AKST', 'PST', 'MST', 'CST', 'EST'),
+      multiple = FALSE,
+      options = list(
+        hideSelected = FALSE,
+        plugins = list('remove_button')
+      )
+    )
+  })
+
 
   output$siteType <- renderUI({
     data <- uploaded_data() ## datasetlist()
@@ -363,39 +396,95 @@ function(input, output, session) {
     mySummary <- c(N.missing.days,N.days.flagged.fail,N.days.flagged.suspect,N.days.flagged.noFlagData)
     return(mySummary)
   }
+  
+  observeEvent(input$combinedBtn,{
+    shinyjs::hide(id = "timeFieldDiv")
+    shinyjs::addClass("combinedBtn", "active")
+    shinyjs::removeClass("separateBtn", "active")
+    dateButtonClicked$activeBtn <- "combined"
+  })
+  
+  observeEvent(input$separateBtn,{
+    shinyjs::show(id = "timeFieldDiv")
+    shinyjs::addClass("separateBtn","active")
+    shinyjs::removeClass("combinedBtn", "active")
+    dateButtonClicked$activeBtn <- "separate"
+  })
 
   observeEvent(input$showrawTS,{
 
     output$display_all_raw_ts <- renderUI({
-      withSpinner(plotlyOutput(outputId="all_raw_ts",width="90%",height="500px"))
+      withSpinner(plotlyOutput(outputId="all_raw_ts"))
     })
 
-    isolate(input$raw_datetime_format)
+    #isolate(input$raw_datetime_format)
     raw_data <- uploaded_data()
     ## gather all the columns were selected for time series
-    my_raw_choices = c(input$line1_1sec,input$line2_1sec,input$line3_1sec,input$line4_1sec,input$line5_1sec,input$line6_1sec)
+    #my_raw_choices = c(input$line1_1sec,input$line2_1sec,input$line3_1sec,input$line4_1sec,input$line5_1sec,input$line6_1sec)
     ## remove those choices not initiated
-    my_raw_choices = my_raw_choices[!grepl("choose a column",my_raw_choices)]
+    #my_raw_choices = my_raw_choices[!grepl("choose a column",my_raw_choices)]
     #print(my_raw_choices)
     #print(is.null(my_raw_choices))
+    my_raw_choices = input$parameters_to_process2
+    
+    raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
+                                      ,fun.userTimeFormat =input$selectedTimeFormat
+                                      ,fun.userTimeZone = input$selectedTimeZone
+                                      ,fun.userDateFieldName = input$selectedDateFieldName
+                                      ,fun.userTimeFieldName = input$selectedTimeFieldName
+                                      ,fun.rawData = raw_data
+                                      ,fun.date.org = dateButtonClicked$activeBtn)
+    
+    print(head(raw_data))
+    
 
-    if (!is.null(my_raw_choices)){
-     all_raw_selected =data.frame(cbind(raw_data[,input$line1_1sec==colnames(raw_data)],raw_data[,input$line2_1sec==colnames(raw_data)],
-                                     raw_data[,input$line3_1sec==colnames(raw_data)],raw_data[,input$line4_1sec==colnames(raw_data)]
-                                     ))
-
-      colnames(all_raw_selected) <- my_raw_choices
-      raw_data_columns$to_plot_raw_ts <- my_raw_choices
-      print(raw_data_columns$date_column_name)
+    if (!is.null(my_raw_choices) && !is.null(raw_data$date.formatted)){
+      
+      uploaded_raw_data  <- raw_data %>%
+        select(my_raw_choices, c("date.formatted")) %>%
+        gather(key = "parameter", value = "value", -date.formatted)
+      
+      p <- ggplot(data = uploaded_raw_data, aes(x = date.formatted, y = value)) +
+        geom_line(aes(colour=parameter)) +
+        labs(x="Date", y="Parameters")+
+        scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
+        theme_bw()+
+        theme(
+          strip.background = element_blank()
+          ,strip.placement = "outside" 
+          ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+          ,plot.title = element_text(hjust=0.5)
+          ,legend.position="bottom"
+          ,axis.text.x=element_text(angle=65, hjust=10)
+        )
+        p = p + facet_grid(parameter ~ ., scales = "free_y")
+       
+         output$all_raw_ts <- renderPlotly({
+          ggplotly(p) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.9))
+        }) 
+      } else if(is.null(raw_data$date.formatted)) {
+        shinyalert("Warning","not a valid date format",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
+                   confirmButtonText="OK",inputId = "alert_wrong_date_format")
+        
+      }
+     
+      
+     # all_raw_selected =data.frame(cbind(raw_data[,input$line1_1sec==colnames(raw_data)],raw_data[,input$line2_1sec==colnames(raw_data)],
+     #                                 raw_data[,input$line3_1sec==colnames(raw_data)],raw_data[,input$line4_1sec==colnames(raw_data)]
+     #                                 ))
+     # 
+     #  colnames(all_raw_selected) <- my_raw_choices
+     #  raw_data_columns$to_plot_raw_ts <- my_raw_choices
+     #  print(raw_data_columns$date_column_name)
 
       
-      if (compositeCols[['flag']] == TRUE) {
-        all_raw_selected$TimeStamp <-
-          paste(raw_data$Date, raw_data$Time, sep = " ")
-      } else {
-        all_raw_selected$TimeStamp <-
-          raw_data[, (names(raw_data) %in% raw_data_columns$date_column_name)]
-      }
+      # if (compositeCols[['flag']] == TRUE) {
+      #   all_raw_selected$TimeStamp <-
+      #     paste(raw_data$Date, raw_data$Time, sep = " ")
+      # } else {
+      #   all_raw_selected$TimeStamp <-
+      #     raw_data[, (names(raw_data) %in% raw_data_columns$date_column_name)]
+      # }
       
      
       
@@ -403,74 +492,92 @@ function(input, output, session) {
 
      ## save(all_raw_selected,file="test_all_raw_selected.RData")
 
-      all_raw_selected <- all_raw_selected[!duplicated(as.list(all_raw_selected))]
+      #all_raw_selected <- all_raw_selected[!duplicated(as.list(all_raw_selected))]
 
 
-      if (input$raw_datetime_format=="%m%d" & is.null(input$get_the_year)){
-        alert_message_to_get_year = "The date/time in this file only provides month and day, please provide the year"
+      # if (input$raw_datetime_format=="%m%d" & is.null(input$get_the_year)){
+      #   alert_message_to_get_year = "The date/time in this file only provides month and day, please provide the year"
+      # 
+      #   shinyalert("",alert_message_to_get_year,closeOnClickOutside = TRUE,closeOnEsc = TRUE,
+      #              confirmButtonText="Submit",inputId = "get_the_year",type="input")
+      # } # the first if end
 
-        shinyalert("",alert_message_to_get_year,closeOnClickOutside = TRUE,closeOnEsc = TRUE,
-                   confirmButtonText="Submit",inputId = "get_the_year",type="input")
-      } # the first if end
-
-    }
+    #}
     
-    output$all_raw_ts <- renderPlotly({
-      tryCatch({
-      if (ncol(all_raw_selected)>1) {
-        x_date_label = "%Y-%m"
-        #print(input$raw_datetime_format)
-        myBreaks = paste0(2," months")
-
-        all_raw_selected_to_plot <- reshape2::melt(all_raw_selected,"TimeStamp")
-
-        ##save(all_raw_selected_to_plot,file="test_selected_raw_data.RData")
-
-          if (input$raw_datetime_format=="%m%d" & !is.null(input$get_the_year)){
-            print(input$get_the_year)
-            all_raw_selected_to_plot$TimeStamp = paste0(input$get_the_year,"-0",substr(all_raw_selected_to_plot$TimeStamp,1,1),"-",substr(all_raw_selected_to_plot$TimeStamp,2,3))
-            my_datetime_format = "%Y-%m-%d"
-            all_raw_ts_plot <- ggplot(data=all_raw_selected_to_plot)+
-              geom_point(mapping = aes(x=as.POSIXct(TimeStamp,format=my_datetime_format),y=value,color=variable),size=0.5)+
-              labs(x="Date",y=paste0(" "))+
-              scale_x_datetime(date_labels=x_date_label,date_breaks="2 months")+
-              theme(text=element_text(size=14,face = "bold", color="cornflowerblue"),
-                    axis.text.x=element_text(angle=45, hjust=1), panel.grid.major.y=element_blank())
-            all_raw_ts_plot <- ggplotly(all_raw_ts_plot,height=500,width=1200,dynamicTicks = TRUE)
-
-          }  else if(input$raw_datetime_format != "%m%d"){
-            print("inside else loop now...")
-            all_raw_ts_plot <- ggplot(data=all_raw_selected_to_plot)+
-            geom_point(mapping = aes(x=as.POSIXct(TimeStamp,format=paste0(input$raw_datetime_format)),y=value,color=variable),size=0.5)+
-            labs(x="Date",y=paste0(" "))+
-            scale_x_datetime(date_labels=x_date_label,date_breaks="2 months")+
-            theme(text=element_text(size=14,face = "bold", color="cornflowerblue"),
-                  axis.text.x=element_text(angle=45, hjust=1), panel.grid.major.y=element_blank())
-            all_raw_ts_plot <- ggplotly(all_raw_ts_plot,height=500,width=1200,dynamicTicks = TRUE)
-
-          }  ## else end
-      
-    } ## outer if loop end
-    }, error= function(e) {
-        if(!(detectDateFormatMismatch(isolate(input$raw_datetime_format)))){
-          #R throws different errors each time there is an error with date format
-          shinyalert("Error","Selected datetime format is not matching with the uploaded column values.",
-                     confirmButtonText="OK",inputId = "wrong_date_format")
-        } else {
-          #other errors
-          shinyalert("Error","some data issue occured while performing the task",
-                     confirmButtonText="OK",inputId = "wrong_date_format")
-        }
-        #toggle(id = 'text', condition = FALSE)
-      })  # end of tryCatch 
-    }) ## renderPlot end 
+    # output$all_raw_ts <- renderPlotly({
+    #   tryCatch({
+    #   if (ncol(all_raw_selected)>1) {
+    #     x_date_label = "%Y-%m"
+    #     #print(input$raw_datetime_format)
+    #     myBreaks = paste0(2," months")
+    # 
+    #     all_raw_selected_to_plot <- reshape2::melt(all_raw_selected,"TimeStamp")
+    # 
+    #     ##save(all_raw_selected_to_plot,file="test_selected_raw_data.RData")
+    # 
+    #       if (input$raw_datetime_format=="%m%d" & !is.null(input$get_the_year)){
+    #         print(input$get_the_year)
+    #         all_raw_selected_to_plot$TimeStamp = paste0(input$get_the_year,"-0",substr(all_raw_selected_to_plot$TimeStamp,1,1),"-",substr(all_raw_selected_to_plot$TimeStamp,2,3))
+    #         my_datetime_format = "%Y-%m-%d"
+    #         all_raw_ts_plot <- ggplot(data=all_raw_selected_to_plot)+
+    #           geom_point(mapping = aes(x=as.POSIXct(TimeStamp,format=my_datetime_format),y=value,color=variable),size=0.5)+
+    #           theme_light()+
+    #           labs(x="Date",y=paste0(" "))+
+    #           scale_x_datetime(date_labels=x_date_label,date_breaks="2 months")+
+    #           theme(text=element_text(size=14,face = "bold", color="cornflowerblue"),
+    #                 axis.text.x=element_text(angle=45, hjust=1),
+    #                 panel.grid.major.y=element_blank(),
+    #                 legend.position="bottom"
+    #                 )
+    #         all_raw_ts_plot <- ggplotly(all_raw_ts_plot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+    # 
+    #       }  else if(input$raw_datetime_format != "%m%d"){
+    #         print("inside else loop now...")
+    #         
+    #         all_raw_ts_plot <- ggplot(data=all_raw_selected_to_plot)+
+    #         geom_point(mapping = aes(x=as.POSIXct(TimeStamp,format=paste0(input$raw_datetime_format)),y=value,color=variable),size=0.5)+
+    #         labs(x="Date",y=paste0(" "))+
+    #         scale_x_datetime(date_labels=x_date_label,date_breaks="2 months")+
+    #         theme(text=element_text(size=14,face = "bold", color="cornflowerblue"),
+    #               axis.text.x=element_text(angle=45, hjust=1), 
+    #               panel.grid.major.y=element_blank(),
+    #               legend.position="bottom"
+    #              )
+    #         all_raw_ts_plot <- ggplotly(all_raw_ts_plot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+    # 
+    #       }  ## else end
+    #   
+    # } ## outer if loop end
+    # }, error= function(e) {
+    #     if(!(detectDateFormatMismatch(isolate(input$raw_datetime_format)))){
+    #       #R throws different errors each time there is an error with date format
+    #       shinyalert("Error","Selected datetime format is not matching with the uploaded column values.",
+    #                  confirmButtonText="OK",inputId = "wrong_date_format")
+    #     } else {
+    #       #other errors
+    #       shinyalert("Error","some data issue occured while performing the task",
+    #                  confirmButtonText="OK",inputId = "wrong_date_format")
+    #     }
+    #     toggle(id = 'text', condition = FALSE)
+    #   })  # end of tryCatch 
+    # }) ## renderPlot end 
   })  ## observeEvent end
- 
+  observeEvent(input$alert_wrong_date_format,{
+    removeUI("#display_all_raw_ts > div", multiple = T)
+    shinyjs::runjs("swal.close();")
+  })
 
 
   observeEvent(input$runQS,{
     tryCatch({
-      
+      # print("ngTst")
+      # print(input$selectedDateFieldName)
+      # print(input$selectedTimeFieldName)
+      # print(input$selectedTimeZone)
+      # print(input$selectedDateFormat)
+      # print(input$selectedTimeFormat)
+      print("ngTest")
+      print(dateButtonClicked$activeBtn)
       raw_data <- uploaded_data()
       ##save(raw_data,file="test_raw_data.RData")
       my_colnames <- names(raw_data)
@@ -500,26 +607,37 @@ function(input, output, session) {
       output$display_quick_summary_table <- renderUI({
         column(12, align = "center", withSpinner(tableOutput("quick_summary_table")))
       })
-      
+
       output$display_footnote_text <- renderUI({
         verbatimTextOutput("quick_summary_table_footnote")
       })
-      if (compositeCols[['flag']] == TRUE) {
-        data.time.cols <-
-          paste(raw_data$Date, raw_data$Time, sep = " ")
-        raw_data$Date.Time <- as.character(data.time.cols)
-      }
+      # if (compositeCols[['flag']] == TRUE) {
+      #   data.time.cols <-
+      #     paste(raw_data$Date, raw_data$Time, sep = " ")
+      #   raw_data$Date.Time <- as.character(data.time.cols)
+      # }
+      
+      raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
+                                        ,fun.userTimeFormat =input$selectedTimeFormat
+                                        ,fun.userTimeZone = input$selectedTimeZone
+                                        ,fun.userDateFieldName = input$selectedDateFieldName
+                                        ,fun.userTimeFieldName = input$selectedTimeFieldName
+                                        ,fun.rawData = raw_data
+                                        ,fun.date.org = dateButtonClicked$activeBtn)
+      
+      print(head(raw_data))
+      raw_data_columns$date_column_name = "date.formatted"
       ## create a quick metadata summary regarding the raw data file
       dailyCheck <- ReportMetaData(
         fun.myFile = NULL
         ,
         fun.myDir.import = NULL
         ,
-        fun.myParam.Name = input$parameters_to_process
+        fun.myParam.Name = input$parameters_to_process2
         ,
         fun.myDateTime.Name = raw_data_columns$date_column_name
         ,
-        fun.myDateTime.Format = input$raw_datetime_format
+        fun.myDateTime.Format = "%Y-%m-%d %H:%M:%S"
         ,
         fun.myThreshold = 20
         ,
@@ -546,10 +664,10 @@ function(input, output, session) {
         toReport[n, 2:5] <- getQuickSummary[[n]]
       }
       
+      print(toReport)
       
       output$quick_summary_table <- renderTable({
         toReport
-        
       }, align = "c") # #renderTable end
       
       saveToReport$metadataTable <- toReport
@@ -633,11 +751,11 @@ function(input, output, session) {
                        style = "color:cornflowerblue;background-color:black;font-weight:bold")
         })
       
-      # output$display_actionButton_saveDailyStatistics <- renderUI({
-      # actionButton(inputId="saveDailyStatistics"
-      #                ,label="Save daily statistics"
-      #                ,style="color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
-      # })
+      output$display_actionButton_saveDailyStatistics <- renderUI({
+      actionButton(inputId="saveDailyStatistics"
+                     ,label="Save daily statistics"
+                     ,style="color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
+      })
       
       ## change the actionButton to downloadButton
       output$display_actionButton_saveDailyStatistics <- renderUI({
@@ -649,15 +767,16 @@ function(input, output, session) {
       })
       
     },error = function(e){
-      if(!detectDateFormatMismatch(isolate(input$raw_datetime_format))){
-        #R throws different errors each time there is an error with date format
-        shinyalert("Error","Selected datetime format is not matching with the uploaded column values.",
-                   confirmButtonText="OK",inputId = "wrong_date_format")
-      } else {
-        #other errors
-        shinyalert("Error","some data issue occured while performing the task",
-                   confirmButtonText="OK",inputId = "wrong_date_format")
-      }
+      # shinyjs::alert('from here')
+      # if(!detectDateFormatMismatch(isolate(input$raw_datetime_format))){
+      #   #R throws different errors each time there is an error with date format
+      #   shinyalert("Error","Selected datetime format is not matching with the uploaded column values.",
+      #              confirmButtonText="OK",inputId = "wrong_date_format")
+      # } else {
+      #   #other errors
+      #   shinyalert("Error","some data issue occured while performing the task",
+      #              confirmButtonText="OK",inputId = "wrong_date_format")
+      # }
     
     }) # end of try catch
 
@@ -709,16 +828,22 @@ function(input, output, session) {
         paste(raw_data$Date, raw_data$Time, sep = " ")
       raw_data$Date.Time <- as.character(data.time.cols)
     }
-    
-    if(class(raw_data$Date) == "character") {
-      tmpMin <- changeDateFormat(raw_data$Date, input$raw_datetime_format)
-      tmpMax <- changeDateFormat(raw_data$Date, input$raw_datetime_format)
-      
-      dateRange$min <- min(as.Date(tmpMin))
-      dateRange$max <- max(as.Date(tmpMax))
-    }
 
-    variables_to_calculate <- input$parameters_to_process
+    raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
+                                      ,fun.userTimeFormat =input$selectedTimeFormat
+                                      ,fun.userTimeZone = input$selectedTimeZone
+                                      ,fun.userDateFieldName = input$selectedDateFieldName
+                                      ,fun.userTimeFieldName = input$selectedTimeFieldName
+                                      ,fun.rawData = raw_data
+                                      ,fun.date.org = dateButtonClicked$activeBtn)
+    
+    print(head(raw_data))
+    dateRange$min <- min(as.Date(raw_data$date.formatted))
+    dateRange$max <- max(as.Date(raw_data$date.formatted))
+   
+     variables_to_calculate <- input$parameters_to_process2
+     raw_data_columns$date_column_name = "date.formatted"
+
 
     ## how to handle "fail" or "suspect" measurements
 
@@ -744,7 +869,7 @@ function(input, output, session) {
                                    ,fun.myDir.import=NULL
                                    ,fun.myParam.Name=variables_to_calculate
                                    ,fun.myDateTime.Name=raw_data_columns$date_column_name
-                                   ,fun.myDateTime.Format=input$raw_datetime_format
+                                   ,fun.myDateTime.Format="%Y-%m-%d %H:%M:%S"
                                    ,fun.myThreshold=20
                                    ,fun.myConfig=""
                                    ,df.input=raw_data
@@ -821,8 +946,6 @@ function(input, output, session) {
   # Data Exploration####
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-
   observeEvent(input[["tabset"]], {
 
 
@@ -849,7 +972,7 @@ function(input, output, session) {
 
     output$summary_table_input_3 <- renderUI({
 
-      selectizeInput("summarise_metrics",label ="Select daily statistics metrics",
+      selectizeInput("summarise_metrics",label ="Select metrics",
                      choices=c("mean","median","min", "max","range","sd","var","cv","n"),
                      multiple = FALSE,
                      selected="mean",
@@ -1599,8 +1722,8 @@ function(input, output, session) {
       gageDailyStats <- SumStats.updated(fun.myFile=NULL
                                          ,fun.myDir.import=NULL
                                          ,fun.myParam.Name=gage_variables_to_calculate
-                                         ,fun.myDateTime.Name=raw_data_columns$date_column_name
-                                         ,fun.myDateTime.Format=input$raw_datetime_format
+                                         ,fun.myDateTime.Name="Date.Time"
+                                         ,fun.myDateTime.Format="%Y-%m-%d %H:%M%:S"
                                          ,fun.myThreshold=20
                                          ,fun.myConfig=""
                                          ,df.input=gageRawData$gagedata
@@ -1615,198 +1738,307 @@ function(input, output, session) {
       # })
       
       
-      plotlyGraphList <- list()
-      for(varName in gage_variables_to_calculate) {
-          local({
-                    tempid = paste("plot_gage_ts",varName,sep="")
-                    output$display_time_series_1 <- renderUI({
-                      withSpinner(plotlyOutput(tempid),type=2)
-                      #do.call(tagList, plotList)
-                    })
-                    # currentOutPutId = paste("plot_gage_ts", varName,sep = "")
-                    # plotList[[i]] <- currentOutPutId
-                    # print(currentOutPutId)
-                    gageData <- gageDailyStats[[which(names(gageDailyStats)==varName)]]
-                    
-                    gage_range = calculate_time_range(as.list(gageData), input$raw_datetime_format)
-                    gageBreaks = gage_range[[1]]
-                    gage_x_date_label = gage_range[[2]]
-                    
-                   gage_mean_col <- paste0(varName,".",input$dailyStats_ts_metrics)
-                   
-                   gageBounds <- getLowerUpperBoundsAndShading(input$dailyStats_shading, varName)
-                   gage_upper_col <- gageBounds[[1]]
-                   gage_lower_col <- gageBounds[[2]]
-                   shading_text <- gageBounds[[3]]
-                   
-                   if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")) {
-                     gage_col_selected = c("Date",gage_mean_col,gage_lower_col,gage_upper_col)
-                     gage_data_to_plot <- gageData[gage_col_selected]
-                     temVar <- paste("plot_gage_ts",varName,sep="")
-                     # output$temVar <- renderPlotly({
-                     #   drawTsPlot(gage_data_to_plot, gage_mean_col, gage_lower_col, gage_upper_col, gage_x_date_label, gageBreaks, "USGS gage" ,shading_text, NULL, gage_data_to_plot$Date)
-                     #   #print(currentOutPutId)
-                     # })
-                     
-                        insertUI(
-                          selector = "#display_time_series_1",
-                          where="beforeEnd",
-                         ui = renderPlotly({
-                           drawTsPlot(gage_data_to_plot, gage_mean_col, gage_lower_col, gage_upper_col, gage_x_date_label, gageBreaks, "USGS gage" ,shading_text, NULL, gage_data_to_plot$Date)
-                           #print(currentOutPutId)
-                         })
-                       )
-                     
-                   } else {
-                     gage_col_selected = c("Date",gage_mean_col)
-                     gage_data_to_plot <- gageData[gage_col_selected]
-                     # temVar <- paste("plot_gage_ts",varName,sep="")
-                     # output$temVar <- renderPlotly({
-                     #   plotlyGraphList[[varName]] <- drawTsPlot(gage_data_to_plot, gage_mean_col, NULL, NULL, gage_x_date_label, gageBreaks, "USGS gage",NULL, NULL, gage_data_to_plot$Date)
-                     # })
-                      insertUI(
-                        selector = "#display_time_series_1",
-                        where="beforeEnd",
-                       ui = renderPlotly({
-                         plotlyGraphList[[varName]] <- drawTsPlot(gage_data_to_plot, gage_mean_col, NULL, NULL, gage_x_date_label, gageBreaks, "USGS gage",NULL, NULL, gage_data_to_plot$Date)
-                         #print(currentOutPutId)
-                       })
-                     )
-                   }
-
-                   #i <- i + 1
-          }) # end of local
-      }#end of for loop, need to move
-     
-     } else {
-       if (input$gage_id != "" && input$gage_id > 0 && nrow(dayMetRawData$daymetdata) == 0) {
-         shinyalert("Warning","No USGS gage data has been downladed yet!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
-                    confirmButtonText="OK",inputId = "no_gage_downloaded")
-       }
-    }
-
-    
-   
-    
-    if(input$daymet_lat != "" && length(input$daymet_lat) > 0 && input$daymet_long != "" && length(input$daymet_long) > 0 && nrow(dayMetRawData$daymetdata) > 0) {
-     
-      dayMetDailyStats <- SumStats.updated(fun.myFile=NULL
-                                           ,fun.myDir.import=NULL
-                                           ,fun.myParam.Name="precip"
-                                           ,fun.myDateTime.Name="Date"
-                                           ,fun.myDateTime.Format="%Y-%m-%d"
-                                           ,fun.myThreshold=20
-                                           ,fun.myConfig=""
-                                           ,df.input=dayMetRawData$daymetdata)
-      daymetStatsView(dayMetDailyStats, input$dailyStats_ts_metrics,"precip")
       
-    } else {
-      if (input$daymet_lat != "" && length(input$daymet_lat) > 0 && input$daymet_long != "" && length(input$daymet_long) > 0 && nrow(gageRawData$gagedata) == 0) {
-        shinyalert("Warning","No daymet data has been downladed yet!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
-                   confirmButtonText="OK",inputId = "no_daymet_downloaded")
-      }
-    }
+      gageList <- list()
+      gageList2 <- Reduce(full_join, gageDailyStats)
+      gageCols <- paste(gage_variables_to_calculate, input$dailyStats_ts_metrics, sep=".")
+      # gage_upper_col <- NULL
+      # gage_lower_col <- NULL
+      # gage_shading_text <- NULL
+      # if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")) {
+      #  
+      #     if (input$dailyStats_shading=="quantiles"){
+      #       gage_upper_col <- paste0(gage_variables_to_calculate,".q.75%")
+      #       gage_lower_col <- paste0(gage_variables_to_calculate,".q.25%")
+      #       shading_text <- paste0(gage_variables_to_calculate, " between daily 25th percentiles and 75th percentiles")
+      #     }else if (input$dailyStats_shading=="minMax"){
+      #       gage_upper_col <- paste0(gage_variables_to_calculate,".min")
+      #       gage_lower_col <- paste0(gage_variables_to_calculate,".max")
+      #       gage_shading_text <- paste0(gage_variables_to_calculate, " between daily minimum and maximum values")
+      #     }
+      # }
+      
+      #gagePlotHeight = (length(gage_variables_to_calculate) * 200)
+
+      
+      gageData  <- gageList2 %>%
+        select(gageCols,"Date") %>%
+        gather(key = "parameter", value = "value",-Date)
+      
+      
+      gagePlot <- ggplot(data = gageData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
+        geom_line(aes(colour=parameter)) +
+        # if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")) {
+        #   geom_ribbon(data=ribbon_data, aes(ymin=!!sym(lowerBound),ymax=!!sym(upperBound),x=as.POSIXct(Date,format="%Y-%m-%d"),fill=plotShadingText),alpha=0.5)
+        # }
+      
+        scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
+        labs(title="USGS gage metrics", x="Date", y="Parameters")+
+        theme_bw()+
+        theme(
+          strip.background = element_blank(),
+          ,strip.placement = "outside" 
+          ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+          ,plot.title = element_text(hjust=0.5)
+          ,legend.position="bottom"
+          ,axis.text.x=element_text(angle=65, hjust=10)
+        )
+      
+      gagePlot = gagePlot + facet_grid(parameter ~ ., scales = "free_y")
+      
+      insertUI(
+        selector = "#display_time_series_1",
+        where="beforeEnd",
+        ui = renderPlotly({
+          ggplotly(gagePlot) 
+          #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+        })
+      )
+      
+     }
+      
+      
+      
+      
+    #   plotlyGraphList <- list()
+    #   for(varName in gage_variables_to_calculate) {
+    #       local({
+    #                 tempid = paste("plot_gage_ts",varName,sep="")
+    #                 output$display_time_series_1 <- renderUI({
+    #                   withSpinner(plotlyOutput(tempid),type=2)
+    #                   #do.call(tagList, plotList)
+    #                 })
+    #                 # currentOutPutId = paste("plot_gage_ts", varName,sep = "")
+    #                 # plotList[[i]] <- currentOutPutId
+    #                 # print(currentOutPutId)
+    #                 gageData <- gageDailyStats[[which(names(gageDailyStats)==varName)]]
+    #                 
+    #                 gage_range = calculate_time_range(as.list(gageData), "%Y-%M-%D %H:%M%:S")
+    #                 gageBreaks = gage_range[[1]]
+    #                 gage_x_date_label = gage_range[[2]]
+    #                 
+    #                gage_mean_col <- paste0(varName,".",input$dailyStats_ts_metrics)
+    #                
+    #                gageBounds <- getLowerUpperBoundsAndShading(input$dailyStats_shading, varName)
+    #                gage_upper_col <- gageBounds[[1]]
+    #                gage_lower_col <- gageBounds[[2]]
+    #                shading_text <- gageBounds[[3]]
+    #                
+    #                if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")) {
+    #                  gage_col_selected = c("Date",gage_mean_col,gage_lower_col,gage_upper_col)
+    #                  gage_data_to_plot <- gageData[gage_col_selected]
+    #                  temVar <- paste("plot_gage_ts",varName,sep="")
+    #                  # output$temVar <- renderPlotly({
+    #                  #   drawTsPlot(gage_data_to_plot, gage_mean_col, gage_lower_col, gage_upper_col, gage_x_date_label, gageBreaks, "USGS gage" ,shading_text, NULL, gage_data_to_plot$Date)
+    #                  #   #print(currentOutPutId)
+    #                  # })
+    #                  
+    #                     insertUI(
+    #                       selector = "#display_time_series_1",
+    #                       where="beforeEnd",
+    #                      ui = renderPlotly({
+    #                        drawTsPlot(gage_data_to_plot, gage_mean_col, gage_lower_col, gage_upper_col, gage_x_date_label, gageBreaks, "USGS gage" ,shading_text, NULL, gage_data_to_plot$Date)
+    #                        #print(currentOutPutId)
+    #                      })
+    #                    )
+    #                  
+    #                } else {
+    #                  gage_col_selected = c("Date",gage_mean_col)
+    #                  gage_data_to_plot <- gageData[gage_col_selected]
+    #                  # temVar <- paste("plot_gage_ts",varName,sep="")
+    #                  # output$temVar <- renderPlotly({
+    #                  #   plotlyGraphList[[varName]] <- drawTsPlot(gage_data_to_plot, gage_mean_col, NULL, NULL, gage_x_date_label, gageBreaks, "USGS gage",NULL, NULL, gage_data_to_plot$Date)
+    #                  # })
+    #                   insertUI(
+    #                     selector = "#display_time_series_1",
+    #                     where="beforeEnd",
+    #                    ui = renderPlotly({
+    #                      plotlyGraphList[[varName]] <- drawTsPlot(gage_data_to_plot, gage_mean_col, NULL, NULL, gage_x_date_label, gageBreaks, "USGS gage",NULL, NULL, gage_data_to_plot$Date)
+    #                      #print(currentOutPutId)
+    #                    })
+    #                  )
+    #                }
+    # 
+    #                #i <- i + 1
+    #       }) # end of local
+    #   }#end of for loop, need to move
+    #  
+    #  } else {
+    #    if (input$gage_id != "" && input$gage_id > 0 && nrow(dayMetRawData$daymetdata) == 0) {
+    #      shinyalert("Warning","No USGS gage data has been downladed yet!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
+    #                 confirmButtonText="OK",inputId = "no_gage_downloaded")
+    #    }
+    # }
+    # 
+    # 
+    # 
+    # 
+    # if(input$daymet_lat != "" && length(input$daymet_lat) > 0 && input$daymet_long != "" && length(input$daymet_long) > 0 && nrow(dayMetRawData$daymetdata) > 0) {
+    #  
+    #   dayMetDailyStats <- SumStats.updated(fun.myFile=NULL
+    #                                        ,fun.myDir.import=NULL
+    #                                        ,fun.myParam.Name="precip"
+    #                                        ,fun.myDateTime.Name="Date"
+    #                                        ,fun.myDateTime.Format="%Y-%m-%d"
+    #                                        ,fun.myThreshold=20
+    #                                        ,fun.myConfig=""
+    #                                        ,df.input=dayMetRawData$daymetdata)
+    #   daymetStatsView(dayMetDailyStats, input$dailyStats_ts_metrics,"precip")
+    #   
+    # } else {
+    #   if (input$daymet_lat != "" && length(input$daymet_lat) > 0 && input$daymet_long != "" && length(input$daymet_long) > 0 && nrow(gageRawData$gagedata) == 0) {
+    #     shinyalert("Warning","No daymet data has been downladed yet!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
+    #                confirmButtonText="OK",inputId = "no_daymet_downloaded")
+    #   }
+    # }
     
     myList <- processed$processed_dailyStats
     variable_to_plot <- input$dailyStats_ts_variable_name
+   
+
     removeUI("#display_time_series > div", multiple = T)
-
-    for(varName in variable_to_plot) {
-      local({
-
-          myData <- myList[[which(names(myList)==varName)]]
-          mean_col <- paste0(varName,".",input$dailyStats_ts_metrics)
-      
-          
-          ## dynamically change the "date_breaks" based on the width of the time window
-          cal_range = calculate_time_range(myData, input$raw_datetime_format)
-          myBreaks = cal_range[[1]]
-          x_date_label = cal_range[[2]]
-      
-      
-          caluclatedBounds <- getLowerUpperBoundsAndShading(input$dailyStats_shading, varName)
-          upper_col <- caluclatedBounds[[1]]
-          lower_col <- caluclatedBounds[[2]]
-          shading_text <- caluclatedBounds[[3]]
-      
-          
-          
-          if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading!="newData"){
-              cols_selected = c("Date",mean_col,lower_col,upper_col)
-              data_to_plot <- myData[cols_selected]
-              
-             if (!all(is.na(data_to_plot[,mean_col]))){
-               insertUI(
-                 selector = "#display_time_series",
-                 where="beforeEnd",
-                 ui = renderPlotly({
-                   drawTsPlot(data_to_plot, mean_col, lower_col, upper_col, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),shading_text, NULL, data_to_plot$Date)
-                   #print(currentOutPutId)
-                 })
-               )
-               
-               #   output$plot_dailyStats_ts <- renderPlotly({
-               #    drawTsPlot(data_to_plot, mean_col, lower_col, upper_col, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),shading_text, NULL, data_to_plot$Date)
-               # })  # renderPlot close
-             }else{
-                    shinyalert("Warning","No data available to plot for the selected variable!"
-                               ,closeOnClickOutside = TRUE
-                               ,closeOnEsc = TRUE
-                               ,confirmButtonText="OK"
-                               ,inputId = "alert_data_not_avail_for_ts")
-             }##inner if else loop close
-      
-          }else if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
-                shading_data <- uploaded_newData()
-                shading_cols_selected <- c(input$newData_date_col,input$newData_lower_col,input$newData_upper_col)
-                data_to_add_as_shading <- shading_data[shading_cols_selected]
-          
-                data_to_plot <- myData[c("Date",mean_col)]
-                insertUI(
-                  selector = "#display_time_series",
-                  where="beforeEnd",
-                  ui = renderPlotly({
-                    drawTsPlot(data_to_plot, mean_col, input$newData_lower_col, input$newData_upper_col, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),isolate(input$newData_name), data_to_add_as_shading, input$newData_date_col)
-                    #print(currentOutPutId)
-                  })
-                )
-                
-                # output$plot_dailyStats_ts <- renderPlotly({
-                #   
-                #   drawTsPlot(data_to_plot, mean_col, input$newData_lower_col, input$newData_upper_col, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),isolate(input$newData_name), data_to_add_as_shading, input$newData_date_col)
-                # })  # renderPlot close
-          
-              }else{
-                cols_selected = c("Date",mean_col)
-                data_to_plot <- myData[cols_selected]
-                if (!all(is.na(data_to_plot[,mean_col]))){
-                  
-                  
-                  insertUI(
-                    selector = "#display_time_series",
-                    where="beforeEnd",
-                    ui = renderPlotly({
-                      drawTsPlot(data_to_plot, mean_col, NULL, NULL, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),NULL, NULL, data_to_plot$Date)
-                      #print(currentOutPutId)
-                    })
-                  )
-                  
-  
-                  # output$plot_dailyStats_ts <- renderPlotly({
-                  #   #geom_ribbon is not needed here thus all the related params are null
-                  #   drawTsPlot(data_to_plot, mean_col, NULL, NULL, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),NULL, NULL, data_to_plot$Date)
-                  # })  # renderPlot close
-                }else{
-                  shinyalert("Warning","No data available to plot for the selected variable!"
-                             ,closeOnClickOutside = TRUE
-                             ,closeOnEsc = TRUE
-                             ,confirmButtonText="OK"
-                             ,inputId = "alert_data_not_avail_for_ts")
-                }##inner if else loop close
-              }
-        }) # end of main local
-      } # end of for loop
     
+    
+    # myData2  <- data.frame(myList) %>%
+    #   select(variable_to_plot, c("Date.Time")) %>%
+    #   gather(key = "parameter", value = "value", -Date.Time)
+ 
+    
+    ngTest <- list()
+    mainData <- Reduce(full_join, myList)
+    statsCols <- paste(variable_to_plot, input$dailyStats_ts_metrics, sep=".")
+    # myData <- ngTest2[, c(statsCols, "Date")]
+    # print(head(myData))
+
+    myData  <- mainData %>%
+      select(statsCols, "Date") %>%
+      gather(key = "parameter", value = "value",-Date)
+    
+    #plotHeight = length(variable_to_plot) * 200
+    
+
+    p <- ggplot(data = myData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
+    geom_line(aes(colour=parameter)) +
+    #geom_ribbon(data=ribbon_data, aes(ymin=!!sym(lowerBound),ymax=!!sym(upperBound),x=as.POSIXct(Date,format="%Y-%m-%d"),fill=plotShadingText),alpha=0.5)
+    scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
+    labs(title="Uloaded File metrics", x="Date", y="Parameters")+
+    theme_bw()+
+    theme(
+      strip.background = element_blank()
+      ,strip.placement = "outside"
+      ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+      ,plot.title = element_text(hjust=0.5)
+      ,legend.position="bottom"
+      ,axis.text.x=element_text(angle=65, hjust=10)
+    )
+
+    p = p + facet_grid(parameter ~ ., scales = "free_y")
+
+    insertUI(
+      selector = "#display_time_series",
+      where="beforeEnd",
+      ui = renderPlotly({
+        ggplotly(p) 
+        #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+      })
+    )
+    
+
+    # for(varName in variable_to_plot) {
+    #   local({
+    # 
+    #       myData <- myList[[which(names(myList)==varName)]]
+    #       mean_col <- paste0(varName,".",input$dailyStats_ts_metrics)
+    # 
+    #       ## dynamically change the "date_breaks" based on the width of the time window
+    #       cal_range = calculate_time_range(myData, "%Y-%m-%s %H:%M:%S")
+    #       myBreaks = cal_range[[1]]
+    #       x_date_label = cal_range[[2]]
+    # 
+    # 
+    #       caluclatedBounds <- getLowerUpperBoundsAndShading(input$dailyStats_shading, varName)
+    #       upper_col <- caluclatedBounds[[1]]
+    #       lower_col <- caluclatedBounds[[2]]
+    #       shading_text <- caluclatedBounds[[3]]
+    # 
+    # 
+    # 
+    #       if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading!="newData"){
+    #           cols_selected = c("Date",mean_col,lower_col,upper_col)
+    #           data_to_plot <- myData[cols_selected]
+    # 
+    #          if (!all(is.na(data_to_plot[,mean_col]))){
+    #            insertUI(
+    #              selector = "#display_time_series",
+    #              where="beforeEnd",
+    #              ui = renderPlotly({
+    #                drawTsPlot(data_to_plot, mean_col, lower_col, upper_col, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),shading_text, NULL, data_to_plot$Date)
+    #                #print(currentOutPutId)
+    #              })
+    #            )
+    # 
+    #            #   output$plot_dailyStats_ts <- renderPlotly({
+    #            #    drawTsPlot(data_to_plot, mean_col, lower_col, upper_col, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),shading_text, NULL, data_to_plot$Date)
+    #            # })  # renderPlot close
+    #          }else{
+    #                 shinyalert("Warning","No data available to plot for the selected variable!"
+    #                            ,closeOnClickOutside = TRUE
+    #                            ,closeOnEsc = TRUE
+    #                            ,confirmButtonText="OK"
+    #                            ,inputId = "alert_data_not_avail_for_ts")
+    #          }##inner if else loop close
+    # 
+    #       }else if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
+    #             shading_data <- uploaded_newData()
+    #             shading_cols_selected <- c(input$newData_date_col,input$newData_lower_col,input$newData_upper_col)
+    #             data_to_add_as_shading <- shading_data[shading_cols_selected]
+    # 
+    #             data_to_plot <- myData[c("Date",mean_col)]
+    #             insertUI(
+    #               selector = "#display_time_series",
+    #               where="beforeEnd",
+    #               ui = renderPlotly({
+    #                 drawTsPlot(data_to_plot, mean_col, input$newData_lower_col, input$newData_upper_col, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),isolate(input$newData_name), data_to_add_as_shading, input$newData_date_col)
+    #                 #print(currentOutPutId)
+    #               })
+    #             )
+    # 
+    #             # output$plot_dailyStats_ts <- renderPlotly({
+    #             #
+    #             #   drawTsPlot(data_to_plot, mean_col, input$newData_lower_col, input$newData_upper_col, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),isolate(input$newData_name), data_to_add_as_shading, input$newData_date_col)
+    #             # })  # renderPlot close
+    # 
+    #           }else{
+    #             cols_selected = c("Date",mean_col)
+    #             data_to_plot <- myData[cols_selected]
+    #             if (!all(is.na(data_to_plot[,mean_col]))){
+    # 
+    # 
+    #               insertUI(
+    #                 selector = "#display_time_series",
+    #                 where="beforeEnd",
+    #                 ui = renderPlotly({
+    #                   drawTsPlot(data_to_plot, mean_col, NULL, NULL, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),NULL, NULL, data_to_plot$Date)
+    #                   #print(currentOutPutId)
+    #                 })
+    #               )
+    # 
+    # 
+    #               # output$plot_dailyStats_ts <- renderPlotly({
+    #               #   #geom_ribbon is not needed here thus all the related params are null
+    #               #   drawTsPlot(data_to_plot, mean_col, NULL, NULL, x_date_label, myBreaks, isolate(input$dailyStats_ts_title),NULL, NULL, data_to_plot$Date)
+    #               # })  # renderPlot close
+    #             }else{
+    #               shinyalert("Warning","No data available to plot for the selected variable!"
+    #                          ,closeOnClickOutside = TRUE
+    #                          ,closeOnEsc = TRUE
+    #                          ,confirmButtonText="OK"
+    #                          ,inputId = "alert_data_not_avail_for_ts")
+    #             }##inner if else loop close
+    #           }
+    #     }) # end of main local
+    #   } # end of for loop
+
 
   })  # observeEvent end
 
@@ -3447,8 +3679,7 @@ function(input, output, session) {
   observeEvent(input$display_gage_raw, {
     if (input$gage_id != "" && length(input$gage_id) > 0) {
       output$display_time_series_1 <- renderUI({
-        withSpinner(plotlyOutput("plot_gage_ts"),
-                    type = 2)
+        withSpinner(plotlyOutput("plot_gage_ts"),type = 2)
       })
       raw_data_merged <- gageRawData$gagedata
        # covers if user removes GageId from the dropdown
@@ -3464,6 +3695,7 @@ function(input, output, session) {
 
        p <- ggplot(data = raw_data_merged, aes(x = Date.Time, y = value)) +
         geom_line(aes(colour=parameter)) +
+        labs(title="USGS gage Raw Data", y="Parameters", x="Date") + 
         scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
         theme_bw()+
         theme(
@@ -3516,8 +3748,7 @@ function(input, output, session) {
           scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," months"))+
           theme_light()+
           #facet_grid(site ~., scales="fixed")+ 
-          labs(x="Date", y="Precipitation (mm/day)")+
-          ggtitle("Precipitation Plot")+
+          labs(title="DayMet Precipitation Plot", x="Date", y="Precipitation (mm/day)")+
           theme(       
              text=element_text(size=10,face = "bold", color="cornflowerblue")
             ,plot.title = element_text(hjust=0.5)
@@ -3581,16 +3812,5 @@ function(input, output, session) {
     }
     
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
 }

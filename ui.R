@@ -249,7 +249,7 @@ shinyUI(fluidPage(
                           mainPanel(
                             width = 9,
                             fluidRow(column(width = 9, uiOutput("display_time_series"))),
-                            br(),
+                            hr(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_1"))),
                             br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_2"))),
