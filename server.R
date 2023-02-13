@@ -1605,6 +1605,13 @@ function(input, output, session) {
     
 
     #Display uploaded file stats
+    
+    if(input$dailyStats_ts_title != "") {
+    mainMapTitle = input$dailyStats_ts_title
+    } else {
+      mainMapTitle = "Uploaded File metrics"
+    }
+    
     myList <- processed$processed_dailyStats
     variable_to_plot <- input$dailyStats_ts_variable_name
    
@@ -1631,7 +1638,7 @@ function(input, output, session) {
     geom_line(aes(colour=parameter)) +
     #geom_ribbon(data=ribbon_data, aes(ymin=!!sym(lowerBound),ymax=!!sym(upperBound),x=as.POSIXct(Date,format="%Y-%m-%d"),fill=plotShadingText),alpha=0.5)
     scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
-    labs(title="Uploaded File metrics", x="Date", y="Parameters")+
+    labs(title=mainMapTitle, x="Date", y="Parameters")+
     theme_bw()+
     #facet_grid(parameter ~ ., scales = "free_y", labeller = labeller(conservation2 =label_wrap_gen(width = 10, multi_line = TRUE)))+
     facet_grid(parameter ~ ., scales = "free_y")+
