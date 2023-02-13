@@ -10,6 +10,32 @@
     "has_parameters": false
   },
   "packages": {
+    "BH": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "BH",
+        "Type": "Package",
+        "Title": "Boost C++ Header Files",
+        "Version": "1.78.0-0",
+        "Date": "2021-12-14",
+        "Author": "Dirk Eddelbuettel, John W. Emerson and Michael J. Kane",
+        "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
+        "Description": "Boost provides free peer-reviewed portable C++ source \n libraries.  A large part of Boost is provided as C++ template code\n which is resolved entirely at compile-time without linking.  This \n package aims to provide the most useful subset of Boost libraries \n for template use among CRAN packages. By placing these libraries in \n this package, we offer a more efficient distribution system for CRAN \n as replication of this code in the sources of other packages is \n avoided. As of release 1.78.0-0, the following Boost libraries are\n included: 'accumulators' 'algorithm' 'align' 'any' 'atomic' 'beast'\n 'bimap' 'bind' 'circular_buffer' 'compute' 'concept' 'config'\n 'container' 'date_time' 'detail' 'dynamic_bitset' 'exception'\n 'flyweight' 'foreach' 'functional' 'fusion' 'geometry' 'graph' 'heap'\n 'icl' 'integer' 'interprocess' 'intrusive' 'io' 'iostreams'\n 'iterator' 'lambda2' 'math' 'move' 'mp11' 'mpl' 'multiprecision'\n 'numeric' 'pending' 'phoenix' 'polygon' 'preprocessor' 'process'\n 'propery_tree' 'random' 'range' 'scope_exit' 'smart_ptr' 'sort'\n 'spirit' 'tuple' 'type_traits' 'typeof' 'unordered' 'utility' 'uuid'.",
+        "License": "BSL-1.0",
+        "URL": "https://github.com/eddelbuettel/bh,\nhttps://dirk.eddelbuettel.com/code/bh.html",
+        "BugReports": "https://github.com/eddelbuettel/bh/issues",
+        "NeedsCompilation": "no",
+        "Packaged": "2021-12-14 21:51:21 UTC; edd",
+        "Repository": "CRAN",
+        "Date/Publication": "2021-12-15 07:50:08 UTC",
+        "Built": "R 4.2.0; ; 2022-04-24 01:28:44 UTC; windows"
+      }
+    },
     "ContDataQC": {
       "Source": "github",
       "Repository": null,
@@ -506,6 +532,40 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-10-21 08:35:11 UTC",
         "Built": "R 4.2.2; ; 2023-01-08 02:22:55 UTC; windows"
+      }
+    },
+    "anytime": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "anytime",
+        "Type": "Package",
+        "Title": "Anything to 'POSIXct' or 'Date' Converter",
+        "Version": "0.3.9",
+        "Date": "2020-08-26",
+        "Author": "Dirk Eddelbuettel",
+        "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
+        "Description": "Convert input in any one of character, integer, numeric, factor,\n or ordered type into 'POSIXct' (or 'Date') objects, using one of a number of\n predefined formats, and relying on Boost facilities for date and time parsing.",
+        "URL": "http://dirk.eddelbuettel.com/code/anytime.html",
+        "BugReports": "https://github.com/eddelbuettel/anytime/issues",
+        "License": "GPL (>= 2)",
+        "Encoding": "UTF-8",
+        "Depends": "R (>= 3.2.0)",
+        "Imports": "Rcpp (>= 0.12.9)",
+        "LinkingTo": "Rcpp (>= 0.12.9), BH",
+        "Suggests": "tinytest (>= 1.0.0), gettz",
+        "RoxygenNote": "6.0.1",
+        "NeedsCompilation": "yes",
+        "Packaged": "2020-08-26 17:46:45.898451 UTC; edd",
+        "Repository": "CRAN",
+        "Date/Publication": "2020-08-27 11:40:21 UTC",
+        "Built": "R 4.2.2; x86_64-w64-mingw32; 2023-01-29 02:51:06 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
       }
     },
     "askpass": {
@@ -1168,6 +1228,31 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-02-22 00:58:45 UTC",
         "Built": "R 4.2.2; ; 2022-12-20 01:39:36 UTC; windows"
+      }
+    },
+    "codetools": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "codetools",
+        "Version": "0.2-18",
+        "Priority": "recommended",
+        "Author": "Luke Tierney <luke-tierney@uiowa.edu>",
+        "Description": "Code analysis tools for R.",
+        "Title": "Code Analysis Tools for R",
+        "Depends": "R (>= 2.1)",
+        "Maintainer": "Luke Tierney <luke-tierney@uiowa.edu>",
+        "URL": "https://gitlab.com/luke-tierney/codetools",
+        "License": "GPL",
+        "NeedsCompilation": "no",
+        "Packaged": "2020-11-02 14:45:50 UTC; luke",
+        "Repository": "CRAN",
+        "Date/Publication": "2020-11-04 17:12:32 UTC",
+        "Built": "R 4.2.2; ; 2022-10-31 14:46:35 UTC; windows"
       }
     },
     "colorspace": {
@@ -2122,6 +2207,37 @@
         "Archs": "x64"
       }
     },
+    "future": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "future",
+        "Version": "1.31.0",
+        "Title": "Unified Parallel and Distributed Processing in R for Everyone",
+        "Imports": "digest, globals (>= 0.16.1), listenv (>= 0.8.0), parallel,\nparallelly (>= 1.34.0), utils",
+        "Suggests": "methods, RhpcBLASctl, R.rsp, markdown",
+        "VignetteBuilder": "R.rsp",
+        "Authors@R": "c(person(\"Henrik\", \"Bengtsson\", role=c(\"aut\", \"cre\", \"cph\"),\n                                          email = \"henrikb@braju.com\"))",
+        "Description": "The purpose of this package is to provide a lightweight and\n    unified Future API for sequential and parallel processing of R\n    expression via futures.  The simplest way to evaluate an expression\n    in parallel is to use `x %<-% { expression }` with `plan(multisession)`.\n    This package implements sequential, multicore, multisession, and\n    cluster futures.  With these, R expressions can be evaluated on the\n    local machine, in parallel a set of local machines, or distributed\n    on a mix of local and remote machines.\n    Extensions to this package implement additional backends for\n    processing futures via compute cluster schedulers, etc.\n    Because of its unified API, there is no need to modify any code in order\n    switch from sequential on the local machine to, say, distributed\n    processing on a remote compute cluster.\n    Another strength of this package is that global variables and functions\n    are automatically identified and exported as needed, making it\n    straightforward to tweak existing code to make use of futures.",
+        "License": "LGPL (>= 2.1)",
+        "LazyLoad": "TRUE",
+        "ByteCompile": "TRUE",
+        "URL": "https://future.futureverse.org,\nhttps://github.com/HenrikBengtsson/future",
+        "BugReports": "https://github.com/HenrikBengtsson/future/issues",
+        "RoxygenNote": "7.2.3",
+        "NeedsCompilation": "no",
+        "Packaged": "2023-01-31 16:27:41 UTC; hb",
+        "Author": "Henrik Bengtsson [aut, cre, cph]",
+        "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-02-01 08:50:08 UTC",
+        "Built": "R 4.2.2; ; 2023-02-12 00:58:49 UTC; windows"
+      }
+    },
     "gargle": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -2356,6 +2472,36 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-09-08 10:42:55 UTC",
         "Built": "R 4.2.2; ; 2022-12-20 01:40:48 UTC; windows"
+      }
+    },
+    "globals": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "globals",
+        "Version": "0.16.2",
+        "Depends": "R (>= 3.1.2)",
+        "Imports": "codetools",
+        "Title": "Identify Global Objects in R Expressions",
+        "Authors@R": "c(\n    person(\"Henrik\", \"Bengtsson\", role=c(\"aut\", \"cre\", \"cph\"),\n           email=\"henrikb@braju.com\"),\n    person(\"Davis\",\"Vaughan\", role=\"ctb\",\n           email=\"davis@rstudio.com\"))",
+        "Description": "Identifies global (\"unknown\" or \"free\") objects in R expressions\n    by code inspection using various strategies (ordered, liberal, or\n    conservative).  The objective of this package is to make it as simple as\n    possible to identify global objects for the purpose of exporting them in\n    parallel, distributed compute environments.",
+        "License": "LGPL (>= 2.1)",
+        "LazyLoad": "TRUE",
+        "ByteCompile": "TRUE",
+        "URL": "https://globals.futureverse.org,\nhttps://github.com/HenrikBengtsson/globals",
+        "BugReports": "https://github.com/HenrikBengtsson/globals/issues",
+        "RoxygenNote": "7.2.2",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-11-21 20:18:24 UTC; hb",
+        "Author": "Henrik Bengtsson [aut, cre, cph],\n  Davis Vaughan [ctb]",
+        "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-11-21 21:10:02 UTC",
+        "Built": "R 4.2.2; ; 2023-02-12 02:33:51 UTC; windows"
       }
     },
     "glue": {
@@ -3078,6 +3224,36 @@
         "Built": "R 4.2.2; ; 2022-12-15 02:41:11 UTC; windows"
       }
     },
+    "listenv": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "listenv",
+        "Version": "0.9.0",
+        "Depends": "R (>= 3.1.2)",
+        "Suggests": "R.utils, R.rsp, markdown",
+        "VignetteBuilder": "R.rsp",
+        "Title": "Environments Behaving (Almost) as Lists",
+        "Authors@R": "c(person(\"Henrik\", \"Bengtsson\", role=c(\"aut\", \"cre\", \"cph\"),\n                                          email = \"henrikb@braju.com\"))",
+        "Description": "List environments are environments that have list-like properties.  For instance, the elements of a list environment are ordered and can be accessed and iterated over using index subsetting, e.g. 'x <- listenv(a = 1, b = 2); for (i in seq_along(x)) x[[i]] <- x[[i]] ^ 2; y <- as.list(x)'.",
+        "License": "LGPL (>= 2.1)",
+        "LazyLoad": "TRUE",
+        "URL": "https://listenv.futureverse.org,\nhttps://github.com/HenrikBengtsson/listenv",
+        "BugReports": "https://github.com/HenrikBengtsson/listenv/issues",
+        "RoxygenNote": "7.2.3",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-12-16 03:07:59 UTC; hb",
+        "Author": "Henrik Bengtsson [aut, cre, cph]",
+        "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-12-16 07:40:02 UTC",
+        "Built": "R 4.2.2; ; 2023-02-12 02:33:52 UTC; windows"
+      }
+    },
     "lme4": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -3614,6 +3790,35 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-06-29 20:00:02 UTC",
         "Built": "R 4.2.2; ; 2022-12-20 01:43:30 UTC; windows"
+      }
+    },
+    "parallelly": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "parallelly",
+        "Version": "1.34.0",
+        "Title": "Enhancing the 'parallel' Package",
+        "Imports": "parallel, tools, utils",
+        "Authors@R": "c(person(\"Henrik\", \"Bengtsson\", role=c(\"aut\", \"cre\", \"cph\"),\n                                          email = \"henrikb@braju.com\"))",
+        "Description": "Utility functions that enhance the 'parallel' package and support the built-in parallel backends of the 'future' package.  For example, availableCores() gives the number of CPU cores available to your R process as given by the operating system, 'cgroups' and Linux containers, R options, and environment variables, including those set by job schedulers on high-performance compute clusters. If none is set, it will fall back to parallel::detectCores(). Another example is makeClusterPSOCK(), which is backward compatible with parallel::makePSOCKcluster() while doing a better job in setting up remote cluster workers without the need for configuring the firewall to do port-forwarding to your local computer.",
+        "License": "LGPL (>= 2.1)",
+        "LazyLoad": "TRUE",
+        "ByteCompile": "TRUE",
+        "URL": "https://parallelly.futureverse.org,\nhttps://github.com/HenrikBengtsson/parallelly",
+        "BugReports": "https://github.com/HenrikBengtsson/parallelly/issues",
+        "RoxygenNote": "7.2.3",
+        "NeedsCompilation": "no",
+        "Packaged": "2023-01-13 15:09:48 UTC; hb",
+        "Author": "Henrik Bengtsson [aut, cre, cph]",
+        "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-01-13 17:30:02 UTC",
+        "Built": "R 4.2.2; ; 2023-01-15 00:51:38 UTC; windows"
       }
     },
     "pbkrtest": {
@@ -5081,6 +5286,37 @@
         "Built": "R 4.2.2; ; 2023-01-08 05:24:59 UTC; windows"
       }
     },
+    "shinyWidgets": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "shinyWidgets",
+        "Title": "Custom Inputs Widgets for Shiny",
+        "Version": "0.7.6",
+        "Authors@R": "c(\n  person(\"Victor\", \"Perrier\", email = \"victor.perrier@dreamrs.fr\", role = c(\"aut\", \"cre\", \"cph\")),\n  person(\"Fanny\", \"Meyer\", role = \"aut\"),\n  person(\"David\", \"Granjon\", role = \"aut\"),\n  person(\"Ian\", \"Fellows\", role = \"ctb\", comment = \"Methods for mutating vertical tabs & updateMultiInput\"),\n  person(\"Wil\", \"Davis\", role = \"ctb\", comment = \"numericRangeInput function\"),\n  person(\"Spencer\", \"Matthews\", role = \"ctb\", comment = \"autoNumeric methods\"),\n  person(family = \"JavaScript and CSS libraries authors\", role = c(\"ctb\", \"cph\"), comment = \"All authors are listed in LICENSE.md\")\n  )",
+        "Description": "Collection of custom input controls and user interface components for 'Shiny' applications. \n  Give your applications a unique and colorful style !",
+        "URL": "https://github.com/dreamRs/shinyWidgets,\nhttps://dreamrs.github.io/shinyWidgets/",
+        "BugReports": "https://github.com/dreamRs/shinyWidgets/issues",
+        "License": "GPL-3",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "RoxygenNote": "7.2.1",
+        "Depends": "R (>= 3.1.0)",
+        "Imports": "anytime, bslib, sass, shiny (>= 1.6.0), htmltools (>= 0.5.1),\njsonlite, grDevices, rlang",
+        "Suggests": "shinydashboard, testthat, covr, shinydashboardPlus (>=\n2.0.0), bs4Dash, argonR, argonDash, tablerDash, ggplot2, DT,\nscales",
+        "NeedsCompilation": "no",
+        "Packaged": "2023-01-08 18:42:06 UTC; victor",
+        "Author": "Victor Perrier [aut, cre, cph],\n  Fanny Meyer [aut],\n  David Granjon [aut],\n  Ian Fellows [ctb] (Methods for mutating vertical tabs &\n    updateMultiInput),\n  Wil Davis [ctb] (numericRangeInput function),\n  Spencer Matthews [ctb] (autoNumeric methods),\n  JavaScript and CSS libraries authors [ctb, cph] (All authors are listed\n    in LICENSE.md)",
+        "Maintainer": "Victor Perrier <victor.perrier@dreamrs.fr>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-01-08 19:30:04 UTC",
+        "Built": "R 4.2.2; ; 2023-01-29 05:13:44 UTC; windows"
+      }
+    },
     "shinyalert": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -6498,7 +6734,7 @@
       "checksum": "588a23f324477417c7b809502f44ee11"
     },
     "_moved/import_raw_data.R": {
-      "checksum": "9433bd8a71a1aa94c1a382544a520676"
+      "checksum": "03a2b3d2a9fb66c37ae3fa9365f1a9bf"
     },
     "_moved/install_packages_for_app.R": {
       "checksum": "cb7c04852f50066a986368dd9458d76a"
@@ -6527,8 +6763,26 @@
     "ContDataQC_test_data/DATA_two_columns_two_digits_years.csv": {
       "checksum": "33505e96a7cc2ca26a80117375a16638"
     },
-    "ContDataQC_test_data/dayMetDataReview.csv": {
-      "checksum": "4a5d9ea15960d1c5dfc3bb778af58ad0"
+    "ContDataQC_test_data/FromJen/10RD014_AW_20170508_20211029.csv": {
+      "checksum": "faf52299633f6d68d114e1261accff22"
+    },
+    "ContDataQC_test_data/FromJen/10RD014_DO_20170508_20211029.csv": {
+      "checksum": "f1d7d322e75659baa335b187c1cbe808"
+    },
+    "ContDataQC_test_data/FromJen/test_QC_Hunting_AW_20140422_20190425.csv": {
+      "checksum": "7b29f3fd81b325dd46f3607bcfe97d1e"
+    },
+    "ContDataQC_test_data/FromJen/test_QC_LittleStony_AW_20140418_20180817.csv": {
+      "checksum": "2cb09171818a3b769894d0c89e44207f"
+    },
+    "ContDataQC_test_data/FromJen/test_QC_Piney_AW_20140428_20181203.csv": {
+      "checksum": "fa6779834eec192e275a8f39561638bc"
+    },
+    "ContDataQC_test_data/FromJen/VA_Instructions_ContDataSumViz_20221228.pdf": {
+      "checksum": "79286a8314b099164bc99f28e3b8d111"
+    },
+    "ContDataQC_test_data/HISS2 Sites LatLong.csv": {
+      "checksum": "8fbbe42df312319b22abdea9cb6089bc"
     },
     "ContDataQC_test_data/MA_ParkersBrook_StageDischargeTemp_20121205_20210930.xlsx": {
       "checksum": "eea161aee62248811d444ab82ff56c51"
@@ -6557,26 +6811,14 @@
     "ContDataQC_test_data/Ranch_OverallSumStats_2001_2022_mod.csv": {
       "checksum": "9e58133d544630f1f62ba1d3929de6b5"
     },
-    "ContDataQC_test_data/saved_dailyStats_VT_Ranch_AW_20180412_20210427_dailyStats.csv": {
-      "checksum": "11bfeef352c330b42c3dbe1ac91e87d3"
-    },
     "ContDataQC_test_data/VT_Ranch_AW_20180412_20210427.csv": {
       "checksum": "9350038e9907fad27feadc5777215c0f"
     },
     "ContDataQC_test_data/VT_Ranch_AW_20180412_20210427_composite.csv": {
       "checksum": "b500117e78009a153f09be5635c70fb2"
     },
-    "data/2129_daymet_v4_daily_na_tmin_2020.nc": {
-      "checksum": "39f5a363ecbcf2cfb6853de04327e70d"
-    },
-    "data/daymet_v4_daily_pr_vp_2021.nc": {
-      "checksum": "8d6175b96550f2f0af425d4ff2643824"
-    },
-    "daymet_v4_daily_pr_vp_2021.nc": {
-      "checksum": "8d6175b96550f2f0af425d4ff2643824"
-    },
-    "daymetdata_metadata.txt": {
-      "checksum": "2ce9b72ed12b95789bb625bca6aa740f"
+    "ContDataQC_test_data/VT_Ranch_AW_20180412_20210427_forwardSlash.csv": {
+      "checksum": "2c55ac42cd5e8e36753301cb3b55662e"
     },
     "external/App_USGSgage.html": {
       "checksum": "376e0086aa3b41aec3e9114cc238b7e8"
@@ -6585,7 +6827,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "ceecd04bd0c2dfd75399671f155b8181"
+      "checksum": "f49889d310c8027c0ead8cf16c88e1ae"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -6607,6 +6849,9 @@
     },
     "log/contDataSumViz.log": {
       "checksum": "71c77232b18888e0a7b07a5567b9b81f"
+    },
+    "modules/dateAndTimePopUp.R": {
+      "checksum": "998509d93121de8b91a946479622ebaa"
     },
     "Output/reports/myReport.html": {
       "checksum": "409c923b7b56ece270a890064d734b9a"
@@ -6675,13 +6920,28 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "415f2d7c4534b429a1b7264748b85016"
+      "checksum": "cb3bb50f01ea33acacce1af9b1167604"
+    },
+    "serverBK.R": {
+      "checksum": "713ca6014c6ab306e73dd308bb1cbae1"
+    },
+    "serverBk2.R": {
+      "checksum": "91114b617ff0e86d966e5d14883a0ffc"
+    },
+    "serverMYDateChanges.R": {
+      "checksum": "0198b4db8730903c8a67c3493f3b1fae"
+    },
+    "StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230213.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230203.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
     },
     "test.xlsx": {
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "ui.R": {
-      "checksum": "f8edf13c5504bb61f50038311d581e47"
+      "checksum": "08d0161bb17c484c19ab08f82745099d"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -6695,17 +6955,17 @@
     "update_ContDataQC/download_usgs_gage_data.R": {
       "checksum": "fc07a28f5b5cd5c5ffad617ad3f9cb55"
     },
+    "update_ContDataQC/fun.ConvertDateFormat.R": {
+      "checksum": "8cfa39e47cc721c612ad8184e343f927"
+    },
     "update_ContDataQC/fun.DayMetData.R": {
       "checksum": "ad42686b321f273b8a90e62597fab91d"
     },
     "update_ContDataQC/fun.GageData.R": {
-      "checksum": "26bd9c781bdb8af0057842ba248cac84"
+      "checksum": "6ba38f100b0693f8005c9d39cdb71686"
     },
-    "update_ContDataQC/fun.GageTest.R": {
-      "checksum": "bc3b63763f42afa28e0448dd949263f6"
-    },
-    "update_ContDataQC/fun.GageTest2.R": {
-      "checksum": "df82669b5ae0034e9abe5ae9aca2e6b6"
+    "update_ContDataQC/fun.PreparePlotly.R": {
+      "checksum": "3b95d587ce01e6bcb6a60b19ab17f7c9"
     },
     "update_ContDataQC/ReportMetaData.R": {
       "checksum": "8add92a237cae0d8bfde092d560adbdf"
@@ -6722,14 +6982,17 @@
     "www/ContDataSumViz_banner_updated.png": {
       "checksum": "5bb10a550349dfe72443f10b6bdd4189"
     },
+    "www/ContDataSumViz_header_banner.png": {
+      "checksum": "81a9cfa95cad3db97d3d034322ed786c"
+    },
     "www/GDD.R": {
       "checksum": "ed8341d5bbf0eeb3ec8a577287112165"
     },
     "www/script.js": {
-      "checksum": "5deee33094751ab700b9db8190fae160"
+      "checksum": "7cb6f2f6982233b9765a16530b19ece2"
     },
     "www/styles.css": {
-      "checksum": "fdd7652ef99d13c3de28525cf87a2cca"
+      "checksum": "4a37f2d3e6b05ab4ba1a4c911a0ed18a"
     }
   },
   "users": null

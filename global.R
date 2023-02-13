@@ -57,7 +57,9 @@ library("IHA")
 library("XLConnect")
 library("daymetr")
 library("lubridate")
-
+library("promises")
+library("future")
+plan(multisession)
 
 
 # fails without dplyr and stringr from tidyverse
@@ -72,6 +74,7 @@ source("update_ContDataQC/download_usgs_gage_data.R")
 source("update_ContDataQC/fun.GageData.R")
 source("update_ContDataQC/fun.DayMetData.R")
 source("update_ContDataQC/fun.ConvertDateFormat.R")
+
 
 
 # Other ----

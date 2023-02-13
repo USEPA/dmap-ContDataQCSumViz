@@ -47,13 +47,7 @@ fun.GageData <- function(fun.myData.SiteID
                      ,fun.myData.DateRange.End
                      ,fun.myDir.export = getwd()
                      ,fun.myTZ = ContData.env$myTZ) {##FUN.fun.GageData.START
-  #
-  # data directories
-  #myDir.data.import <- paste(fun.myDir.BASE,ifelse(fun.myDir.SUB.import=="",""
-  #,paste("/",fun.myDir.SUB.import,sep="")),sep="")
-  #myDir.data.export <- paste(fun.myDir.BASE,ifelse(fun.myDir.SUB.export=="",""
-  # ,paste("/",fun.myDir.SUB.export,sep="")),sep="")
- # myDir.data.import <- fun.myDir.import
+  
   myDir.data.export <- fun.myDir.export
   #
   myDate <- format(Sys.Date(),"%Y%m%d")
@@ -130,12 +124,7 @@ fun.GageData <- function(fun.myData.SiteID
     #
     # Get available data
     data.what.uv <- dataRetrieval::whatNWISdata(siteNumber=strGage,service="uv")
-    # future versions to get all available data
-    #data.what.uv.param <- data.what.uv[,"parameter_nm"]
-    # column deprecated in dataRetrieval v2.7.3.c:\Program Files\Microsoft VS Code\resources\app\out\vs\code\electron-sandbox\workbench\workbench.html
-    #
-    #data.what.Codes <- as.vector(USGS.Code.Desc[,"Code"][data.what.uv[
-    #       ,"parameter_nm"]%in%USGS.Code.Desc$Desc])
+
     data.what.Codes <- data.what.uv[,"parm_cd"]
 
     # inform user
@@ -176,16 +165,6 @@ fun.GageData <- function(fun.myData.SiteID
     myDrop <- c("agency_cd","tz_cd")
     myKeep <- names(data.myGage)[! names(data.myGage) %in% myDrop]
     data.myGage <- data.myGage[,myKeep]
-    # and code column
-    #data.myGage <- data.myGage[,-ncol(data.myGage.q)]
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # hard code only Discharge due to time limits on project
-
-  #   NewNames <- c(myName.SiteID,myName.DateTime,myName.Discharge,paste("_cd"
-    # ,myName.Discharge,sep="."))
-  #   names(data.myGage) <- NewNames
-
 
     # replace "_Inst" with null and leave "_cd"
     names(data.myGage) <- gsub("_Inst","",names(data.myGage))
@@ -218,44 +197,14 @@ fun.GageData <- function(fun.myData.SiteID
                                ,File.Date.End
                                ,sep=ContData.env$myDelim)
                          ,"csv",sep=".")
-    # 10.2. Save to File the data (overwrites any existing file).
-    #print(paste("Saving output of file ",intCounter," of "
-    # ,intCounter.Stop," files complete.",sep=""))
-    #utils::flush.console()
-    #write.csv(data.myGage,file=paste(myDir.data.export,"/",strFile.Out,sep="")
-    # ,quote=FALSE,row.names=FALSE)
-    
-    # No need to save in this updated function
-    # utils::write.csv(data.myGage
-    #                  ,file.path(myDir.data.export,strFile.Out)
-    #                  ,quote=FALSE
-    #                  ,row.names=FALSE)
-
-
-    #
-    # 11. Clean up
     cat("\n")
     # 11.1. Inform user of progress and update LOG
     myMsg <- "COMPLETE"
     myItems.Complete <- myItems.Complete + 1
-    #myItems.Log[intCounter,2] <- myMsg
-    #fun.write.log(myItems.Log,myDate,myTime)
-    #fun.Msg.Status(myMsg, intCounter, intItems.Total, strGage)
     cat("\n")
     utils::flush.console()
     # 11.2. Remove data
     colNames <- names(data.myGage)
-    
-    ##run daily stats
-    
-    
-    
-   
-    
-    #rm(data.myGage)
-  #  rm(data.myGage.gh)
-
-
 
   }##WHILE.END
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -275,9 +224,7 @@ fun.GageData <- function(fun.myData.SiteID
   # encase in loop so can handle multiple SiteIDs
   #remove all columns ending with _cd, cannot be used
   data.myGage <- data.myGage %>% select(-ends_with("_cd")) 
-
   return(data.myGage)
 
-  #
 }##FUN.fun.GageData.END
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

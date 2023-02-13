@@ -43,11 +43,12 @@ shinyUI(fluidPage(
                                    font-weight: bold;
                                    }"))),
     tags$style("#big-heading {font-size:15px;color:black;font-style:bold;display:block; }"),
+    tags$style("#display_validation_msgs {   color: red; font-weight: bold; }"),
+
     tags$style(HTML(".shiny-notification{
                             position:fixed;
                             top:calc(50%);
                             left:calc(50%);}")),
-
     # spacing
     fluidRow(p()),
 
@@ -57,7 +58,7 @@ shinyUI(fluidPage(
         width = 12,
         actionButton("reset all",
           label = img(
-            src = "ContDataSumViz_banner_no_EPA.png",
+            src = "ContDataSumViz_header_banner.png",
             width = "100%"
           ),
           width = "100%"
@@ -101,10 +102,10 @@ shinyUI(fluidPage(
                     uiOutput("siteType"),
                     hr(),
                     uiOutput("manage"),
-                    hr(),
-                    uiOutput("select"),
-                    hr(),
-                    uiOutput("display_button")
+                    # hr(),
+                    # uiOutput("select"),
+                    # hr(),
+                    # uiOutput("display_button")
                   ),
                   mainPanel(
                     width = 9,
@@ -113,10 +114,10 @@ shinyUI(fluidPage(
                 ) # sidebarLayout end
               ), # column close
 
-              column(
-                width = 12,
-                tableOutput("contents")
-              ), # column close
+              # column(
+              #   width = 12,
+              #   tableOutput("contents")
+              # ), # column close
             ) # fluidRow close
           ) # fluidPage close
         ), # tabPanel end
@@ -248,14 +249,13 @@ shinyUI(fluidPage(
                           ),
                           mainPanel(
                             width = 9,
-                            fluidRow(column(width = 9, uiOutput("display_time_series"))),
-                            hr(),
+                            fluidRow(column(width = 9, plotlyOutput("display_time_series"))),
+                            br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_1"))),
                             br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_2"))),
                             br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_3"))),
-
                           ) # mainPanel end
                         ) # sidebarLayout end
                       ), # column close

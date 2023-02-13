@@ -24,8 +24,6 @@ fun.ConvertDateFormat <- function(fun.userDateFormat
   # print(fun.userTimeFormat)
   # print(fun.date.org)
     
-
-
     if(fun.date.org == 'combined') {
         tmpDateData <- fun.rawData %>% pull(fun.userDateFieldName)
         if(fun.userTimeFormat == "None") {
@@ -98,8 +96,5 @@ fun.sub.format.date <- function(fun.userDateFormat, fun.userTimeFormat, fun.user
     fun.rawData$date.formatted <- lubridate::mdy_hms(tmpData, tz=fun.userTimeZone)
   }
   
-  
-  
-
   return(fun.rawData)
 }
