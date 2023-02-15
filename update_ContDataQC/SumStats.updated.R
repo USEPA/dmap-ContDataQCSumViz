@@ -174,6 +174,7 @@ SumStats.updated <- function(fun.myFile
     # QC.1. Define parameter flag field
     ## If flag parameter names is different from config then it won't be found
     myParam.Name.Flag <- paste(ContData.env$myName.Flag, i, sep=".")
+
     # QC.2. Modify columns to keep (see 3.2.) based on presence of "flag" field
     ## give user feedback
     if (myParam.Name.Flag %in% names(df.load)) {##IF.flagINnames.START
@@ -201,7 +202,7 @@ SumStats.updated <- function(fun.myFile
                         , mySuspects.Num
                         , " suspects were excluded based on user's config file.")
       
-      }else if(ContData.env$myStats.Fails.Exclude == TRUE & ContData.env$myStats.Suspects.Exclude == TRUE){
+      } else if(ContData.env$myStats.Fails.Exclude == TRUE & ContData.env$myStats.Suspects.Exclude == TRUE){
         myFails <- df.load[,myParam.Name.Flag]==ContData.env$myFlagVal.Fail
         myFails.Num <- sum(myFails)
         # convert to NA
@@ -216,17 +217,16 @@ SumStats.updated <- function(fun.myFile
                         , " fails and "
                         , mySuspects.Num
                         , " suspects were excluded based on user's config file.")
-      }else {
+      } else {
         # Message to User
         myMsg <- "QC Flag field was found and fails & suspects were all
-included based on user's config file."
+        included based on user's config file."
       }##IF.Fails.END
       #
     } else {
       # QC.2.2. No Flag column
       myCol <- c(fun.myDateTime.Name, i)
-      myMsg <- "No QC Flag field was found so all data points were used in
-      calculations."
+      myMsg <- "No QC Flag field was found so all data points were used in calculations."
     }##IF.flagINnames.END
     cat(paste0(myMsg, "\n"))
     
@@ -237,10 +237,21 @@ included based on user's config file."
     # 3.2. Add "Date" field
     fd01 <- "%Y-%m-%d" #ContData.env$myFormat.Date
     myDate.Name <- "Date"
-    df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name], fd01)
+
+    # tempCol <- df.param %>% pull(fun.myDateTime.Name)
+    # df.param[,myDate.Name] <- as.Date(tempCol, "%Y-%m-%d")
+    df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name],fd01)
+    if( ContData.env$myStats.missing.data.fill == TRUE) {
+        fullSeq <- seq.Date(min(as.Date(df.param$Date, "%Y-%m-%d")), to = max(as.Date(df.param$Date,"%Y-%m-%d")), by = 1)
+        filled_missingData <- df.param %>% complete(Date = fullSeq)
+        df.param <- as.data.frame(filled_missingData)
+    }
+   
+    #fd01
+    #df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name],  tryFormats("%Y-%m-%d %H:%M:%S","%Y-%m-%d"))
     # 3.3. Data column to numeric
     # may get "NAs introduced by coercion" so suppress
-    df.param[,i] <- suppressWarnings(as.numeric(df.param[,i]))
+    df.param[,i] <- suppressWarnings(as.numeric(unlist(df.param[,i])))
     #~~~~~~~~~~~~~~~~~~~~~~~~~
     # OLD method using doBy
     # 4. Daily Stats for data####
@@ -259,7 +270,7 @@ included based on user's config file."
                      ,paste("q",formatC(100*myQ,width=2,flag="0"),sep=""))
     #
     myFUN.sumBy <- function(x, ...){##FUN.myFUN.sumBy.START
-      c(mean=mean(x,na.rm=TRUE)
+      c(mean=mean(x,na.rm=FALSE)
         ,median=stats::median(x,na.rm=TRUE)
         ,min=suppressWarnings(min(x,na.rm=TRUE))
         ,max=suppressWarnings(max(x,na.rm=TRUE))

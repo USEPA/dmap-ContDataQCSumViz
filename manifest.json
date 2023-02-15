@@ -6769,6 +6769,12 @@
     "ContDataQC_test_data/FromJen/10RD014_DO_20170508_20211029.csv": {
       "checksum": "f1d7d322e75659baa335b187c1cbe808"
     },
+    "ContDataQC_test_data/FromJen/Metadata_OverallSumStats_USGSgage.xlsx": {
+      "checksum": "b1f18c5f18631eb6bcc3a3f3447fa8d9"
+    },
+    "ContDataQC_test_data/FromJen/Ranch_OverallSumStats_2001_2022_mod.csv": {
+      "checksum": "32679467e7ca76f6e3620db42497a350"
+    },
     "ContDataQC_test_data/FromJen/test_QC_Hunting_AW_20140422_20190425.csv": {
       "checksum": "7b29f3fd81b325dd46f3607bcfe97d1e"
     },
@@ -6920,7 +6926,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "cb3bb50f01ea33acacce1af9b1167604"
+      "checksum": "debfa18d1a6e87d7fc21f3819c8fc848"
     },
     "serverBK.R": {
       "checksum": "713ca6014c6ab306e73dd308bb1cbae1"
@@ -6941,7 +6947,7 @@
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "ui.R": {
-      "checksum": "08d0161bb17c484c19ab08f82745099d"
+      "checksum": "cd6b39aa3734383f2c0b45c996d24f9d"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -6950,7 +6956,7 @@
       "checksum": "124b238f16afa4c89efdce758751989c"
     },
     "update_ContDataQC/config.R": {
-      "checksum": "9afdf8b704b4a07156378c74c8eacd6d"
+      "checksum": "23bf4005da9d6f81448e4d7530f2e606"
     },
     "update_ContDataQC/download_usgs_gage_data.R": {
       "checksum": "fc07a28f5b5cd5c5ffad617ad3f9cb55"
@@ -6964,14 +6970,11 @@
     "update_ContDataQC/fun.GageData.R": {
       "checksum": "6ba38f100b0693f8005c9d39cdb71686"
     },
-    "update_ContDataQC/fun.PreparePlotly.R": {
-      "checksum": "3b95d587ce01e6bcb6a60b19ab17f7c9"
-    },
     "update_ContDataQC/ReportMetaData.R": {
       "checksum": "8add92a237cae0d8bfde092d560adbdf"
     },
     "update_ContDataQC/SumStats.updated.R": {
-      "checksum": "5ba3cf8158412ab2b2bf89c448eed99a"
+      "checksum": "3d8a07e7c19f5973b75fc1ea769431fd"
     },
     "www/ContDataSumViz_banner.png": {
       "checksum": "af6a3abac239c0553226d175af54536d"
@@ -6992,7 +6995,7 @@
       "checksum": "7cb6f2f6982233b9765a16530b19ece2"
     },
     "www/styles.css": {
-      "checksum": "4a37f2d3e6b05ab4ba1a4c911a0ed18a"
+      "checksum": "153c982cdd428d40470a9aefa96da64a"
     }
   },
   "users": null

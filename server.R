@@ -74,7 +74,6 @@ function(input, output, session) {
   conflict_prefer("yday", "data.table")
   loaded_data <- reactiveValues()
   raw_data_columns<-reactiveValues()
-  compositeCols <- reactiveValues()
   dateRange <- reactiveValues()
   dateButtonClicked <- reactiveValues(activeBtn = "combined")
 
@@ -127,9 +126,7 @@ function(input, output, session) {
     
     shinyjs::runjs("$('#display_validation_msgs').empty()")
     
-
     my_data <- uploaded_data()
-    compositeCols$flag <- FALSE
     output$display_raw_ts <- renderUI({
 
       if (length(my_data) > 0 ) {
@@ -148,8 +145,7 @@ function(input, output, session) {
           shinyalert("Warning",alert_message_no_date_column,closeOnClickOutside = TRUE,closeOnEsc = TRUE,
                      confirmButtonText="OK",inputId = "alert_no_date")
         } else if(!'DATE.TIME' %in% my_colnames & !'Date.Time' %in% my_colnames & ('Date' %in% my_colnames | 'DATE' %in% my_colnames ) & ('Time' %in% my_colnames | 'TIME' %in% my_colnames)){
-          compositeCols[['flag']] <- TRUE
-          #creating a new composite column
+            #creating a new composite column
           raw_data_columns$date_column_name <- "Date.Time"
         } else{
           raw_data_columns$date_column_name <- possible_date_columns[1]
@@ -225,6 +221,7 @@ function(input, output, session) {
                                ), #fluidRow end
 
               fluidRow(column(width=8,style="padding:20px;",
+                        uiOutput("display_fill_data"),
                         uiOutput("display_checkBoxes_dailyStats_1"),
                         uiOutput("display_radioButtons_dailyStats_2")
                      ), # column close
@@ -548,6 +545,7 @@ function(input, output, session) {
           })
     
           raw_data_columns$date_column_name = "date.formatted"
+       
           ## create a quick metadata summary regarding the raw data file
           dailyCheck <- ReportMetaData(
             fun.myFile = NULL
@@ -620,6 +618,10 @@ function(input, output, session) {
             Note_text_line2 = paste0("Total number of days in this period: ", total_N_days, " days")
             paste(Note_text_line1, Note_text_line2, sep = "\n")
           })
+         
+           output$display_fill_data <- renderUI({
+            checkboxInput("fillMissingData", "Fill missing data with 'NA' values", FALSE)
+          })
           
           check_no_flags <-
             all(toReport[, 3] == "No flag field found") &&
@@ -628,6 +630,7 @@ function(input, output, session) {
           
           if (!check_no_flags) {
             output$display_checkBoxes_dailyStats_1 <- renderUI({
+              
               checkboxGroupInput(
                 "exclude_flagged"
                 ,
@@ -640,7 +643,6 @@ function(input, output, session) {
                 )
                 ,
                 selected = "fail"
-                
               )
             }) # renderUI close
           } # if loop close
@@ -686,6 +688,7 @@ function(input, output, session) {
                            ,
                            style = "color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
           })
+          
       }
     }, error = function(e) {
         print(e)
@@ -735,12 +738,6 @@ function(input, output, session) {
     raw_data <- uploaded_data()
     showModal(modalDialog("Calculating the daily statistics now...",footer=NULL))
     
-    if (compositeCols[['flag']] == TRUE) {
-      data.time.cols <-
-        paste(raw_data$Date, raw_data$Time, sep = " ")
-      raw_data$Date.Time <- as.character(data.time.cols)
-    }
-
     raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
                                       ,fun.userTimeFormat =input$selectedTimeFormat
                                       ,fun.userTimeZone = input$selectedTimeZone
@@ -752,30 +749,64 @@ function(input, output, session) {
     print(head(raw_data))
     dateRange$min <- min(as.Date(raw_data$date.formatted))
     dateRange$max <- max(as.Date(raw_data$date.formatted))
-   
-     variables_to_calculate <- input$parameters_to_process2
-     raw_data_columns$date_column_name = "date.formatted"
+    
+    #fullSeq <- seq.Date(from = min(as.Date(df.toCheck$Date, "%Y-%m-%d")), to = max(as.Date(df.toCheck$Date, "%Y-%m-%d")), by = 1)
+    # fullSeq <- seq.Date(min(as.Date(raw_data$date.formatted, "%Y-%m-%d %H:%M:%S")), to = max(as.Date(raw_data$date.formatted,"%Y-%m-%d %H:%M:%S")), by = 1)
+    # raw_data <- raw_data %>% complete(date.formatted = fullSeq)
+    # raw_data <- as.data.frame(raw_data)
+    
+    variables_to_calculate <- input$parameters_to_process2
+    raw_data_columns$date_column_name = "date.formatted"
 
 
     ## how to handle "fail" or "suspect" measurements
+     
+     print(str(input$exclude_flagged))
 
-    if (is.null(input$exclude_flagged)){
-      ContData.env$myStats.Fails.Exclude = FALSE
-      ContData.env$myStats.Suspects.Exclude = FALSE
-      print(input$exclude_flagged)
-    }else if(length(input$exclude_flagged)==1 & input$exclude_flagged[1] == 'fail'){
-      print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
-      ContData.env$myStats.Fails.Exclude = TRUE
-      ContData.env$myStats.Suspects.Exclude = FALSE
-    }else if(length(input$exclude_flagged)==1 & input$exclude_flagged[1] == 'suspect'){
-      print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
-      ContData.env$myStats.Fails.Exclude = FALSE
-      ContData.env$myStats.Suspects.Exclude = TRUE
-    }else if(length(input$exclude_flagged) == 2){
-      ContData.env$myStats.Fails.Exclude = TRUE
-      ContData.env$myStats.Suspects.Exclude = TRUE
-      print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
-    }
+    # if (is.null(input$exclude_flagged)){
+    #   ContData.env$myStats.Fails.Exclude = FALSE
+    #   ContData.env$myStats.Suspects.Exclude = FALSE
+    #   print(input$exclude_flagged)
+    # }else if(length(input$exclude_flagged)==1 & input$exclude_flagged[1] == 'fail'){
+    #   print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
+    #   ContData.env$myStats.Fails.Exclude = TRUE
+    #   ContData.env$myStats.Suspects.Exclude = FALSE
+    # }else if(length(input$exclude_flagged)==1 & input$exclude_flagged[1] == 'suspect'){
+    #   print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
+    #   ContData.env$myStats.Fails.Exclude = FALSE
+    #   ContData.env$myStats.Suspects.Exclude = TRUE
+    # }else if(length(input$exclude_flagged) == 2){
+    #   ContData.env$myStats.Fails.Exclude = TRUE
+    #   ContData.env$myStats.Suspects.Exclude = TRUE
+    #   print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
+    # }
+     
+     
+     
+     if (is.null(input$exclude_flagged)){
+       ContData.env$myStats.Fails.Exclude = FALSE
+       ContData.env$myStats.Suspects.Exclude = FALSE
+     }
+     if('fail' %in% input$exclude_flagged){
+       print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
+       ContData.env$myStats.Fails.Exclude = TRUE
+     }else {
+       ContData.env$myStats.Fails.Exclude = FALSE
+     }
+     if('suspect' %in% input$exclude_flagged){
+       print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
+       ContData.env$myStats.Suspects.Exclude = TRUE
+     }else {
+       ContData.env$myStats.Suspects.Exclude = FALSE
+     } 
+     if('flag not known' %in% input$exclude_flagged) {
+       #do nothing, logic is not there in the sumStts.updated function
+       print("Just for testing")
+     }
+     
+     
+     # Fill missing data
+     ContData.env$myStats.missing.data.fill = input$fillMissingData
 
     dailyStats <- SumStats.updated(fun.myFile=NULL
                                    ,fun.myDir.import=NULL
@@ -1621,11 +1652,19 @@ function(input, output, session) {
   
     mainData <- Reduce(full_join, myList)
     statsCols <- paste(variable_to_plot, input$dailyStats_ts_metrics, sep=".")
+    upperCols <- paste(variable_to_plot, "q.75%", sep=".")
+    lowerCols <- paste(variable_to_plot, "q.25%", sep=".")
+    
+    data_com <- c(variable_to_plot, statsCols, upperCols, lowerCols)
+    print(data_com)
+    
+    shadeCols <- paste0(variable_to_plot, " between daily 25th percentiles and 75th percentiles")
+    
 
 
-    myData  <- mainData %>%
-      select(statsCols, "Date") %>%
-      gather(key = "parameter", value = "value",-Date)
+    myData  <- mainData %>% select(statsCols, "Date") %>%
+      mutate(Date=as.Date(Date + 1)) %>%
+      gather(key = "parameter", value = "value", -Date)
    
     #default plot height from plotly is 400 Px
     
@@ -1634,9 +1673,9 @@ function(input, output, session) {
       plotHeight <- plotHeight + ((length(variable_to_plot) - 2) * 82)
     }
    
-    p <- ggplot(data = myData, aes(x=as.POSIXct(Date,format="%Y-%m-%d %H:%M:%S"), y = value)) +
+    p <- ggplot(data = myData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
     geom_line(aes(colour=parameter)) +
-    #geom_ribbon(data=ribbon_data, aes(ymin=!!sym(lowerBound),ymax=!!sym(upperBound),x=as.POSIXct(Date,format="%Y-%m-%d"),fill=plotShadingText),alpha=0.5)
+   # geom_ribbon(data=ribbon_data, aes(ymin=!!sym(lowerBound),ymax=!!sym(upperBound),x=as.POSIXct(Date,format="%Y-%m-%d"),fill=plotShadingText),alpha=0.5)
     scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
     labs(title=mainMapTitle, x="Date", y="Parameters")+
     theme_bw()+

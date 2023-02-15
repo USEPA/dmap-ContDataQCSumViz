@@ -43,12 +43,8 @@ shinyUI(fluidPage(
                                    font-weight: bold;
                                    }"))),
     tags$style("#big-heading {font-size:15px;color:black;font-style:bold;display:block; }"),
+    tags$style("#display_fill_data .shiny-input-container .checkbox label span {font-weight: bold; }"),
     tags$style("#display_validation_msgs {   color: red; font-weight: bold; }"),
-
-    tags$style(HTML(".shiny-notification{
-                            position:fixed;
-                            top:calc(50%);
-                            left:calc(50%);}")),
     # spacing
     fluidRow(p()),
 
