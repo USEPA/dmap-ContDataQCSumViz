@@ -1660,10 +1660,10 @@ function(input, output, session) {
     
     shadeCols <- paste0(variable_to_plot, " between daily 25th percentiles and 75th percentiles")
     
-
+    # Removing this change from the below select, on EPA machine it looks fine.
+    #mutate(Date=as.Date(Date + 1)) %>%
 
     myData  <- mainData %>% select(statsCols, "Date") %>%
-      mutate(Date=as.Date(Date + 1)) %>%
       gather(key = "parameter", value = "value", -Date)
    
     #default plot height from plotly is 400 Px
