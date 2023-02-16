@@ -55,7 +55,8 @@ shinyUI(fluidPage(
         actionButton("reset all",
           label = img(
             src = "ContDataSumViz_header_banner.png",
-            width = "100%"
+            width = "100%",
+            height="175"
           ),
           width = "100%"
         )
@@ -83,8 +84,7 @@ shinyUI(fluidPage(
                       multiple = FALSE,
                       accept = c(
                         "text/csv",
-                        "text/comma-separated-values,
-                                                                               text/plain",
+                        "text/comma-separated-values,text/plain",
                         ".csv"
                       )
                     ),

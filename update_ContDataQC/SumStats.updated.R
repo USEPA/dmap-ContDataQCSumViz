@@ -270,7 +270,7 @@ SumStats.updated <- function(fun.myFile
                      ,paste("q",formatC(100*myQ,width=2,flag="0"),sep=""))
     #
     myFUN.sumBy <- function(x, ...){##FUN.myFUN.sumBy.START
-      c(mean=mean(x,na.rm=FALSE)
+      c(mean=mean(x,na.rm=TRUE)
         ,median=stats::median(x,na.rm=TRUE)
         ,min=suppressWarnings(min(x,na.rm=TRUE))
         ,max=suppressWarnings(max(x,na.rm=TRUE))
