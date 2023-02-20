@@ -43,6 +43,10 @@ shinyUI(fluidPage(
                                    font-weight: bold;
                                    }"))),
     tags$style("#big-heading {font-size:15px;color:black;font-style:bold;display:block; }"),
+    tags$style(HTML(".shiny-notification{
+                            position:fixed;
+                            top:calc(50%);
+                            left:calc(50%);}")),
     tags$style("#display_fill_data .shiny-input-container .checkbox label span {font-weight: bold; }"),
     tags$style("#display_validation_msgs {   color: red; font-weight: bold; }"),
     # spacing
@@ -245,13 +249,14 @@ shinyUI(fluidPage(
                           ),
                           mainPanel(
                             width = 9,
-                            fluidRow(column(width = 9, plotlyOutput("display_time_series"))),
+                            br(),
+                            fluidRow(column(width = 9, withSpinner(plotlyOutput("display_time_series")))),
                             br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_1"))),
                             br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_2"))),
                             br(),
-                            fluidRow(column(width = 9, uiOutput("display_time_series_3"))),
+                            fluidRow(column(width = 9, uiOutput("display_time_series_3")))
                           ) # mainPanel end
                         ) # sidebarLayout end
                       ), # column close

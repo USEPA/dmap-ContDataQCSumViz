@@ -59,7 +59,9 @@ library("daymetr")
 library("lubridate")
 library("promises")
 library("future")
+#library("ggtext")
 plan(multisession)
+#options(scipen=999) 
 
 
 # fails without dplyr and stringr from tidyverse

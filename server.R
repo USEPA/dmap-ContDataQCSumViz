@@ -97,9 +97,11 @@ function(input, output, session) {
 
   #  Upload Data##############################
 
+
   #EWL
   if (file.exists("_moved/File_Format.rds")) file.remove("_moved/File_Format.rds")
   do.call(file.remove, list(list.files("Selected_Files", full.names = TRUE)))
+ 
 
   uploaded_data<-eventReactive(c(input$uploaded_data_file),{
                                 loaded_data$name <- input$uploaded_data_file$name # nolint
@@ -419,12 +421,6 @@ function(input, output, session) {
 
     #isolate(input$raw_datetime_format)
     raw_data <- uploaded_data()
-    ## gather all the columns were selected for time series
-    #my_raw_choices = c(input$line1_1sec,input$line2_1sec,input$line3_1sec,input$line4_1sec,input$line5_1sec,input$line6_1sec)
-    ## remove those choices not initiated
-    #my_raw_choices = my_raw_choices[!grepl("choose a column",my_raw_choices)]
-    #print(my_raw_choices)
-    #print(is.null(my_raw_choices))
     my_raw_choices = input$parameters_to_process2
     
     raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
@@ -435,19 +431,27 @@ function(input, output, session) {
                                       ,fun.rawData = raw_data
                                       ,fun.date.org = dateButtonClicked$activeBtn)
     
-    print(head(raw_data))
+    #print(head(raw_data))
     
 
     if (!is.null(my_raw_choices) && !is.null(raw_data$date.formatted)){
       
-      uploaded_raw_data  <- raw_data %>%
+      fullSeq <- seq.Date(min(as.Date(raw_data$date.formatted, "%Y-%m-%d")), to = max(as.Date(raw_data$date.formatted,"%Y-%m-%d")), by = 1)
+      modified_raw_data <- raw_data %>% complete(date.formatted = fullSeq)
+     
+      
+      uploaded_raw_data  <- modified_raw_data %>%
         select(my_raw_choices, c("date.formatted")) %>%
         gather(key = "parameter", value = "value", -date.formatted)
+      
+      main_range = calculate_time_range(as.list(uploaded_raw_data))
+      mainBreaks = main_range[[1]]
+      main_x_date_label = main_range[[2]]
       
       p <- ggplot(data = uploaded_raw_data, aes(x = date.formatted, y = value)) +
         geom_line(aes(colour=parameter)) +
         labs(x="Date", y="Parameters")+
-        scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
+        scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
         theme_bw()+
         theme(
           strip.background = element_blank()
@@ -620,7 +624,7 @@ function(input, output, session) {
           })
          
            output$display_fill_data <- renderUI({
-            checkboxInput("fillMissingData", "Fill missing data with 'NA' values", FALSE)
+            checkboxInput("fillMissingData", "Fill missing data with 'NA' values", TRUE)
           })
           
           check_no_flags <-
@@ -1622,86 +1626,133 @@ function(input, output, session) {
   
 
   observeEvent(input$display_ts, {
+          
+        shinyjs::runjs("$('#ngTest').show()")
+          #Display USGS gage stats
+          display_gage_stats()
+          
+          #Display DayMet raw data, if the screen is refresh, for now only raw data is there for the daymet
+          if (input$daymet_lat != "" && length(input$daymet_lat) > 0 && input$daymet_long != "" && length(input$daymet_long) > 0) {
+              #simulate click to download and refresh the data
+              click("get_daymet_data")
+          }
 
-    #Display USGS gage stats
-    display_gage_stats()
-   
-    
-    
-    #Display DayMet raw data, if the screen is refresh, for now only raw data is there for the daymet
-    if (input$daymet_lat != "" && length(input$daymet_lat) > 0 && input$daymet_long != "" && length(input$daymet_long) > 0) {
-        #simulate click to download and refresh the data
-        click("get_daymet_data")
-    }
-    
+          #Display uploaded file stats
+          mainMapTitle <- getMapTitle(input$dailyStats_shading, input$dailyStats_ts_title)
+          statsList <- processed$processed_dailyStats
+          variable_to_plot <- input$dailyStats_ts_variable_name
 
-    #Display uploaded file stats
-    
-    if(input$dailyStats_ts_title != "") {
-    mainMapTitle = input$dailyStats_ts_title
-    } else {
-      mainMapTitle = "Uploaded File metrics"
-    }
-    
-    myList <- processed$processed_dailyStats
-    variable_to_plot <- input$dailyStats_ts_variable_name
-   
-    # output$display_time_series <- renderUI({
-    #   withSpinner(plotlyOutput("plot_dailyStats_ts"),type=2)
-    # })
-  
-    mainData <- Reduce(full_join, myList)
-    statsCols <- paste(variable_to_plot, input$dailyStats_ts_metrics, sep=".")
-    upperCols <- paste(variable_to_plot, "q.75%", sep=".")
-    lowerCols <- paste(variable_to_plot, "q.25%", sep=".")
-    
-    data_com <- c(variable_to_plot, statsCols, upperCols, lowerCols)
-    print(data_com)
-    
-    shadeCols <- paste0(variable_to_plot, " between daily 25th percentiles and 75th percentiles")
-    
-    # Removing this change from the below select, on EPA machine it looks fine.
-    #mutate(Date=as.Date(Date + 1)) %>%
-
-    myData  <- mainData %>% select(statsCols, "Date") %>%
-      gather(key = "parameter", value = "value", -Date)
-   
-    #default plot height from plotly is 400 Px
-    
-    plotHeight <- 400
-    if(length(variable_to_plot > 2)) {
-      plotHeight <- plotHeight + ((length(variable_to_plot) - 2) * 82)
-    }
-   
-    p <- ggplot(data = myData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
-    geom_line(aes(colour=parameter)) +
-   # geom_ribbon(data=ribbon_data, aes(ymin=!!sym(lowerBound),ymax=!!sym(upperBound),x=as.POSIXct(Date,format="%Y-%m-%d"),fill=plotShadingText),alpha=0.5)
-    scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
-    labs(title=mainMapTitle, x="Date", y="Parameters")+
-    theme_bw()+
-    #facet_grid(parameter ~ ., scales = "free_y", labeller = labeller(conservation2 =label_wrap_gen(width = 10, multi_line = TRUE)))+
-    facet_grid(parameter ~ ., scales = "free_y")+
-    theme(
-      strip.background = element_blank()
-      ,strip.text.y = element_blank()
-     #,strip.text.y = element_text(angle = 35)
-            ,strip.placement = "outside"
-      ,text=element_text(size=10,face = "bold", color="cornflowerblue")
-      ,plot.title = element_text(hjust=0.5)
-      ,legend.position="bottom"
-      ,axis.text.x=element_text(angle=65, hjust=10)
-    )
-    
-    output$display_time_series <-  renderPlotly({
-      ggplotly(p,height=plotHeight) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
-    })
-   
-     shinyjs::removeClass("display_time_series", "html-fill-item-overflow-hidden")
-     shinyjs::runjs("$('#display_time_series').removeAttr('style')")
-    #shinyjs::runjs("$($('#display_time_series').find('.main-svg')).width('100%')")
-   #Gage
-     shinyjs::removeClass("#plot_gage_ts", "html-fill-item-overflow-hidden")
-     shinyjs::runjs("$('#plot_gage_ts').removeAttr('style')")
+          mainData <- Reduce(full_join, statsList)
+          plotHeight <- 400
+          if(length(variable_to_plot > 2)) {
+            plotHeight <- plotHeight + ((length(variable_to_plot) - 2) * 82)
+          }
+         
+         if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading!="newData"){
+                
+                #shadingText <- paste0(variable_to_plot, " between daily 25th percentiles and 75th percentiles")
+                mainList <- list()
+                for(varName in variable_to_plot) {
+                  if(input$dailyStats_shading=="quantiles") {
+                    mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "q.25%", sep="."), upper_col=paste(varName, "q.75%", sep="."), Date))
+                  } else if(input$dailyStats_shading=="minMax"){
+                    mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "min", sep="."), upper_col=paste(varName, "max", sep="."), Date))
+                  }
+                }
+                main_range = calculate_time_range(as.list(bind_rows(mainList, .id="df")))
+                mainBreaks = main_range[[1]]
+                main_x_date_label = main_range[[2]]
+                
+                # output$display_time_series <- renderUI({
+                #  # withSpinner(plotlyOutput("plot_dailyStats_ts"),type=2)
+                # }) 
+                
+                output$display_time_series <-  renderPlotly({
+                 
+                    mainPlot <- ggplot(bind_rows(mainList, .id="df")) +
+                    labs(title=mainMapTitle, x="Date", y="Parameters")+
+                    geom_ribbon(na.rm=TRUE, show.legend=TRUE, aes(ymin=lower_col,ymax=upper_col,x=as.POSIXct(Date,format="%Y-%m-%d",fill="df")),alpha=0.3, inherit.aes = FALSE)+
+                    geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=df))+
+                    scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
+                    theme_bw()+
+                    facet_grid(df ~ ., scales = "free_y")+
+                    scale_color_discrete(name="")+
+                     theme(
+                       strip.background = element_blank()
+                       ,legend.title=element_blank()
+                       ,strip.text.y = element_blank()
+                       ,strip.placement = "outside"
+                       ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+                       ,plot.title = element_text(hjust=0.5)
+                       ,legend.position="bottom"
+                       ,axis.text.x=element_text(angle=65, hjust=10)
+                     )
+                      ggplotly(mainPlot,height=plotHeight) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+                  
+                })
+         
+         } else if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
+          
+           # shading_data <- uploaded_newData()
+           # shading_cols_selected <- c(input$newData_date_col,input$newData_lower_col,input$newData_upper_col)
+           # data_to_add_as_shading <- shading_data[shading_cols_selected]
+           # 
+           # data_to_plot <- myData[c("Date",mean_col)]
+           # output$plot_dailyStats_ts <- renderPlot({
+           #   p1 <- ggplot(data_to_plot)+
+           #     geom_line(aes(y=!!sym(mean_col),x=as.POSIXct(Date,format="%Y-%m-%d"),colour=mean_col),size=0.8)+
+           #     geom_ribbon(data=data_to_add_as_shading,aes(x=as.POSIXct(!!sym(input$newData_date_col),format="%Y-%m-%d"),
+           #                                                 ymin=isolate(!!sym(input$newData_lower_col)),ymax=isolate(!!sym(input$newData_upper_col)),fill=isolate(input$newData_name)),alpha=0.5)+
+           #     scale_x_datetime(date_labels=x_date_label,date_breaks=myBreaks)+
+           #     scale_fill_manual("",labels=isolate(input$newData_name),values=c("grey80"="grey80"))+
+           #     labs(title=isolate(input$dailyStats_ts_title), x = "Date",y = mean_col)+
+           #     theme_minimal()+
+           #     scale_colour_manual("", values = "blue")+
+           #     theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
+           #           ,plot.title = element_text(hjust=0.5)
+           #           ,plot.background = element_rect(color="grey20",size=2)
+           #           ,legend.position = "bottom"
+           #           ,axis.text.x=element_text(angle=45, hjust=1))
+           #   #ggplotly(p1)
+           #   print(p1)
+           # })  # renderPlot close
+         } else {
+               statsCols <- paste(variable_to_plot, input$dailyStats_ts_metrics, sep=".")
+               myData  <- mainData %>% select(statsCols, "Date") %>%
+                 gather(key = "parameter", value = "value", -Date)
+               
+               main_range = calculate_time_range(as.list(myData))
+               mainBreaks = main_range[[1]]
+               main_x_date_label = main_range[[2]]
+               
+                p <- ggplot(data = myData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
+                geom_line(aes(colour=parameter)) +
+                #scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
+                scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+  
+                labs(title=mainMapTitle, x="Date", y="Parameters")+
+                theme_bw()+
+                facet_grid(parameter ~ ., scales = "free_y")+
+                theme(
+                  strip.background = element_blank()
+                  ,strip.text.y = element_blank()
+                 #,strip.text.y = element_text(angle = 35)
+                        ,strip.placement = "outside"
+                  ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+                  ,plot.title = element_text(hjust=0.5)
+                  ,legend.position="bottom"
+                  ,axis.text.x=element_text(angle=65, hjust=10)
+                )
+               output$display_time_series <-  renderPlotly({
+                 ggplotly(p,height=plotHeight) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+               })
+         }
+          #fix layout issues when gage, daymet and main map are rendered
+           shinyjs::removeClass("display_time_series", "html-fill-item-overflow-hidden")
+           shinyjs::runjs("$('#display_time_series').removeAttr('style')")
+          #Gage
+           shinyjs::removeClass("#plot_gage_ts", "html-fill-item-overflow-hidden")
+           shinyjs::runjs("$('#plot_gage_ts').removeAttr('style')")
+           shinyjs::runjs("$('#ngTest').hide()")
    
   })  # observeEvent end
 
@@ -1767,7 +1818,7 @@ function(input, output, session) {
   })
 
 
-
+  output$display_time_series <- renderPlotly({(NULL)})
 
   observeEvent(input$display_ts_overlay, {
     
@@ -3096,43 +3147,9 @@ function(input, output, session) {
     }
 
   )
- 
-  #geom_line(aes(y=!!sym(plotMeanCol),x=as.POSIXct(lineDate,format="%Y-%m-%d"),colour=plotMeanCol),size=0.8)
-  drawTsPlot <- function(plotData, plotMeanCol, lowerBound = NULL, upperBound = NULL, xLabel, xbreaks, plotTitle, plotShadingText="should not be this", ribbon_data=NULL, lineDate) {
-    tryCatch({
-      plotData$DateAndTime <- as.POSIXct(lineDate,format="%Y-%m-%d")
-
-      p1 <- ggplot(plotData) +
-        geom_line(aes(y=!!sym(plotMeanCol),x=DateAndTime,colour=plotMeanCol),size=0.8)
-      if(!is.null(lowerBound) & !is.null(upperBound)) {
-        p1 =  p1 + geom_ribbon(data=ribbon_data, aes(ymin=!!sym(lowerBound),ymax=!!sym(upperBound),x=DateAndTime,fill=plotShadingText),alpha=0.5)
-      }
-      p1 = p1 +
-        scale_x_datetime(date_labels=xLabel,date_breaks=xbreaks)+
-        labs(title=plotTitle ,x = "Date",y = plotMeanCol)+
-        theme_light()+
-          scale_colour_manual("", values = "blue")+
-          scale_fill_manual("", values = "grey12")+
-          theme(text=element_text(size=10,face = "bold", color="cornflowerblue")
-                ,plot.title = element_text(hjust=0.5)
-                ,plot.background = element_rect(color="grey20",size=2)
-                ,axis.text.x=element_text(angle=45, hjust=1)
-                ,legend.position = "bottom", legend.title = element_blank()
-                )
-        ggplotly(p1) %>%
-        plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
-      #ggplotly(p1)
-      #print(p1)
-     }, error= function(e) {
-        #other errors
-      message("Error-some data issue occured while performing the task")
-      print(e)
-    })
-  }
   
-  calculate_time_range <- function(baseData, uploadedFormat) {
-    conDate = changeDateFormat(baseData$Date,uploadedFormat)
-    time_range <- difftime(max(as.POSIXct(conDate,format="%Y-%m-%d")),min(as.POSIXct(conDate,format="%Y-%m-%d")),units="days")
+  calculate_time_range <- function(baseData) {
+    time_range <- difftime(max(as.POSIXct(baseData$Date,format="%Y-%m-%d")),min(as.POSIXct(baseData$Date,format="%Y-%m-%d")),units="days")
     if (as.numeric(time_range)<365*2){
       myBreaks = paste0(1," months")
       x_date_label = "%Y-%m-%d"
@@ -3148,17 +3165,20 @@ function(input, output, session) {
     }
   }
   
-  getLowerUpperBoundsAndShading <- function(shandingName, statsVarName) {
+  getMapTitle <- function(shandingName, userTitle) {
+    shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
     if (shandingName=="quantiles"){
-      upper_col <- paste0(statsVarName,".q.75%")
-      lower_col <- paste0(statsVarName,".q.25%")
-      shading_text <- paste0(statsVarName, " between daily 25th percentiles and 75th percentiles")
+      shading_text <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
     }else if (shandingName=="minMax"){
-      upper_col <- paste0(statsVarName,".min")
-      lower_col <- paste0(statsVarName,".max")
-      shading_text <- paste0(statsVarName, " between daily minimum and maximum values")
+      shading_text <- " \n <span style='font-size:10px'>(Shading between daily minimum and maximum values)</span>"
     }
-    return(list(upper_col,lower_col,shading_text))
+    
+    if(userTitle != "") {
+      shading_text = paste0(userTitle, shadingText)
+    } else {
+      shading_text =  paste0("Uploaded File metrics", shadingText)
+    }
+    return(shading_text)
   }
   
   changeDateFormat <- function(uploadedDate, uploadedFormat) {
@@ -3207,11 +3227,15 @@ function(input, output, session) {
       gageData  <- gageList2 %>%
         select(gageCols,"Date") %>%
         gather(key = "parameter", value = "value",-Date)
+      
+      main_range = calculate_time_range(as.list(gageData))
+      mainBreaks = main_range[[1]]
+      main_x_date_label = main_range[[2]]
 
 
       gagePlot <- ggplot(data = gageData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
         geom_line(aes(colour=parameter)) +
-        scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
+        scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
         labs(title="USGS gage metrics", x="Date", y="Parameters")+
         theme_bw()+
         theme(
@@ -3254,11 +3278,15 @@ function(input, output, session) {
         select(-ends_with("SiteID")) %>%
         gather(key = "parameter", value = "value",-GageID, -Date.Time)
       }
+      
+      main_range = calculate_time_range(as.list(raw_data_merged))
+      mainBreaks = main_range[[1]]
+      main_x_date_label = main_range[[2]]
 
        p <- ggplot(data = raw_data_merged, aes(x = Date.Time, y = value)) +
         geom_line(aes(colour=parameter)) +
         labs(title="USGS gage Raw Data", y="Parameters", x="Date") + 
-        scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
+        scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
         theme_bw()+
         theme(
                strip.background = element_blank()
@@ -3303,10 +3331,14 @@ function(input, output, session) {
         #Fills in the progress bar once the operation is complete
         incProgress(1/1, detail = paste("Retrieved records for Latitude and Longitude ",input$daymet_lat, input$daymet_long))
         Sys.sleep(1)
+        
+        main_range = calculate_time_range(as.list(dayMetRawData$daymetdata))
+        mainBreaks = main_range[[1]]
+        main_x_date_label = main_range[[2]]
      
         precipplot<-ggplot( dayMetRawData$daymetdata, aes(Date, precip))+
           geom_line(aes(y=precip,x=as.POSIXct(Date,format="%Y-%m-%d"),colour=year),size=0.8)+
-          scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," months"))+
+          scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
           theme_light()+
           #facet_grid(site ~., scales="fixed")+ 
           labs(title="DayMet Precipitation Plot", x="Date", y="Precipitation (mm/day)")+
@@ -3324,54 +3356,7 @@ function(input, output, session) {
     
   })
   
-  daymetStatsView <- function(dayMetDailyStats, statsVar, varToProcess) {
- 
-    # output$display_time_series_1 <- renderUI({
-    #   # withSpinner(plotlyOutput(tempid),type=2)
-    #   #do.call(tagList, plotList)
-    # })
 
-    removeUI("#display_time_series_3 > div", multiple = T)
-    daymetStats <- dayMetDailyStats[[which(names(dayMetDailyStats)==varToProcess)]]
-    
-    daymet_range = calculate_time_range(as.list(daymetStats), "%Y-%m-%d")
-    daymetBreaks = daymet_range[[1]]
-    daymet_x_date_label = daymet_range[[2]]
-    
-    daymet_mean_col <- paste0(varToProcess,".",input$dailyStats_ts_metrics)
-    
-    daymetBounds <- getLowerUpperBoundsAndShading(input$dailyStats_shading, varToProcess)
-    daymet_upper_col <- daymetBounds[[1]]
-    daymet_lower_col <- daymetBounds[[2]]
-    shading_text <- daymetBounds[[3]]
-    
-    if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")) {
-      daymet_col_selected = c("Date",daymet_mean_col,daymet_lower_col,daymet_upper_col)
-      daymet_data_to_plot <- daymetStats[daymet_col_selected]
-      insertUI(
-        selector = "#display_time_series_3",
-        where="beforeEnd",
-        ui = renderPlotly({
-          drawTsPlot(daymet_data_to_plot, daymet_mean_col, daymet_lower_col, daymet_upper_col, daymet_x_date_label, daymetBreaks, "DayMet" ,shading_text, NULL, daymet_data_to_plot$Date)
-          #print(currentOutPutId)
-        })
-      )
-      
-    } else {
-      daymet_col_selected = c("Date",daymet_mean_col)
-      daymet_data_to_plot <- daymetStats[daymet_col_selected]
-      insertUI(
-        selector = "#display_time_series_3",
-        where="beforeEnd",
-        ui = renderPlotly({
-         drawTsPlot(daymet_data_to_plot, daymet_mean_col, NULL, NULL, daymet_x_date_label, daymetBreaks, "DayMet",NULL, NULL, daymet_data_to_plot$Date)
-          #print(currentOutPutId)
-        })
-      )
-    }
-    
-  }
-  
   prepareDateFormatErrorMsg <- function(errorMsg) {
     if(errorMsg[1] == "All formats failed to parse. No formats found.") {
       errorMsg[1] = "There is mismatch between uploaded file date format and 'Selected date format', please correct and try again."

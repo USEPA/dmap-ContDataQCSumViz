@@ -53,9 +53,9 @@ fun.dayMetData <- function(
 }##FUN.fun.GageData.END
 
 
-test <- fun.dayMetData(fun.lat <- 36.0133,
-                       fun.lon <- -84.2625,
-                       fun.year.start <- 2018,
-                       fun.year.end <- 2020,
-                       fun.internal <-  TRUE)
-print(test)
+# test <- fun.dayMetData(fun.lat <- 39.44164,
+#                        fun.lon <- -80.87723,
+#                        fun.year.start <- 2015,
+#                        fun.year.end <- 2020,
+#                        fun.internal <-  TRUE)
+# print(test)
