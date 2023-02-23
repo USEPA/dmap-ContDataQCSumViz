@@ -18,7 +18,7 @@ import_raw_data<-function(fileName,formatType,has_header=T){
     mydata=read.table(fileName,header=has_header)
     
   }else if(fileFormat==2){
-    mydata=read.csv(fileName,header=has_header, comment.char = '#')
+    mydata=read.csv(fileName,header=has_header, comment.char = '#', fileEncoding='latin1')
     
   }else if(fileFormat==3){
     mydata=read_excel(fileName,sheet=1,col_names=has_header)

@@ -54,7 +54,7 @@ fun.sub.format.date <- function(fun.userDateFormat, fun.userTimeFormat, fun.user
     fun.rawData$date.formatted <- lubridate::ydm_hm(tmpData, tz=fun.userTimeZone)
   } else if(fun.userDateFormat == "Month, Day, Year" && fun.userTimeFormat == "Hour, Minute") {
     fun.rawData$date.formatted <- lubridate::mdy_hm(tmpData, tz=fun.userTimeZone)
-  }  else if(fun.userDateFormat == "Day, Monty, Year" && fun.userTimeFormat == "Hour, Minute") {
+  }  else if(fun.userDateFormat == "Day, Month, Year" && fun.userTimeFormat == "Hour, Minute") {
     fun.rawData$date.formatted <- lubridate::dmy_hm(tmpData, tz=fun.userTimeZone)
   } else if(fun.userDateFormat == "Abbreviated month, Day of the month, Year" && fun.userTimeFormat == "Hour, Minute") {
     fun.rawData$date.formatted <- lubridate::mdy_hm(tmpData, tz=fun.userTimeZone)
@@ -66,7 +66,7 @@ fun.sub.format.date <- function(fun.userDateFormat, fun.userTimeFormat, fun.user
     fun.rawData$date.formatted <- lubridate::ydm_hms(tmpData, tz=fun.userTimeZone)
   } else if(fun.userDateFormat == "Month, Day, Year" && fun.userTimeFormat == "Hour, Minute, Second") {
     fun.rawData$date.formatted <- lubridate::mdy_hms(tmpData, tz=fun.userTimeZone)
-  }  else if(fun.userDateFormat == "Day, Monty, Year" && fun.userTimeFormat == "Hour, Minute, Second") {
+  }  else if(fun.userDateFormat == "Day, Month, Year" && fun.userTimeFormat == "Hour, Minute, Second") {
     fun.rawData$date.formatted <- lubridate::dmy_hms(tmpData, tz=fun.userTimeZone)
   } else if(fun.userDateFormat == "Abbreviated month, Day of the month, Year" && fun.userTimeFormat == "Hour, Minute, Second") {
     fun.rawData$date.formatted <- lubridate::mdy_hms(tmpData)
@@ -78,7 +78,7 @@ fun.sub.format.date <- function(fun.userDateFormat, fun.userTimeFormat, fun.user
     fun.rawData$date.formatted <- lubridate::ydm_hm(tmpData, tz=fun.userTimeZone)
   } else if(fun.userDateFormat == "Month, Day, Year" && fun.userTimeFormat == "Hour in 12-hour format, Minute, AM/PM") {
     fun.rawData$date.formatted <- lubridate::mdy_hm (tmpData, tz=fun.userTimeZone)
-  }  else if(fun.userDateFormat == "Day, Monty, Year" && fun.userTimeFormat == "Hour in 12-hour format, Minute, AM/PM") {
+  }  else if(fun.userDateFormat == "Day, Month Year" && fun.userTimeFormat == "Hour in 12-hour format, Minute, AM/PM") {
     fun.rawData$date.formatted <- lubridate::dmy_hm(tmpData, tz=fun.userTimeZone)
   } else if(fun.userDateFormat == "Abbreviated month, Day of the month, Year" && fun.userTimeFormat == "Hour in 12-hour format, Minute, AM/PM") {
     fun.rawData$date.formatted <- lubridate::mdy_hm(tmpData, tz=fun.userTimeZone)
@@ -90,7 +90,7 @@ fun.sub.format.date <- function(fun.userDateFormat, fun.userTimeFormat, fun.user
     fun.rawData$date.formatted <- lubridate::ydm_hms(tmpData, tz=fun.userTimeZone)
   } else if(fun.userDateFormat == "Month, Day, Year" && fun.userTimeFormat == "Hour in 12-hour format, Minute, Second, AM/PM") {
     fun.rawData$date.formatted <- lubridate::mdy_hms(tmpData, tz=fun.userTimeZone)
-  }  else if(fun.userDateFormat == "Day, Monty, Year" && fun.userTimeFormat == "Hour in 12-hour format, Minute, Second, AM/PM") {
+  }  else if(fun.userDateFormat == "Day, Month Year" && fun.userTimeFormat == "Hour in 12-hour format, Minute, Second, AM/PM") {
     fun.rawData$date.formatted <- lubridate::dmy_hms(tmpData, tz=fun.userTimeZone)
   } else if(fun.userDateFormat == "Abbreviated month, Day of the month, Year" && fun.userTimeFormat == "Hour in 12-hour format, Minute, Second, AM/PM") {
     fun.rawData$date.formatted <- lubridate::mdy_hms(tmpData, tz=fun.userTimeZone)

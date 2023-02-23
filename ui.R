@@ -252,6 +252,8 @@ shinyUI(fluidPage(
                             br(),
                             fluidRow(column(width = 9, withSpinner(plotlyOutput("display_time_series")))),
                             br(),
+                            fluidRow(column(width = 9, withSpinner(plotlyOutput("testSubgraph")))),
+                            br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_1"))),
                             br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_2"))),

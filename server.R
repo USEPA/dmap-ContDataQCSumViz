@@ -79,6 +79,7 @@ function(input, output, session) {
 
   currentOutPutId <- reactiveValues()
   gageColNames  <- NULL
+  daymetCols <- NULL
   consoleUSGS <- NULL
 
   selected_to_plot <- reactiveValues(all_selected=data.frame())
@@ -128,6 +129,8 @@ function(input, output, session) {
     
     shinyjs::runjs("$('#display_validation_msgs').empty()")
     
+    alert_message_no_date_column = paste0("We assume the dataset you uploaded contains at lease one date time column, but no date time column is identified, please check.")
+    
     my_data <- uploaded_data()
     output$display_raw_ts <- renderUI({
 
@@ -141,14 +144,10 @@ function(input, output, session) {
         possible_date_columns <- date_keys_in_favor_order[date_keys_in_favor_order %in% my_colnames]
         all_date_columns <- all_date_related_keys[all_date_related_keys %in% my_colnames]
 
-        # R ignore.case or pattern matching not wokring properly
-        if (identical(length(possible_date_columns),integer(0))){
+        if (length(possible_date_columns) == 0 | identical(length(possible_date_columns),integer(0))){
           print("inside shinyalert loop now...")
           shinyalert("Warning",alert_message_no_date_column,closeOnClickOutside = TRUE,closeOnEsc = TRUE,
                      confirmButtonText="OK",inputId = "alert_no_date")
-        } else if(!'DATE.TIME' %in% my_colnames & !'Date.Time' %in% my_colnames & ('Date' %in% my_colnames | 'DATE' %in% my_colnames ) & ('Time' %in% my_colnames | 'TIME' %in% my_colnames)){
-            #creating a new composite column
-          raw_data_columns$date_column_name <- "Date.Time"
         } else{
           raw_data_columns$date_column_name <- possible_date_columns[1]
         }
@@ -171,15 +170,15 @@ function(input, output, session) {
         ),
         box(width="100%",class="well",id="dateBox",
             fluidRow(
-              column(width=3,
+              column(width=4,
                      actionGroupButtons(
                        inputIds = c("combinedBtn", "separateBtn"),
-                       labels = list("Combined", "Separate"),
+                       labels = list("Date and Time combined", "Date and Time separate"),
                        status = c("primary active", "primary"),
                        size="sm"
                      )
               ),
-              column(width=6,uiOutput("display_validation_msgs"))
+              column(width=8,uiOutput("display_validation_msgs"))
             ),
             fluidRow(
               column(width=4, selectizeInput("parameters_to_process2",label ="Select parameters to process",
@@ -419,58 +418,59 @@ function(input, output, session) {
       withSpinner(plotlyOutput(outputId="all_raw_ts"))
     })
 
-    #isolate(input$raw_datetime_format)
     raw_data <- uploaded_data()
-    my_raw_choices = input$parameters_to_process2
+    #Missing site id is just a warning
+    validateSiteId(raw_data)
     
-    raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
-                                      ,fun.userTimeFormat =input$selectedTimeFormat
-                                      ,fun.userTimeZone = input$selectedTimeZone
-                                      ,fun.userDateFieldName = input$selectedDateFieldName
-                                      ,fun.userTimeFieldName = input$selectedTimeFieldName
-                                      ,fun.rawData = raw_data
-                                      ,fun.date.org = dateButtonClicked$activeBtn)
+    #display_validation_msgs dateBox
+    if (validateUserInputs(raw_data) == FALSE){
+      
+        my_raw_choices = input$parameters_to_process2
+        raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
+                                          ,fun.userTimeFormat =input$selectedTimeFormat
+                                          ,fun.userTimeZone = input$selectedTimeZone
+                                          ,fun.userDateFieldName = input$selectedDateFieldName
+                                          ,fun.userTimeFieldName = input$selectedTimeFieldName
+                                          ,fun.rawData = raw_data
+                                          ,fun.date.org = dateButtonClicked$activeBtn)
     
-    #print(head(raw_data))
-    
-
-    if (!is.null(my_raw_choices) && !is.null(raw_data$date.formatted)){
-      
-      fullSeq <- seq.Date(min(as.Date(raw_data$date.formatted, "%Y-%m-%d")), to = max(as.Date(raw_data$date.formatted,"%Y-%m-%d")), by = 1)
-      modified_raw_data <- raw_data %>% complete(date.formatted = fullSeq)
-     
-      
-      uploaded_raw_data  <- modified_raw_data %>%
-        select(my_raw_choices, c("date.formatted")) %>%
-        gather(key = "parameter", value = "value", -date.formatted)
-      
-      main_range = calculate_time_range(as.list(uploaded_raw_data))
-      mainBreaks = main_range[[1]]
-      main_x_date_label = main_range[[2]]
-      
-      p <- ggplot(data = uploaded_raw_data, aes(x = date.formatted, y = value)) +
-        geom_line(aes(colour=parameter)) +
-        labs(x="Date", y="Parameters")+
-        scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
-        theme_bw()+
-        theme(
-          strip.background = element_blank()
-          ,strip.placement = "outside" 
-          ,text=element_text(size=10,face = "bold", color="cornflowerblue")
-          ,plot.title = element_text(hjust=0.5)
-          ,legend.position="bottom"
-          ,axis.text.x=element_text(angle=65, hjust=10)
-        )
-        p = p + facet_grid(parameter ~ ., scales = "free_y")
-       
-         output$all_raw_ts <- renderPlotly({
-          ggplotly(p) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.9))
-        }) 
-      } else if(is.null(raw_data$date.formatted)) {
-        shinyalert("Warning","not a valid date format",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
-                   confirmButtonText="OK",inputId = "alert_wrong_date_format")
-        
-      }
+        if (!is.null(my_raw_choices) && !is.null(raw_data$date.formatted)){
+          
+          fullSeq <- seq.Date(min(as.Date(raw_data$date.formatted, "%Y-%m-%d")), to = max(as.Date(raw_data$date.formatted,"%Y-%m-%d")), by = 1)
+          modified_raw_data <- raw_data %>% complete(date.formatted = fullSeq)
+          
+          uploaded_raw_data  <- modified_raw_data %>%
+            select(my_raw_choices, c("date.formatted")) %>%
+            gather(key = "parameter", value = "value", -date.formatted)
+          
+          main_range = calculate_time_range(as.list(uploaded_raw_data))
+          mainBreaks = main_range[[1]]
+          main_x_date_label = main_range[[2]]
+          
+          p <- ggplot(data = uploaded_raw_data, aes(x = date.formatted, y = value)) +
+            geom_line(aes(colour=parameter)) +
+            labs(x="Date", y="Parameters")+
+            scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
+            theme_bw()+
+            theme(
+              strip.background = element_blank()
+              ,strip.placement = "outside" 
+              ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+              ,plot.title = element_text(hjust=0.5)
+              ,legend.position="bottom"
+              ,axis.text.x=element_text(angle=65, hjust=10)
+             )
+             p = p + facet_grid(parameter ~ ., scales = "free_y")
+           
+             output$all_raw_ts <- renderPlotly({
+              ggplotly(p) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.9))
+            }) 
+          } else if(is.null(raw_data$date.formatted)) {
+            shinyalert("Warning","not a valid date format",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
+                       confirmButtonText="OK",inputId = "alert_wrong_date_format")
+            
+          }
+    }
      
   })  ## observeEvent end
   observeEvent(input$alert_wrong_date_format,{
@@ -482,43 +482,15 @@ function(input, output, session) {
   observeEvent(input$runQS,{
     
     shinyjs::runjs("$('#display_validation_msgs').empty()")
-
     tryCatch({
-
       raw_data <- uploaded_data()
-      
       #It does not stop user, just warns them
       validateSiteId(raw_data)
-      
-       #display_validation_msgs dateBox
-
-      
-      if(dateButtonClicked$activeBtn == 'combined' & (is.null(input$parameters_to_process2) | input$selectedDateFormat == "" |
-         input$selectedDateFieldName == "")) {
-        shinyjs::runjs("$('#display_validation_msgs').empty()")
-        output$display_validation_msgs <- renderUI({
-          shiny::validate(
-            shiny::need(input$selectedDateFormat != "", 'Please select date format'	),
-            shiny::need(input$selectedDateFieldName != "", 'Please select date field name.'),
-            shiny::need(!is.null(input$parameters_to_process2), 'Please select parameters to process.')
-          )
-         })
-      } else if(dateButtonClicked$activeBtn == 'separate' & (is.null(input$parameters_to_process2) | input$selectedDateFormat == "" |
-                                                             input$selectedDateFieldName == "" | input$selectedTimeFieldName == "")){
-        shinyjs::runjs("$('#display_validation_msgs').empty()")
-        output$display_validation_msgs <- renderUI({
-          shiny::validate(
-            shiny::need(input$selectedDateFormat != "", 'Please select date format'	),
-            shiny::need(input$selectedDateFieldName != "", 'Please select date field name.'),
-            shiny::need(!is.null(input$parameters_to_process2), 'Please select parameters to process.'),
-            shiny::need(input$selectedTimeFieldName != "", 'Please select time field name.')
-          )
-        })
-      } else {
+      #display_validation_msgs dateBox
+      if (validateUserInputs(raw_data) == FALSE){
           output$display_quick_summary_table <- renderUI({
             column(12, align = "center", withSpinner(tableOutput("quick_summary_table")))
           })
-    
           output$display_footnote_text <- renderUI({
             verbatimTextOutput("quick_summary_table_footnote")
           })
@@ -531,6 +503,28 @@ function(input, output, session) {
                                           ,fun.userTimeFieldName = input$selectedTimeFieldName
                                           ,fun.rawData = raw_data
                                           ,fun.date.org = dateButtonClicked$activeBtn)
+              
+              raw_data_columns$date_column_name = "date.formatted"
+              
+              ## create a quick metadata summary regarding the raw data file
+              dailyCheck <- ReportMetaData(
+                fun.myFile = NULL
+                ,
+                fun.myDir.import = NULL
+                ,
+                fun.myParam.Name = input$parameters_to_process2
+                ,
+                fun.myDateTime.Name = raw_data_columns$date_column_name
+                ,
+                fun.myDateTime.Format = "%Y-%m-%d %H:%M:%S"
+                ,
+                fun.myThreshold = 20
+                ,
+                fun.myConfig = ""
+                ,
+                df.input = raw_data
+              ) 
+   
           }, error = function(parsingMsg) {
             output$display_validation_msgs <- renderUI({
               str(parsingMsg)
@@ -547,27 +541,6 @@ function(input, output, session) {
               prepareDateFormatErrorMsg(parsingMsg)
             })
           })
-    
-          raw_data_columns$date_column_name = "date.formatted"
-       
-          ## create a quick metadata summary regarding the raw data file
-          dailyCheck <- ReportMetaData(
-            fun.myFile = NULL
-            ,
-            fun.myDir.import = NULL
-            ,
-            fun.myParam.Name = input$parameters_to_process2
-            ,
-            fun.myDateTime.Name = raw_data_columns$date_column_name
-            ,
-            fun.myDateTime.Format = "%Y-%m-%d %H:%M:%S"
-            ,
-            fun.myThreshold = 20
-            ,
-            fun.myConfig = ""
-            ,
-            df.input = raw_data
-          )
           #save(dailyCheck, file="test_dailyCheck.RData")
           
           getQuickSummary <- lapply(dailyCheck, myQuickSummary)
@@ -587,8 +560,7 @@ function(input, output, session) {
             toReport[n, 2:5] <- getQuickSummary[[n]]
           }
           
-          print(toReport)
-          
+          #print(toReport)
           output$quick_summary_table <- renderTable({
             toReport
           }, align = "c") # #renderTable end
@@ -767,26 +739,6 @@ function(input, output, session) {
      
      print(str(input$exclude_flagged))
 
-    # if (is.null(input$exclude_flagged)){
-    #   ContData.env$myStats.Fails.Exclude = FALSE
-    #   ContData.env$myStats.Suspects.Exclude = FALSE
-    #   print(input$exclude_flagged)
-    # }else if(length(input$exclude_flagged)==1 & input$exclude_flagged[1] == 'fail'){
-    #   print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
-    #   ContData.env$myStats.Fails.Exclude = TRUE
-    #   ContData.env$myStats.Suspects.Exclude = FALSE
-    # }else if(length(input$exclude_flagged)==1 & input$exclude_flagged[1] == 'suspect'){
-    #   print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
-    #   ContData.env$myStats.Fails.Exclude = FALSE
-    #   ContData.env$myStats.Suspects.Exclude = TRUE
-    # }else if(length(input$exclude_flagged) == 2){
-    #   ContData.env$myStats.Fails.Exclude = TRUE
-    #   ContData.env$myStats.Suspects.Exclude = TRUE
-    #   print(paste0("check the exclude flagged choices are:",input$exclude_flagged))
-    # }
-     
-     
-     
      if (is.null(input$exclude_flagged)){
        ContData.env$myStats.Fails.Exclude = FALSE
        ContData.env$myStats.Suspects.Exclude = FALSE
@@ -812,7 +764,7 @@ function(input, output, session) {
      # Fill missing data
      ContData.env$myStats.missing.data.fill = input$fillMissingData
 
-    dailyStats <- SumStats.updated(fun.myFile=NULL
+     dailyStats <- SumStats.updated(fun.myFile=NULL
                                    ,fun.myDir.import=NULL
                                    ,fun.myParam.Name=variables_to_calculate
                                    ,fun.myDateTime.Name=raw_data_columns$date_column_name
@@ -822,10 +774,9 @@ function(input, output, session) {
                                    ,df.input=raw_data
                                    )
 
-    #save(dailyStats, file="test_dailyStats.RData")
-    processed$processed_dailyStats <- dailyStats
-
-    removeModal()
+      #save(dailyStats, file="test_dailyStats.RData")
+      processed$processed_dailyStats <- dailyStats
+      removeModal()
 
   })
 
@@ -855,16 +806,15 @@ function(input, output, session) {
   output$saveDailyStatistics <- downloadHandler(
 
     filename = function(){
-
-    name_in_file <- loaded_data$name
-    if (endsWith(loaded_data$name,".csv")) name_in_file <- sub(".csv$","",loaded_data$name)
-    if (endsWith(loaded_data$name,".xlsx")) name_in_file <- sub(".xlsx$","",loaded_data$name)
-
-    if (input$how_to_save == "save2"){
-      paste0("saved_dailyStats_",name_in_file,"_dailyStats.csv")
-    }else if(input$how_to_save == "save1"){
-      paste0("saved_dailyStats_",name_in_file,".zip")
-    }
+      name_in_file <- loaded_data$name
+      if (endsWith(loaded_data$name,".csv")) name_in_file <- sub(".csv$","",loaded_data$name)
+      if (endsWith(loaded_data$name,".xlsx")) name_in_file <- sub(".xlsx$","",loaded_data$name)
+  
+      if (input$how_to_save == "save2"){
+        paste0("saved_dailyStats_",name_in_file,"_dailyStats.csv")
+      }else if(input$how_to_save == "save1"){
+        paste0("saved_dailyStats_",name_in_file,".zip")
+      }
     },
 
     content = function(file){
@@ -970,7 +920,6 @@ function(input, output, session) {
 
 
     ##USGS Gage
-
     output$time_series_input_7 <- renderUI({
       tagList(
         tags$h5("USGS Gage"),
@@ -987,17 +936,21 @@ function(input, output, session) {
     })
     
     # END OF USGS gage
-    
     #Daymet
     output$day_met_section <- renderUI({
       tagList(
         tags$h5("DayMet"),
         textInput(inputId="daymet_lat", label="Site Latitude",value=""),
         textInput(inputId="daymet_long", label="Site Longitude",value=""), 
-        actionButton(inputId="get_daymet_data", label="Download and View daymet data",style="color:cornflowerblue;background-color:black;font-weight:bold")
+        selectizeInput("daymet_params", label ="Select Daymet variables",
+                       choices=daymetCols,
+                       multiple = TRUE,
+                       selected=NULL,
+                       options = list(hideSelected = FALSE)),
+        actionButton(inputId="get_daymet_data", label="Get Daymet data",style="color:cornflowerblue;background-color:black;font-weight:bold"),
+        actionButton(inputId="display_daymet_raw", label="View Daymet raw data",style="color:cornflowerblue;background-color:black;font-weight:bold")
       )
     })
-    
     #end of Daymet
     
     tagList(
@@ -1613,7 +1566,7 @@ function(input, output, session) {
       })
 
       message("USGS data retrieved")
-      #str(colnames(gageRawData$gagedata))
+      print(gageRawData$gagedata)
 
       allVars <- colnames(gageRawData$gagedata)
       varsToPlot <- allVars[!(allVars %in% c("SiteID","GageID","Date.Time"))]
@@ -1626,8 +1579,8 @@ function(input, output, session) {
   
 
   observeEvent(input$display_ts, {
-          
-        shinyjs::runjs("$('#ngTest').show()")
+        
+          if(length(processed$processed_dailyStats) > 0) {
           #Display USGS gage stats
           display_gage_stats()
           
@@ -1669,7 +1622,7 @@ function(input, output, session) {
                 
                 output$display_time_series <-  renderPlotly({
                  
-                    mainPlot <- ggplot(bind_rows(mainList, .id="df")) +
+                    mainPlot <- ggplot(bind_rows(mainList, .id="df"), dynamicTicks = TRUE) +
                     labs(title=mainMapTitle, x="Date", y="Parameters")+
                     geom_ribbon(na.rm=TRUE, show.legend=TRUE, aes(ymin=lower_col,ymax=upper_col,x=as.POSIXct(Date,format="%Y-%m-%d",fill="df")),alpha=0.3, inherit.aes = FALSE)+
                     geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=df))+
@@ -1687,9 +1640,54 @@ function(input, output, session) {
                        ,legend.position="bottom"
                        ,axis.text.x=element_text(angle=65, hjust=10)
                      )
-                      ggplotly(mainPlot,height=plotHeight) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+                      ggplotly(mainPlot,height=plotHeight) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3)) 
+                     # %>% event_register("plotly_relayout")
                   
                 })
+                
+                # if(input$gage_id != "" && length(input$gage_id) > 0 && nrow(gageRawData$gagedata) > 0) {
+                #   
+                #   #total_row_num <- lengths(variable_to_plot) + lengths(input$gaze_params)
+                # 
+                # output$testSubgraph <- renderPlotly({
+                #   
+                #     mainPlot2 <- ggplot(bind_rows(mainList, .id="df"), dynamicTicks = TRUE) +
+                #       labs(title="Map for discussion only", x="Date", y="Parameters")+
+                #       geom_ribbon(na.rm=TRUE, show.legend=TRUE, aes(ymin=lower_col,ymax=upper_col,x=as.POSIXct(Date,format="%Y-%m-%d",fill="df")),alpha=0.3, inherit.aes = FALSE)+
+                #       geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=df))+
+                #       scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
+                #       theme_bw()+
+                #       facet_grid(df ~ ., scales = "free_y")+
+                #       scale_color_discrete(name="")+
+                #       theme(
+                #         strip.background = element_blank()
+                #         ,legend.title=element_blank()
+                #         ,strip.text.y = element_blank()
+                #         ,strip.placement = "outside"
+                #         ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+                #         ,plot.title = element_text(hjust=0.5)
+                #         ,legend.position="bottom"
+                #         ,axis.text.x=element_text(angle=65, hjust=10)
+                #       )
+                #     # ggplotly(mainPlot,height=plotHeight) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3)) %>%
+                #     #   event_register("plotly_relayout")
+                #     
+                #     gageStatsPlot <-  fun.gageStatsPlot (
+                #       fun.gage.id = input$gage_id,
+                #       fun.gage.data = gageRawData$gagedata,
+                #       fun.gage.vars.to.process = input$gaze_params,
+                #       fun.stats.column = input$dailyStats_ts_metrics,
+                #       fun.internal = TRUE
+                #     )
+                #     
+                #     
+                #     # ggplotly(gageStatsPlot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+                #     
+                #     subplot(ggplotly(gageStatsPlot), ggplotly(mainPlot2), nrows = 2, shareX = TRUE) %>% 
+                #       plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+                #     
+                #   })
+                # }
          
          } else if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
           
@@ -1750,10 +1748,22 @@ function(input, output, session) {
            shinyjs::removeClass("display_time_series", "html-fill-item-overflow-hidden")
            shinyjs::runjs("$('#display_time_series').removeAttr('style')")
           #Gage
+
            shinyjs::removeClass("#plot_gage_ts", "html-fill-item-overflow-hidden")
            shinyjs::runjs("$('#plot_gage_ts').removeAttr('style')")
-           shinyjs::runjs("$('#ngTest').hide()")
-   
+           
+           
+           #fix layout issues when gage, daymet and main map are rendered
+           shinyjs::removeClass("testSubgraph", "html-fill-item-overflow-hidden")
+           shinyjs::runjs("$('#testSubgraph').removeAttr('style')")
+           #Gage
+          }  else (
+            shinyalert("Error","Please calculate the daily statistics first on the 'Upload Data' tab",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
+                       confirmButtonText="OK",inputId = "no_gage_downloaded")
+          )
+
+           
+
   })  # observeEvent end
 
   ## close the alert messages
@@ -1819,6 +1829,12 @@ function(input, output, session) {
 
 
   output$display_time_series <- renderPlotly({(NULL)})
+  output$testSubgraph <- renderPlotly({(NULL)})
+  
+  # display_time_series_Proxy <- plotlyProxy("display_time_series")
+  # gage_proxy <- plotlyProxy("plot_gage_ts")
+  
+  
 
   observeEvent(input$display_ts_overlay, {
     
@@ -3199,58 +3215,21 @@ function(input, output, session) {
   display_gage_stats <- function() {
 
     if(input$gage_id != "" && length(input$gage_id) > 0 && nrow(gageRawData$gagedata) > 0) {
-      gage_variables_to_calculate <- input$gaze_params
-
-      ContData.env$myStats.Fails.Exclude = TRUE
-      ContData.env$myStats.Suspects.Exclude = TRUE
-
-      #for now, need to make it input base
-      gageDailyStats <- SumStats.updated(fun.myFile=NULL
-                                         ,fun.myDir.import=NULL
-                                         ,fun.myParam.Name=gage_variables_to_calculate
-                                         ,fun.myDateTime.Name="Date.Time"
-                                         ,fun.myDateTime.Format="%Y-%m-%d %H:%M%:S"
-                                         ,fun.myThreshold=20
-                                         ,fun.myConfig=""
-                                         ,df.input=gageRawData$gagedata
-      )
-
+      
       output$display_time_series_1 <- renderUI({
         withSpinner(plotlyOutput("plot_gage_ts"),type=2)
-        #do.call(tagList, plotList)
       })
-
-      gageList <- list()
-      gageList2 <- Reduce(full_join, gageDailyStats)
-      gageCols <- paste(gage_variables_to_calculate, input$dailyStats_ts_metrics, sep=".")
-
-      gageData  <- gageList2 %>%
-        select(gageCols,"Date") %>%
-        gather(key = "parameter", value = "value",-Date)
       
-      main_range = calculate_time_range(as.list(gageData))
-      mainBreaks = main_range[[1]]
-      main_x_date_label = main_range[[2]]
-
-
-      gagePlot <- ggplot(data = gageData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
-        geom_line(aes(colour=parameter)) +
-        scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
-        labs(title="USGS gage metrics", x="Date", y="Parameters")+
-        theme_bw()+
-        theme(
-          strip.background = element_blank()
-          ,strip.placement = "outside"
-          ,text=element_text(size=10,face = "bold", color="cornflowerblue")
-          ,plot.title = element_text(hjust=0.5)
-          ,legend.position="bottom"
-          ,axis.text.x=element_text(angle=65, hjust=10)
-        )
-
-      gagePlot = gagePlot + facet_grid(parameter ~ ., scales = "free_y")
+      gageStatsPlot <-  fun.gageStatsPlot (
+                                          fun.gage.id = input$gage_id,
+                                          fun.gage.data = gageRawData$gagedata,
+                                          fun.gage.vars.to.process = input$gaze_params,
+                                          fun.stats.column = input$dailyStats_ts_metrics,
+                                          fun.internal = TRUE
+                                        )
 
       output$plot_gage_ts <- renderPlotly({
-        ggplotly(gagePlot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+        ggplotly(gageStatsPlot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
       })
 
     } else {
@@ -3267,39 +3246,12 @@ function(input, output, session) {
       output$display_time_series_1 <- renderUI({
         withSpinner(plotlyOutput("plot_gage_ts"),type = 2)
       })
-      raw_data_merged <- gageRawData$gagedata
-       # covers if user removes GageId from the dropdown
-      if(input$gaze_params != "" && length(input$gaze_params) > 0) {
-        raw_data_merged  <- raw_data_merged %>%
-          select(c(input$gaze_params), c("GageID", "Date.Time")) %>%
-          gather(key = "parameter", value = "value",-GageID, -Date.Time)
-      } else {
-      raw_data_merged  <- raw_data_merged %>%
-        select(-ends_with("SiteID")) %>%
-        gather(key = "parameter", value = "value",-GageID, -Date.Time)
-      }
-      
-      main_range = calculate_time_range(as.list(raw_data_merged))
-      mainBreaks = main_range[[1]]
-      main_x_date_label = main_range[[2]]
+       gageRawPlot <- fun.gageRawPlot(fun.gage.data = gageRawData$gagedata,
+                             fun.gage.vars.to.process = input$gaze_params,
+                             fun.internal = TRUE)
 
-       p <- ggplot(data = raw_data_merged, aes(x = Date.Time, y = value)) +
-        geom_line(aes(colour=parameter)) +
-        labs(title="USGS gage Raw Data", y="Parameters", x="Date") + 
-        scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
-        theme_bw()+
-        theme(
-               strip.background = element_blank()
-               ,strip.placement = "outside" 
-               ,text=element_text(size=10,face = "bold", color="cornflowerblue")
-               ,plot.title = element_text(hjust=0.5)
-               ,legend.position="bottom"
-               ,axis.text.x=element_text(angle=65, hjust=10)
-        )
-      
-       p = p + facet_grid(parameter ~ ., scales = "free_y")
       output$plot_gage_ts <- renderPlotly({
-        ggplotly(p) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+        ggplotly(gageRawPlot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
       })
     }
   })
@@ -3320,24 +3272,26 @@ function(input, output, session) {
         endYear <- format(dateRange$max, format='%Y')
 
         #Actually gets the gage data from the USGS NWIS system
-        dayMetRawData$daymetdata <- fun.dayMetData(
+        dayMetRawData <- fun.dayMetData(
                                fun.lat <- input$daymet_lat,
                                fun.lon <- input$daymet_long,
                                fun.year.start <-  as.numeric(startYear),
                                fun.year.end <-  as.numeric(endYear),
                                fun.internal <-  TRUE
                                )
+        dyametCols <- dayMetRawData$daymetColumns
+        updateSelectizeInput(session, 'daymet_params', choices = dyametCols, selected = dyametCols[1])
         
         #Fills in the progress bar once the operation is complete
         incProgress(1/1, detail = paste("Retrieved records for Latitude and Longitude ",input$daymet_lat, input$daymet_long))
         Sys.sleep(1)
         
-        main_range = calculate_time_range(as.list(dayMetRawData$daymetdata))
+        main_range = calculate_time_range(as.list(dayMetRawData$dayMetData))
         mainBreaks = main_range[[1]]
         main_x_date_label = main_range[[2]]
      
-        precipplot<-ggplot( dayMetRawData$daymetdata, aes(Date, precip))+
-          geom_line(aes(y=precip,x=as.POSIXct(Date,format="%Y-%m-%d"),colour=year),size=0.8)+
+        precipplot<-ggplot( dayMetRawData$dayMetData, aes(Date, precip))+
+          geom_line(aes(y=precip,x=as.POSIXct(Date,format="%Y-%m-%d")),size=0.8, color="cornflowerblue")+
           scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
           theme_light()+
           #facet_grid(site ~., scales="fixed")+ 
@@ -3369,11 +3323,17 @@ function(input, output, session) {
   
   validateSiteId <- function(raw_data) {
     my_colnames <- names(raw_data)
-    idx_ID_col <-
-      str_detect(my_colnames, "SiteID") |
-      str_detect(my_colnames, "SITEID")
-    loaded_data$siteID <- unique(raw_data[idx_ID_col])
-    if (length(unique(raw_data[idx_ID_col])) > 1) {
+    idx_ID_col <- str_detect(my_colnames, regex('site', ignore_case = T))
+    total_siteids_found <- sum(idx_ID_col, na.rm=TRUE)
+    print(total_siteids_found)
+   
+    # idx_ID_col <-  str_detect(my_colnames, "Site") |
+    #                str_detect(my_colnames, "site") |
+    #                str_detect(my_colnames, "SITE")
+      
+    # loaded_data$siteID <- unique(raw_data[idx_ID_col])
+    if (total_siteids_found > 1) {
+    # if (length(unique(raw_data[idx_ID_col])) > 1) {
       shinyalert(
         "Warning",
         "More than one site ID is detected, please confirm if the loaded data is a single site file.",
@@ -3382,7 +3342,7 @@ function(input, output, session) {
         confirmButtonText = "OK",
         inputId = "alert_not_single_site"
       )
-    } else if (length(unique(raw_data[idx_ID_col])) == 0) {
+    } else if (total_siteids_found  == 0) {
       shinyalert(
         "Warning",
         "No site ID is detected, please confirm if the loaded data has the SiteID column.",
@@ -3393,5 +3353,72 @@ function(input, output, session) {
       )
     }
   }
-
+  
+  # observeEvent(event_data("plotly_relayout"), {
+  #   d <- event_data("plotly_relayout")
+  # 
+  #   xmin <- if (length(d[["xaxis.range[0]"]])) d[["xaxis.range[0]"]] else d[["xaxis.range"]][1]
+  #   xmax <- if (length(d[["xaxis.range[1]"]])) d[["xaxis.range[1]"]] else d[["xaxis.range"]][2]
+  #   if (is.null(xmin) || is.null(xmax)) return(NULL)
+  #   plotlyProxy("plot_gage_ts", session) %>%
+  #     plotlyProxyInvoke("relayout", list(xaxis = list(range = c(xmin, xmax))))
+  #   
+  #   # plotlyProxy("plot", session) %>%
+  #   #  plotlyProxyInvoke("relayout", list(yaxis = list(range = yrng)))
+  #   
+  # })
+  
+  validateUserInputs <- function(raw_data){
+    missingInputs <- FALSE
+    #display_validation_msgs dateBox
+    if (dateButtonClicked$activeBtn == 'combined' &
+        (
+          is.null(input$parameters_to_process2) |
+          input$selectedDateFormat == "" |
+          input$selectedDateFieldName == ""
+        )) {
+      missingInputs <- TRUE
+      shinyjs::runjs("$('#display_validation_msgs').empty()")
+      output$display_validation_msgs <- renderUI({
+        shiny::validate(
+          shiny::need(input$selectedDateFormat != "", 'Please select date format'),
+          shiny::need(
+            input$selectedDateFieldName != "",
+            'Please select date field name.'
+          ),
+          shiny::need(
+            !is.null(input$parameters_to_process2),
+            'Please select parameters to process.'
+          )
+        )
+      })
+    } else if (dateButtonClicked$activeBtn == 'separate' &
+               (
+                 is.null(input$parameters_to_process2) |
+                 input$selectedDateFormat == "" |
+                 input$selectedDateFieldName == "" |
+                 input$selectedTimeFieldName == ""
+               )) {
+      missingInputs <- TRUE
+      shinyjs::runjs("$('#display_validation_msgs').empty()")
+      output$display_validation_msgs <- renderUI({
+        shiny::validate(
+          shiny::need(input$selectedDateFormat != "", 'Please select date format'),
+          shiny::need(
+            input$selectedDateFieldName != "",
+            'Please select date field name.'
+          ),
+          shiny::need(
+            !is.null(input$parameters_to_process2),
+            'Please select parameters to process.'
+          ),
+          shiny::need(
+            input$selectedTimeFieldName != "",
+            'Please select time field name.'
+          )
+        )
+      })
+    }
+    return(missingInputs)
+  }
 }
