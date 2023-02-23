@@ -1580,7 +1580,7 @@ function(input, output, session) {
 
   observeEvent(input$display_ts, {
         
-          if(length(processed$processed_dailyStats) > 0) {
+          if(length(processed$processed_dailyStats) > 0 & length(input$dailyStats_ts_variable_name) > 0) {
           #Display USGS gage stats
           display_gage_stats()
           
@@ -1758,7 +1758,7 @@ function(input, output, session) {
            shinyjs::runjs("$('#testSubgraph').removeAttr('style')")
            #Gage
           }  else (
-            shinyalert("Error","Please calculate the daily statistics first on the 'Upload Data' tab",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
+            shinyalert("Error","Please calculate the daily statistics first on the 'Upload Data' tab and select required parameters",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
                        confirmButtonText="OK",inputId = "no_gage_downloaded")
           )
 
