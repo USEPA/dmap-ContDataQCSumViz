@@ -182,7 +182,7 @@ shinyUI(fluidPage(
                           mainPanel(
                             width = 9,
                             column(width = 9, #uiOutput("all_plots_merged")
-                               div("holod on")    
+                               div("hold on")    
                                    
                             )
                           ) # mainPanel end
