@@ -242,7 +242,7 @@ SumStats.updated <- function(fun.myFile
     # df.param[,myDate.Name] <- as.Date(tempCol, "%Y-%m-%d")
     df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name],fd01)
     if( ContData.env$myStats.missing.data.fill == TRUE) {
-        fullSeq <- seq.Date(min(as.Date(df.param$Date, "%Y-%m-%d")), to = max(as.Date(df.param$Date,"%Y-%m-%d")), by = 1)
+        fullSeq <- seq.Date(min(as.Date(df.param$Date, "%Y-%m-%d"),na.rm = TRUE), to = max(as.Date(df.param$Date,"%Y-%m-%d"),na.rm = TRUE), by = 1)
         filled_missingData <- df.param %>% complete(Date = fullSeq)
         df.param <- as.data.frame(filled_missingData)
     }

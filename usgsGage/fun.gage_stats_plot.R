@@ -50,13 +50,14 @@ fun.gageStatsPlot <- function(
         theme(
           strip.background = element_blank()
           ,strip.placement = "outside"
+          ,strip.text.y = element_blank()
           ,text=element_text(size=10,face = "bold", color="cornflowerblue")
           ,plot.title = element_text(hjust=0.5)
           ,legend.position="bottom"
           ,axis.text.x=element_text(angle=65, hjust=10)
         )
       
-      gagePlot = gagePlot + facet_grid(parameter ~ ., scales = "free_y")
+     gagePlot = gagePlot + facet_grid(parameter ~ ., scales = "free_y")
       return(gagePlot)
     } 
     

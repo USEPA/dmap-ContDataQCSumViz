@@ -21,22 +21,20 @@
 # library(shinycssloaders)
 
 
+
 # Define UI for application
 options(spinner.color.background = "#ffffff", spinner.size = 1)
 shinyUI(fluidPage(
   theme = "styles.css",
   useShinyjs(),
   tags$head(tags$script(src="script.js")),
-
+  # add_busy_spinner(spin = "ajax-loader-spinner.gif"),
   # main panel for variable selection
   mainPanel(
     width = 12,
-
-    # css_tabPanels <- '.nav-tabs>li>a{
-    #                        color: cornflowerblue;
-    #                        font-size: 18px;
-    #                        font-weight: bold;
-    #                        }',
+    tags$head(
+      tags$link(rel="stylesheet", type="text/css", href="customLoader.css")
+    ),
     tags$head(tags$style(HTML(".nav-tabs>li>a{
                                    color: cornflowerblue;
                                    font-size: 18px;
@@ -50,9 +48,11 @@ shinyUI(fluidPage(
     tags$style("#display_fill_data .shiny-input-container .checkbox label span {font-weight: bold; }"),
     tags$style("#display_validation_msgs {   color: red; font-weight: bold; }"),
     # spacing
-    fluidRow(p()),
-
+    fluidRow(id = "one", ),
     # top controls
+    fluidRow( 
+      div(id = "customBusy", class = "loading-modal")
+      ),
     fluidRow(
       column(
         width = 12,
@@ -93,11 +93,14 @@ shinyUI(fluidPage(
                       )
                     ),
                     hr(),
+                    tagList(
                     actionButton(
                       inputId = "uploadId",
                       label = "Use this file",
                       style = "color:cornflowerblue;background-color:black;font-weight:bold"
                     ),
+                    actionButton(inputId="displayidLeft",label = "Display file contents",style="color:cornflowerblue;background-color:black;font-weight:bold;display:none")
+                     ),
                     hr(),
                     uiOutput("siteType"),
                     hr(),
@@ -146,8 +149,8 @@ shinyUI(fluidPage(
                           sidebarPanel(
                             width = 3,
                             # EWL, Start
-                            p("Must calulcate daily statistics before can proceed."),
-                            p("'Upload Data' - 'Use this file' - 'Run meta survey' - 'Calculate daily statistics'"),
+                            p("Must calulcate daily statistics before can proceed.", style='font-weight:bold;font-family: Helvetica Neue, Helvetica, Arial, sans-serif;'),
+                            p("Steps: 'Upload Data' > 'Use this file' > 'Run meta survey' > 'Calculate daily statistics'", style='font-weight:bold;font-family:Helvetica Neue, Helvetica, Arial, sans-serif;'),
                             # EWL, End
                             hr(),
                             uiOutput("summary_table_input_1"),
@@ -167,7 +170,25 @@ shinyUI(fluidPage(
                       ), # column close
                       br(),
                     ), # tabPanel 1 end
-
+                    tabPanel("Time series sub plots",
+                      value = "tab_time_series_sub_plot", 
+                      br(),
+                      column(
+                        width = 12,
+                        sidebarLayout(
+                          sidebarPanel(width = 3,
+                            uiOutput("time_series_sub_plot_inputs")
+                          ),
+                          mainPanel(
+                            width = 9,
+                            column(width = 9, #uiOutput("all_plots_merged")
+                               div("holod on")    
+                                   
+                            )
+                          ) # mainPanel end
+                        )
+                      )
+                    ),
                     ### DE, All, TS Plots ----
                     tabPanel("Time series plots",
                       value = "tab_time_series", br(),
@@ -238,7 +259,7 @@ shinyUI(fluidPage(
                             hr(),
                             fluidRow(
                               column(
-                                width = 6,
+                                width = 9,
                                 uiOutput("time_series_input_5")
                               ),
                               column(
@@ -250,15 +271,13 @@ shinyUI(fluidPage(
                           mainPanel(
                             width = 9,
                             br(),
-                            fluidRow(column(width = 9, withSpinner(plotlyOutput("display_time_series")))),
+                            fluidRow(column(width = 9, plotlyOutput("display_time_series"))),
                             br(),
-                            fluidRow(column(width = 9, withSpinner(plotlyOutput("testSubgraph")))),
-                            br(),
-                            fluidRow(column(width = 9, uiOutput("display_time_series_1"))),
+                            fluidRow(column(width = 9, plotlyOutput("display_time_series_1"))),
                             br(),
                             fluidRow(column(width = 9, uiOutput("display_time_series_2"))),
                             br(),
-                            fluidRow(column(width = 9, uiOutput("display_time_series_3")))
+                            fluidRow(column(width = 9, plotlyOutput("display_time_series_3")))
                           ) # mainPanel end
                         ) # sidebarLayout end
                       ), # column close

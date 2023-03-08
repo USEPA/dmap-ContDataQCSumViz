@@ -46,7 +46,7 @@ fun.GageData <- function(fun.myData.SiteID
                      ,fun.myData.DateRange.Start
                      ,fun.myData.DateRange.End
                      ,fun.myDir.export = getwd()
-                     ,fun.myTZ = ContData.env$myTZ) {##FUN.fun.GageData.START
+                     ,fun.myTZ = "America/New_York") {##FUN.fun.GageData.START
   
   myDir.data.export <- fun.myDir.export
   #
@@ -197,6 +197,15 @@ fun.GageData <- function(fun.myData.SiteID
                                ,File.Date.End
                                ,sep=ContData.env$myDelim)
                          ,"csv",sep=".")
+    
+    
+    # utils::write.csv(data.myGage
+    #                  ,file.path(myDir.data.export,strFile.Out)
+    #                  ,quote=FALSE
+    #                  ,row.names=FALSE)
+    
+    
+    
     cat("\n")
     # 11.1. Inform user of progress and update LOG
     myMsg <- "COMPLETE"
@@ -228,3 +237,12 @@ fun.GageData <- function(fun.myData.SiteID
 
 }##FUN.fun.GageData.END
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# test <- fun.GageData(fun.myData.SiteID = "01104455"
+#                          ,fun.myData.Type = "Gage"
+#                          ,fun.myData.DateRange.Start = "2015-03-03"
+#                          ,fun.myData.DateRange.End = "2020-10-28"
+#                          ,fun.myDir.export = getwd()
+#                          ,fun.myTZ = "America/New_York")
+# print(test)

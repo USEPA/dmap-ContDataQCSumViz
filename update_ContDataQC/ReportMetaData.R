@@ -198,7 +198,7 @@ ReportMetaData <- function(fun.myFile
     ##FOR.i.START
     #
     i.num <- match(i, fun.myParam.Name)
-    print(paste0("WORKING on parameter (", i.num, "/", param.len, "); ", i))
+    #print(paste0("WORKING on parameter (", i.num, "/", param.len, "); ", i))
     utils::flush.console()
     myCol <- c(fun.myDateTime.Name, i)
     
@@ -280,13 +280,4 @@ removeTimeFormat <- function (userFormatString) {
     dateFormat <- str_split(userFormatString, " ")
     return(dateFormat[[1]][1])
   }
-}
-
-checkIgnoreCaseColExist <- function (userColNames, pattern) {
-    #not working with "Date.time", it comes back possitive for "Date"
-   colStatus <- str_detect(userColNames, fixed(pattern, ignore_case = TRUE))
-    if(any(colStatus, TRUE) == TRUE) {
-        return(TRUE)
-    }
-  return(FALSE)
 }

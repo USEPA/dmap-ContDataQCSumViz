@@ -73,7 +73,7 @@ source("update_ContDataQC/CompSiteCDF.updated.R")
 source("update_ContDataQC/SumStats.updated.R")
 source("update_ContDataQC/ReportMetaData.R")
 
-source("update_ContDataQC/fun.DayMetData.R")
+
 source("update_ContDataQC/fun.ConvertDateFormat.R")
 source("sumVizUtils/fun.calculate.time.breaks.R")
 
@@ -82,6 +82,9 @@ source("usgsGage/fun.gage_raw_plot.R")
 source("usgsGage/fun.gage_stats_plot.R")
 source("usgsGage/download_usgs_gage_data.R")
 
+source("dayMet/fun.DayMetData.R")
+source("dayMet/fun.daymet_raw_plot.R")
+source("constants.R")
 
 
 

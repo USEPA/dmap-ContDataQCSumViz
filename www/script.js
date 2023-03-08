@@ -1,9 +1,22 @@
 $(function(){ 
-  // Waiting for `{shiny}` to be connected
-  $(document).on('shiny:connected', function(event) {
-      //$("#display_time_series").removeClass("html-fill-item-overflow-hidden");
-      //display_ts
-  })
+  $(document).on("shiny:busy", function() {
+  	setTimeout(function() {
+	      if ($('html').hasClass('shiny-busy')) {
+	        $("#customBusy").show();
+	        $(":input").prop("disabled", true);
+	      }
+	    }, 500) 
+  });
+  
+  $(document).on("shiny:idle", function() {
+    $(":input").prop("disabled", false);
+     $("#customBusy").hide();
+    });
+    
+  $(document).on("shiny:error", function(event) {
+    $(":input").prop("disabled", false);
+     $("#customBusy").hide();
+   });
 });
 
 

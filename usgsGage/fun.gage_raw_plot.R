@@ -35,6 +35,7 @@ fun.gageRawPlot <- function(
           theme_bw()+
           theme(
             strip.background = element_blank()
+            ,strip.text.y = element_blank()
             ,strip.placement = "outside" 
             ,text=element_text(size=10,face = "bold", color="cornflowerblue")
             ,plot.title = element_text(hjust=0.5)

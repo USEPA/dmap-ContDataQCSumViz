@@ -1,0 +1,16 @@
+.loading-modal {
+    display:    none;
+    position:   fixed;
+    z-index:    2000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+	background-color:rgba( 255, 255, 255, .8 );
+	background-image:url("ajax-loader-spinner.gif");
+	background-position:50% 50%;
+	background-repeat:no-repeat;
+    opacity: 0.80;
+	-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 80);
+	filter: alpha(opacity = 80);
+}
