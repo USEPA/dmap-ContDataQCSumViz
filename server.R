@@ -152,7 +152,7 @@ function(input, output, session) {
         shinyjs::runjs("$('#quick_summary_table_footnote').empty()")
         div(id="mainBox",
         fluidRow(
-          column(width=12, actionButton(inputId="dateTimeBoxButton", style="float:right;background-color:#178acc;color:white", class="active", label="Hide Selection", icon= icon("arrow-down")))
+          column(width=12, actionButton(inputId="dateTimeBoxButton", style="float:right;", class="active btn btn-primary", label="Hide Selection", icon= icon("arrow-down")))
         ),
         box(width="100%",class="well displayed",id="dateBox",
             fluidRow(
@@ -185,8 +185,8 @@ function(input, output, session) {
               column(width=4,uiOutput("select")),
             ),
             fluidRow(
-              column(width=2, actionButton(inputId="runQS", label="Run meta summary",style="color:cornflowerblue;background-color:black;font-weight:bold")),
-              column(width=2, actionButton(inputId="showrawTS", label="Display time series",style="color:cornflowerblue;background-color:black;font-weight:bold")),
+              column(width=2, actionButton(inputId="runQS", label="Run meta summary",class="action-btn-style")),
+              column(width=2, actionButton(inputId="showrawTS", label="Display time series",class="action-btn-style")),
               column(width=2, uiOutput("display_button")),
               column(width=6, div(id="dummy"))
             ),
@@ -336,7 +336,7 @@ function(input, output, session) {
   # output$display_button <- renderUI({
   #   data <- uploaded_data() ## datasetlist()
   #   if (length(data) > 0 ) {
-  #   actionButton(inputId = "displayid",label = "Display file contents",style="color:cornflowerblue;background-color:black;font-weight:bold")
+  #   actionButton(inputId = "displayid",label = "Display file contents",class="action-btn-style")
   #   }
   # })
 
@@ -469,8 +469,6 @@ function(input, output, session) {
           output$display_footnote_text <- renderUI({
             verbatimTextOutput("quick_summary_table_footnote")
           })
-          
-          
 
           raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
                                           ,fun.userTimeFormat =input$selectedTimeFormat
@@ -584,20 +582,23 @@ function(input, output, session) {
             renderUI({
               actionButton(inputId = "calculateDailyStatistics",
                            label = "Calculate daily statistics",
-                           style = "color:cornflowerblue;background-color:black;font-weight:bold")
+                           class="action-btn-style"
+                           )
             })
           
           output$display_actionButton_saveDailyStatistics <- renderUI({
           actionButton(inputId="saveDailyStatistics"
                          ,label="Save daily statistics"
-                         ,style="color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
+                         ,class="action-btn-style"
+                         ,style="padding-left:15px;padding-right:15px;")
           })
           
           ## change the actionButton to downloadButton
           output$display_actionButton_saveDailyStatistics <- renderUI({
             downloadButton(outputId = "saveDailyStatistics",
                            label = "Save daily statistics",
-                           style = "color:cornflowerblue;background-color:black;font-weight:bold;padding-left:15px;padding-right:15px;")
+                           class="action-btn-style",
+                           style = "padding-left:15px;padding-right:15px;")
           })
             #click the button to hide the selection box
             shinyjs::runjs("$('#dateTimeBoxButton').click()")
@@ -763,7 +764,7 @@ function(input, output, session) {
     })
 
     output$summary_table_input_4 <- renderUI({
-      actionButton(inputId="display_table", label="Summarise",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="display_table", label="Summarise",class="action-btn-style")
     })
 
 
@@ -801,8 +802,8 @@ function(input, output, session) {
 
     output$time_series_input_5 <- renderUI({
       tagList(
-      actionButton(inputId="display_ts",label="Display",style="color:cornflowerblue;background-color:black;font-weight:bold"),
-      actionButton(inputId="display_subplot_ts", label="Display Subplots",style="color:cornflowerblue;background-color:black;font-weight:bold"),
+      actionButton(inputId="display_ts",label="Display",class="action-btn-style"),
+      actionButton(inputId="display_subplot_ts", label="Display Subplots",class="action-btn-style"),
       )
     })
 
@@ -818,8 +819,8 @@ function(input, output, session) {
                           multiple = TRUE,
                           selected=NULL,
                           options = list(hideSelected = FALSE)),
-        actionButton(inputId="display_gage_ts", label="Get USGS gage data",style="color:cornflowerblue;background-color:black;font-weight:bold"),
-        actionButton(inputId="display_gage_raw", label="View USGS raw data",style="color:cornflowerblue;background-color:black;font-weight:bold")
+        actionButton(inputId="display_gage_ts", label="Get USGS gage data",class="action-btn-style"),
+        actionButton(inputId="display_gage_raw", label="View USGS raw data",class="action-btn-style")
         )
     })
     
@@ -858,8 +859,8 @@ function(input, output, session) {
                        multiple = TRUE,
                        selected=daymetCols[1],
                        options = list(hideSelected = FALSE)),
-        actionButton(inputId="get_daymet_data", label="Get Daymet data",style="color:cornflowerblue;background-color:black;font-weight:bold"),
-        actionButton(inputId="display_daymet_raw", label="View Daymet raw data",style="color:cornflowerblue;background-color:black;font-weight:bold")
+        actionButton(inputId="get_daymet_data", label="Get Daymet data",class="action-btn-style"),
+        actionButton(inputId="display_daymet_raw", label="View Daymet raw data",class="action-btn-style")
       )
     })
     #end of Daymet
@@ -903,7 +904,7 @@ function(input, output, session) {
     })
 
     output$time_series_overlay_input_5 <- renderUI({
-      actionButton(inputId="display_ts_overlay", label="Display",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="display_ts_overlay", label="Display",class="action-btn-style")
     })
 
     ############ DE, ALL, box plots" << All parameters ############
@@ -943,7 +944,7 @@ function(input, output, session) {
 
 
     output$box_input_5 <- renderUI({
-      actionButton(inputId="display_box", label="Display",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="display_box", label="Display",class="action-btn-style")
     })
 
 
@@ -996,7 +997,7 @@ function(input, output, session) {
     })
 
     output$display_CDF_button <- renderUI({
-      actionButton(inputId="run_CDF", label="Run and display",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="run_CDF", label="Run and display",class="action-btn-style")
     })
 
     ############  DE, ALL, Raster graphs" << All parameters ############
@@ -1034,7 +1035,7 @@ function(input, output, session) {
     })
 
     output$raster_input_6 <- renderUI({
-      actionButton(inputId="run_raster", label="Display",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="run_raster", label="Display",class="action-btn-style")
     })
 
 
@@ -1085,11 +1086,11 @@ function(input, output, session) {
     })
 
     output$display_run_thermal_button <- renderUI({
-      actionButton(inputId="display_thermal", label="Display streamThermal",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="display_thermal", label="Display streamThermal",class="action-btn-style")
     })
 
     output$display_save_thermal_button <- renderUI({
-      downloadButton(outputId="save_thermal", label="Save thermal statistics to excel",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      downloadButton(outputId="save_thermal", label="Save thermal statistics to excel",class="action-btn-style")
     })
 
     output$display_help_text_thermal_statistics <- renderUI({
@@ -1142,7 +1143,7 @@ function(input, output, session) {
     })
 
     output$display_thermal_sensitivity_button <- renderUI({
-      actionButton(inputId="display_thermal_sensitivity", label="Display thermal sensitivity",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="display_thermal_sensitivity", label="Display thermal sensitivity",class="action-btn-style")
     })
 
     output$display_help_text_air_water <- renderUI({
@@ -1196,7 +1197,7 @@ function(input, output, session) {
     })
 
     output$display_water_temp_class_button <- renderUI({
-      actionButton(inputId="display_water_class", label="Display water temperature class",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="display_water_class", label="Display water temperature class",class="action-btn-style")
     })
 
     output$display_help_text_water_temp_class <- renderUI({
@@ -1238,12 +1239,12 @@ function(input, output, session) {
     })
 
     output$display_IHA_button <- renderUI({
-      actionButton(inputId="display_IHA", label="Display IHA tables",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      actionButton(inputId="display_IHA", label="Display IHA tables",class="action-btn-style")
     })
 
 
     output$display_save_IHA_button <- renderUI({
-      downloadButton(outputId="save_IHA", label="Save IHA results to excel",style="color:cornflowerblue;background-color:black;font-weight:bold")
+      downloadButton(outputId="save_IHA", label="Save IHA results to excel",class="action-btn-style")
     })
 
     output$display_help_text_IHA <- renderUI({
@@ -1531,7 +1532,7 @@ function(input, output, session) {
           ts_subplot <- subplot(ggplotly(basePlot), ggplotly(gagePlot), ggplotly(dayMetPlot), nrows = 3, shareX = TRUE)
           annotations <- setAnnotations(3, annotations, titles=c("Uploaded File Map","USGS gage Plot","DayMet Plot"))
         } else if(is.null(gagePlot) & !is.null(dayMetPlot)) {
-          ts_subplot <- subplot(ggplotly(basePlot), ggplotly(dayMetPlot), nrows = 2, shareX = TRUE, fig(10,10))
+          ts_subplot <- subplot(ggplotly(basePlot), ggplotly(dayMetPlot), nrows = 2, shareX = TRUE)
           annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","DayMet Plot"))
         } else if(!is.null(gagePlot) & is.null(dayMetPlot)) {
           ts_subplot <- subplot(ggplotly(basePlot), ggplotly(gagePlot), nrows = 2, shareX = TRUE)
@@ -2520,7 +2521,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_1 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_1", label="Show/hide plot",style="color:cornflowerblue;background-color:black;font-weight:bold")
+                      actionButton(inputId="display_IHA_plot_1", label="Show/hide plot",class="action-btn-style")
       )) # column and fluidRow close
     })
 
@@ -2530,7 +2531,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_2 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_2", label="Show/hide plot",style="color:cornflowerblue;background-color:black;font-weight:bold")
+                      actionButton(inputId="display_IHA_plot_2", label="Show/hide plot",class="action-btn-style")
       )) # column and fluidRow close
     })
 
@@ -2540,7 +2541,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_3 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_3", label="Show/hide plot",style="color:cornflowerblue;background-color:black;font-weight:bold")
+                      actionButton(inputId="display_IHA_plot_3", label="Show/hide plot",class="action-btn-style")
       )) # column and fluidRow close
     })
 
@@ -2550,7 +2551,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_4 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_4", label="Show/hide plot",style="color:cornflowerblue;background-color:black;font-weight:bold")
+                      actionButton(inputId="display_IHA_plot_4", label="Show/hide plot",class="action-btn-style")
       )) # column and fluidRow close
     })
 
@@ -2560,7 +2561,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_5 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_5", label="Show/hide plot",style="color:cornflowerblue;background-color:black;font-weight:bold")
+                      actionButton(inputId="display_IHA_plot_5", label="Show/hide plot",class="action-btn-style")
       )) # column and fluidRow close
     })
 
@@ -3305,8 +3306,6 @@ function(input, output, session) {
     if(errorMsg[1] == "All formats failed to parse. No formats found.") {
       errorMsg[1] = "There is mismatch between uploaded file date format and 'Selected date format', please correct and try again."
       return(errorMsg)
-    } else if(errorMsg[1] == "Text to be written must be a length-one character vector") {
-      #ignore it, known bug in the htmltools package, not a blocker
     } else {
       return(errorMsg)
     }
@@ -3321,25 +3320,8 @@ function(input, output, session) {
     # loaded_data$siteID <- unique(raw_data[idx_ID_col])
     if (total_siteids_found > 1) {
       shinyAlertUI("common_alert_msg", siteIdNotOne, "WARNING")
-      # shinyalert(
-      #   "Warning",
-      #   "More than one site ID is detected, please confirm if the loaded data is a single site file.",
-      #   closeOnClickOutside = TRUE,
-      #   closeOnEsc = TRUE,
-      #   confirmButtonText = "OK",
-      #   inputId = "alert_not_single_site"
-      # )
     } else if (total_siteids_found  == 0) {
       shinyAlertUI("common_alert_msg", noSiteIdFound, "WARNING")
-      
-      # shinyalert(
-      #   "Warning",
-      #   "No site ID is detected, please confirm if the loaded data has the SiteID column.",
-      #   closeOnClickOutside = TRUE,
-      #   closeOnEsc = TRUE,
-      #   confirmButtonText = "OK",
-      #   inputId = "alert_no_siteID"
-      # )
     }
   }
 

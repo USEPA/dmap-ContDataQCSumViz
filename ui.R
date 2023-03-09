@@ -28,25 +28,9 @@ shinyUI(fluidPage(
   theme = "styles.css",
   useShinyjs(),
   tags$head(tags$script(src="script.js")),
-  # add_busy_spinner(spin = "ajax-loader-spinner.gif"),
-  # main panel for variable selection
+  tags$head( tags$link(rel="stylesheet", type="text/css", href="app.css")),
   mainPanel(
     width = 12,
-    tags$head(
-      tags$link(rel="stylesheet", type="text/css", href="customLoader.css")
-    ),
-    tags$head(tags$style(HTML(".nav-tabs>li>a{
-                                   color: cornflowerblue;
-                                   font-size: 18px;
-                                   font-weight: bold;
-                                   }"))),
-    tags$style("#big-heading {font-size:15px;color:black;font-style:bold;display:block; }"),
-    tags$style(HTML(".shiny-notification{
-                            position:fixed;
-                            top:calc(50%);
-                            left:calc(50%);}")),
-    tags$style("#display_fill_data .shiny-input-container .checkbox label span {font-weight: bold; }"),
-    tags$style("#display_validation_msgs {   color: red; font-weight: bold; }"),
     # spacing
     fluidRow(id = "one", ),
     # top controls
@@ -64,12 +48,11 @@ shinyUI(fluidPage(
           ),
           width = "100%"
         )
-      )
+       )
     ),
     fluidRow(
       p(),
       tabsetPanel(
-
         # Upload Data----
         tabPanel(
           "Upload Data",
@@ -97,9 +80,9 @@ shinyUI(fluidPage(
                     actionButton(
                       inputId = "uploadId",
                       label = "Use this file",
-                      style = "color:cornflowerblue;background-color:black;font-weight:bold"
+                      class = "action-btn-style"
                     ),
-                    actionButton(inputId="displayidLeft",label = "Display file contents",style="color:cornflowerblue;background-color:black;font-weight:bold;display:none")
+                    actionButton(inputId="displayidLeft",label = "Display file contents",style="display:none", class="action-btn-style")
                      ),
                     hr(),
                     uiOutput("siteType"),

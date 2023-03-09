@@ -1,0 +1,39 @@
+.loading-modal {
+    display:    none;
+    position:   fixed;
+    z-index:    2000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+	background-color:rgba( 255, 255, 255, .8 );
+	background-image:url("ajax-loader-spinner.gif");
+	background-position:50% 50%;
+	background-repeat:no-repeat;
+    opacity: 0.80;
+	-ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity = 80);
+	filter: alpha(opacity = 80);
+}
+
+
+.nav-tabs>li>a{
+ color: cornflowerblue;
+ font-size: 18px;
+ font-weight: bold;
+ }
+ 
+ #big-heading {font-size:15px;color:black;font-style:bold;display:block;}
+ 
+ .shiny-notification{
+position:fixed;
+top:calc(50%);
+left:calc(50%);
+ }
+ 
+#display_fill_data .shiny-input-container .checkbox label span {font-weight: bold; }
+#display_validation_msgs {   color: red; font-weight: bold; }
+
+.action-btn-style {
+  color:cornflowerblue;background-color:black;font-weight:bold;
+}
+
