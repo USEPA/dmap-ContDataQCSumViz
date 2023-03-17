@@ -6835,9 +6835,18 @@
       "checksum": "d886edee37716c872464da5eec999b71"
     },
     "ContDataQC_test_data/FromTom/CRBuoy discrete same date and time format.csv": {
-      "checksum": "48674dca561fafe45c8098c409d99b6c"
+      "checksum": "0c60b4751311ac83a3447ed071c20df3"
     },
     "ContDataQC_test_data/FromTom/CRBuoy discrete same date and time format.xlsx": {
+      "checksum": "77a0680933801d51cf4b0bc91902a1da"
+    },
+    "ContDataQC_test_data/FromTom/CRBuoy discrete same date and time format2.csv": {
+      "checksum": "0c60b4751311ac83a3447ed071c20df3"
+    },
+    "ContDataQC_test_data/FromTom/CRBuoy discrete same date and time formatorg.csv": {
+      "checksum": "d2dbdfc214551a50368b163ef8794c1e"
+    },
+    "ContDataQC_test_data/FromTom/CRBuoy discrete same date and time formatorg.xlsx": {
       "checksum": "77a0680933801d51cf4b0bc91902a1da"
     },
     "ContDataQC_test_data/FromTom/crbuoy with site ID.csv": {
@@ -7006,7 +7015,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "8d5cee56206bd7019e6a4a3358d8fd73"
+      "checksum": "e29546a388f1b3dfb23616fd4a3b37d2"
     },
     "StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230213.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
@@ -7024,7 +7033,7 @@
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "test_dailyCheck.RData": {
-      "checksum": "f128286c7bc7afb0a1671a97a9245fea"
+      "checksum": "321bdbd0587718d8838680fdaaac1894"
     },
     "ui.R": {
       "checksum": "4e05d8ae8eebe7fd0227854e9526549a"
