@@ -76,9 +76,7 @@ function(input, output, session) {
   loaded_data <- reactiveValues()
   raw_data_columns<-reactiveValues()
   dateRange <- reactiveValues()
-  # dateButtonClicked <- reactiveValues(activeBtn = "combined")
   workflowStatus <- reactiveValues(finish=FALSE)
-
   currentOutPutId <- reactiveValues()
   gageColNames  <- NULL
   daymetCols <- NULL
@@ -333,19 +331,6 @@ function(input, output, session) {
     return(mySummary)
   }
   
-  # observeEvent(input$combinedBtn,{
-  #   shinyjs::hide(id = "timeFieldDiv")
-  #   shinyjs::addClass("combinedBtn", "active")
-  #   shinyjs::removeClass("separateBtn", "active")
-  #   dateButtonClicked$activeBtn <- "combined"
-  # })
-  # 
-  # observeEvent(input$separateBtn,{
-  #   shinyjs::show(id = "timeFieldDiv")
-  #   shinyjs::addClass("separateBtn","active")
-  #   shinyjs::removeClass("combinedBtn", "active")
-  #   dateButtonClicked$activeBtn <- "separate"
-  # })
 
   observeEvent(input$showrawTS,{
 
@@ -598,7 +583,9 @@ function(input, output, session) {
           })
             #click the button to hide the selection box
             shinyjs::runjs("$('#dateTimeBoxButton').click()")
-            updateWorkFlowState("step3", "success")
+            if(workflowStatus$finish==FALSE) {
+              updateWorkFlowState("step3", "success")
+            }
            
           } else {
             shinyAlertUI("common_alert_msg" , invalidDateFormt, "ERROR")
@@ -3350,14 +3337,17 @@ function(input, output, session) {
          }
        } 
      },error = function(parsingMsg) {
+       print(parsingMsg)
        output$display_validation_msgs_new <- renderUI({
          prepareDateFormatErrorMsg(parsingMsg)
        })
      }, warning = function(parsingMsg){
+       print(parsingMsg)
        output$display_validation_msgs_new <- renderUI({
          prepareDateFormatErrorMsg(parsingMsg)
        })
      }, message = function(parsingMsg) {
+       print(parsingMsg)
        output$display_validation_msgs_new <- renderUI({
          prepareDateFormatErrorMsg(parsingMsg)
        })
@@ -3544,7 +3534,6 @@ function(input, output, session) {
         )
       })
     }
-    shinyjs::alert(workflowStatus$finish)
     if(missingInputs == FALSE & tab == "homePage" & workflowStatus$finish==FALSE) {
       updateWorkFlowState("step2", "success")
     } else if(missingInputs == TRUE & tab == "homePage") {
@@ -3575,19 +3564,21 @@ function(input, output, session) {
   uploadFile <- function(uploadedFile, stopExecution=FALSE, tab="") {
     my_data <- NULL
     loaded_data$name <- uploadedFile$name
-    processed$processed_dailyStats = list()
     if(grepl("csv$",uploadedFile$datapath)){
       my_data<-import_raw_data(uploadedFile$datapath,"csv",has_header=TRUE)
     } else if(grepl("xlsx$",uploadedFile$datapath)){
       my_data<-import_raw_data(uploadedFile$datapath,"xlsx",has_header=TRUE)
     }
+    
     if(!is.null(my_data)) {
-      if(tab == "uploadFile") {
+      if(tab == "homePage") {
+        workflowStatus$finish = FALSE
         updateWorkFlowState(elementId= "step1", state="success")
       }
       return(my_data)
     } else {
-      if(tab == "uploadFile") {
+      if(tab == "homePage") {
+         workflowStatus$finish = FALSE
          updateWorkFlowState(elementId= "step1", state="error")
       }
       shinyAlertUI("common_alert_msg", wrongDataFormat, "ERROR")
