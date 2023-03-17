@@ -376,7 +376,7 @@ function(input, output, session) {
                                           ,fun.userDateFieldName = input$selectedDateFieldName
                                           ,fun.userTimeFieldName = input$selectedTimeFieldName
                                           ,fun.rawData = raw_data
-                                          ,fun.date.org = dateButtonClicked$activeBtn)
+                                          ,fun.date.org = input$dtNumOfCols)
     
         if (!is.null(my_raw_choices) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
           
@@ -468,7 +468,7 @@ function(input, output, session) {
                                           ,fun.userDateFieldName = input$selectedDateFieldName
                                           ,fun.userTimeFieldName = input$selectedTimeFieldName
                                           ,fun.rawData = raw_data
-                                          ,fun.date.org = dateButtonClicked$activeBtn)
+                                          ,fun.date.org = input$dtNumOfCols)
           Sys.sleep(2)
           print("passed fun.ConvertDateFormat")
           if (!is.null(input$parameters_to_process2) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){    
@@ -640,7 +640,7 @@ function(input, output, session) {
                                       ,fun.userDateFieldName = input$selectedDateFieldName
                                       ,fun.userTimeFieldName = input$selectedTimeFieldName
                                       ,fun.rawData = raw_data
-                                      ,fun.date.org = dateButtonClicked$activeBtn)
+                                      ,fun.date.org = input$dtNumOfCols)
     
     #print(head(raw_data))
     dateRange$min <- min(as.Date(raw_data$date.formatted), na.rm = TRUE)
@@ -692,6 +692,7 @@ function(input, output, session) {
     })
     } ,error = function(parsingMsg) {
       updateWorkFlowState("step4", "error")
+      print(parsingMsg$message)
     })
   
   })

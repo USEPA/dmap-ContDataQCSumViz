@@ -6804,9 +6804,6 @@
     "ContDataQC_test_data/FromGopa/VT_Ranch_AW_20180412_20210427.csv": {
       "checksum": "9350038e9907fad27feadc5777215c0f"
     },
-    "ContDataQC_test_data/FromJen/~$Metadata_OverallSumStats_USGSgage.xlsx": {
-      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
-    },
     "ContDataQC_test_data/FromJen/10RD014_AW_20170508_20211029.csv": {
       "checksum": "faf52299633f6d68d114e1261accff22"
     },
@@ -7009,7 +7006,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "9a90d0c73bba522e304d3b4f2e93e33e"
+      "checksum": "14b2c9af714d66a0a8ba56aaccd1c7cb"
     },
     "StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230213.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
@@ -7027,7 +7024,7 @@
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "test_dailyCheck.RData": {
-      "checksum": "321bdbd0587718d8838680fdaaac1894"
+      "checksum": "81f9edbadaa8c9155d990876bda6bc42"
     },
     "ui.R": {
       "checksum": "4e05d8ae8eebe7fd0227854e9526549a"
