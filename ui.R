@@ -19,7 +19,28 @@
 # library(plotly)
 # #library(shinycustomloader)
 # library(shinycssloaders)
-
+app_jscode <-
+  "shinyjs.disableTab = function(name) {
+    var tab = $('.nav li a[data-value=' + name + ']');
+    tab.bind('click.tab', function(e) {
+      e.preventDefault();
+      return false;
+    });
+    tab.addClass('disabled');
+  }
+  shinyjs.enableTab = function(name) {
+    var tab = $('.nav li a[data-value=' + name + ']');
+    tab.unbind('click.tab');
+    tab.removeClass('disabled');
+  }"
+## css snipit that makes it LOOK like we are/n't able click the tab (with outchanging functionality)
+app_css <-
+  ".nav li a.disabled {
+    background-color: #aaa !important;
+    color: #333 !important;
+    cursor: not-allowed !important;
+    border-color: #aaa !important;
+  }"
 
 
 # Define UI for application
@@ -27,6 +48,8 @@ options(spinner.color.background = "#ffffff", spinner.size = 1)
 shinyUI(fluidPage(
   theme = "styles.css",
   useShinyjs(),
+  shinyjs::extendShinyjs(text = app_jscode, functions = c("disableTab","enableTab","removeAllClasses")),
+  shinyjs::inlineCSS(app_css),
   tags$head(tags$script(src="script.js")),
   tags$head( tags$link(rel="stylesheet", type="text/css", href="app.css")),
   mainPanel(
@@ -34,7 +57,7 @@ shinyUI(fluidPage(
     # spacing
     fluidRow(id = "one", ),
     # top controls
-    fluidRow( 
+    fluidRow(
       div(id = "customBusy", class = "loading-modal")
       ),
     fluidRow(
@@ -49,6 +72,64 @@ shinyUI(fluidPage(
           width = "100%"
         )
        )
+    ),
+    fluidRow(
+      column(
+        width = 12,
+        br(),
+        div("Please complete below steps before proceeding to 'Data Exploration' and 'Create Report' tabs:", class="text-info", style="font-weight:bold"),
+        br()
+      )
+    ),
+    fluidRow(
+      column(
+        width = 1,
+        div(
+            circleButton(inputId="step1",icon = icon("upload"),status="primary", size="sm"),
+            div("Step 1: Upload file", style="white-space:nowrap;font-weight:bold")
+          ),
+        ),
+        column(width = 1,
+          HTML('<i id="arrow1" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>')
+        ),
+        column(
+          width = 1,
+          div(
+            circleButton(inputId = "step2",icon = icon("calendar"),status = "primary", size="sm"),
+            div("Step 2: Select date and time",style="white-space:nowrap;font-weight:bold")
+          )
+        ),# end of column
+        column(width = 1,
+               HTML('<i id="arrow2" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>')
+        ),
+        column(
+          width = 1,
+          div(
+            circleButton(inputId = "step3",icon = icon("tasks"),status = "primary", size="sm"),
+            div("Step 3: Run meta data",style="white-space:nowrap;font-weight:bold")
+          )
+        ),# end of column
+        column(width = 1,
+               HTML('<i id="arrow3" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>')
+        ),
+        column(
+          width = 1,
+          div(
+            circleButton(inputId = "step4",icon = icon("calculator"),status = "primary",size="sm"),
+            div("Step 4: Run daily statistics",style="white-space:nowrap;font-weight:bold;")
+          )
+        ),# end of column
+        column(width = 1,
+               HTML('<i id="arrow4" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>')
+        ),
+      column(
+        width = 1,
+        div(
+          circleButton(inputId = "step5",icon = icon("check"),status = "primary", size="sm"),
+          div("Step 5: Visualize data",style="white-space:nowrap;font-weight:bold;")
+        )
+      )# end of column
+        
     ),
     fluidRow(
       p(),
@@ -110,7 +191,8 @@ shinyUI(fluidPage(
 
         # Data Exploration ----
         tabPanel(
-          "Data Exploration",
+          title="Data Exploration",
+          value="DataExploration",
           fluidPage(
             fluidRow(
               tabsetPanel(
@@ -208,30 +290,30 @@ shinyUI(fluidPage(
                                     accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
                                   ),
                                   hr(),
-                                  selectizeInput("newData_lower_col",
-                                    label = "Select column to be used as lower bound",
-                                    choices = NULL,
-                                    multiple = FALSE,
-                                    selected = NULL,
-                                    options = list(hideSelected = FALSE)
-                                  ),
-                                  hr(),
-                                  selectizeInput("newData_upper_col",
-                                    label = "Select column to be used as upper bound",
-                                    choices = NULL,
-                                    multiple = FALSE,
-                                    selected = NULL,
-                                    options = list(hideSelected = FALSE)
-                                  ),
-                                  hr(),
-                                  selectizeInput("newData_date_col",
-                                    label = "Select date column",
-                                    choices = NULL,
-                                    multiple = FALSE,
-                                    selected = NULL,
-                                    options = list(hideSelected = FALSE)
-                                  ),
-                                  hr(),
+                                  # selectizeInput("newData_lower_col",
+                                  #   label = "Select column to be used as lower bound",
+                                  #   choices = NULL,
+                                  #   multiple = FALSE,
+                                  #   selected = NULL,
+                                  #   options = list(hideSelected = FALSE)
+                                  # ),
+                                  # hr(),
+                                  # selectizeInput("newData_upper_col",
+                                  #   label = "Select column to be used as upper bound",
+                                  #   choices = NULL,
+                                  #   multiple = FALSE,
+                                  #   selected = NULL,
+                                  #   options = list(hideSelected = FALSE)
+                                  # ),
+                                  #hr(),
+                                  # selectizeInput("newData_date_col",
+                                  #   label = "Select date column",
+                                  #   choices = NULL,
+                                  #   multiple = FALSE,
+                                  #   selected = NULL,
+                                  #   options = list(hideSelected = FALSE)
+                                  # ),
+                                  # hr(),
                                   textInput("newData_name", label = "New data name", value = "USGS")
                                 ), # conditionalPanel end
                               ) # div end
@@ -253,8 +335,11 @@ shinyUI(fluidPage(
                           ),
                           mainPanel(
                             width = 9,
+                            fluidRow(column(width = 12, uiOutput("dateAndTimeBox"))),
                             br(),
                             fluidRow(column(width = 9, plotlyOutput("display_time_series"))),
+                            br(),
+                            fluidRow(column(width = 9, plotlyOutput("display_time_series_new"))),
                             br(),
                             fluidRow(column(width = 9, plotlyOutput("display_time_series_1"))),
                             br(),
@@ -761,7 +846,8 @@ shinyUI(fluidPage(
 
         # Create Report----
         tabPanel(
-          "Create Report",
+          title="Create Report",
+          value="CreateReport",
           fluidPage(
             fluidRow(
               tabsetPanel(

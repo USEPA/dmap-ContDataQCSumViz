@@ -4895,7 +4895,7 @@
         "Maintainer": "Aron Atkins <aron@posit.co>",
         "Repository": "CRAN",
         "Date/Publication": "2023-01-09 22:50:10 UTC",
-        "Built": "R 4.2.2; ; 2023-03-07 03:27:46 UTC; windows"
+        "Built": "R 4.2.2; ; 2023-03-16 03:44:41 UTC; windows"
       }
     },
     "rstudioapi": {
@@ -5404,6 +5404,38 @@
         "Repository": "CRAN",
         "Date/Publication": "2021-09-30 12:10:06 UTC",
         "Built": "R 4.2.2; ; 2022-12-20 04:39:50 UTC; windows"
+      }
+    },
+    "shinyjqui": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "shinyjqui",
+        "Type": "Package",
+        "Title": "'jQuery UI' Interactions and Effects for Shiny",
+        "Version": "0.4.1",
+        "Authors@R": "person(\"Yang\", \"Tang\", email = \"tang_yang@outlook.com\",\n  role = c(\"aut\", \"cre\"))",
+        "Maintainer": "Yang Tang <tang_yang@outlook.com>",
+        "Description": "An extension to shiny that brings interactions and animation effects from\n    'jQuery UI' library.",
+        "License": "MIT + file LICENSE",
+        "Encoding": "UTF-8",
+        "Depends": "R (>= 3.2.0)",
+        "Imports": "shiny (>= 1.5.0), htmltools, htmlwidgets, jsonlite, rlang",
+        "Suggests": "ggplot2, highcharter, knitr, markdown, rmarkdown, plotly",
+        "URL": "https://github.com/yang-tang/shinyjqui,\nhttps://yang-tang.github.io/shinyjqui/",
+        "BugReports": "https://github.com/yang-tang/shinyjqui/issues",
+        "RoxygenNote": "7.1.2",
+        "VignetteBuilder": "knitr",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-02-03 06:36:22 UTC; tangy53",
+        "Author": "Yang Tang [aut, cre]",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-02-03 07:00:02 UTC",
+        "Built": "R 4.2.2; ; 2023-03-07 04:55:07 UTC; windows"
       }
     },
     "shinyjs": {
@@ -6752,7 +6784,7 @@
       "checksum": "9a882d718de77bbe5b43d35fb5752452"
     },
     "constants.R": {
-      "checksum": "4eeeca0f22544af472cb24d11963cec5"
+      "checksum": "8039952e136cb1ed81a8cd1e6b672b1b"
     },
     "ContDataQC_test_data/CDF_WaterTemp_2014_MA.csv": {
       "checksum": "8ef4e057db706fc575d6a5087f2a30d8"
@@ -6771,6 +6803,9 @@
     },
     "ContDataQC_test_data/FromGopa/VT_Ranch_AW_20180412_20210427.csv": {
       "checksum": "9350038e9907fad27feadc5777215c0f"
+    },
+    "ContDataQC_test_data/FromJen/~$Metadata_OverallSumStats_USGSgage.xlsx": {
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
     },
     "ContDataQC_test_data/FromJen/10RD014_AW_20170508_20211029.csv": {
       "checksum": "faf52299633f6d68d114e1261accff22"
@@ -6795,6 +6830,9 @@
     },
     "ContDataQC_test_data/FromJen/VA_Instructions_ContDataSumViz_20221228.pdf": {
       "checksum": "79286a8314b099164bc99f28e3b8d111"
+    },
+    "ContDataQC_test_data/FromTom/CRBuoy discrete different data and time format.csv": {
+      "checksum": "f55de7679f388cead1e828017d276a21"
     },
     "ContDataQC_test_data/FromTom/CRBuoy discrete different data and time format.xlsx": {
       "checksum": "d886edee37716c872464da5eec999b71"
@@ -6865,6 +6903,9 @@
     "dayMet/fun.DayMetData.R": {
       "checksum": "a31cfec905186df96deb64f0991f729a"
     },
+    "dayMet/fun.validate.dateAndTime.R": {
+      "checksum": "83b47303e68c6bdfa7e1072780cddd91"
+    },
     "external/App_USGSgage.html": {
       "checksum": "376e0086aa3b41aec3e9114cc238b7e8"
     },
@@ -6872,7 +6913,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "226d5845f147614d384a97d64232fc41"
+      "checksum": "75ffd3c6a28da5c679c96304deef079a"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -6899,7 +6940,7 @@
       "checksum": "09d6f4bb2029f39f076a2172b191c95c"
     },
     "modules/dateAndTimePopUp.R": {
-      "checksum": "998509d93121de8b91a946479622ebaa"
+      "checksum": "5fb844fed85dac9912d325cca2c714eb"
     },
     "Output/reports/myReport.html": {
       "checksum": "409c923b7b56ece270a890064d734b9a"
@@ -6968,16 +7009,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "8a66016c5ebf4323ba9e0ae5742ac685"
-    },
-    "server.R.bak": {
-      "checksum": "97e690840a8c588ba4bad3fd5fc03924"
-    },
-    "server2242023.R": {
-      "checksum": "9a12742531475aa97cc96034b4a60310"
-    },
-    "serverMYDateChanges.R": {
-      "checksum": "0198b4db8730903c8a67c3493f3b1fae"
+      "checksum": "9a90d0c73bba522e304d3b4f2e93e33e"
     },
     "StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230213.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
@@ -6995,10 +7027,10 @@
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "test_dailyCheck.RData": {
-      "checksum": "093d267fa53f20b3306efe7c4e54c2e2"
+      "checksum": "321bdbd0587718d8838680fdaaac1894"
     },
     "ui.R": {
-      "checksum": "9293a4c2648d6bed15aae1d14529281f"
+      "checksum": "4e05d8ae8eebe7fd0227854e9526549a"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -7034,7 +7066,7 @@
       "checksum": "0b29ec94c8c8c810e3e5f37c7701b717"
     },
     "www/app.css": {
-      "checksum": "8c4d418a2c844780e8dab89cb66d97da"
+      "checksum": "336ec99b0d1becf389957918d349ceee"
     },
     "www/ContDataSumViz_banner.png": {
       "checksum": "af6a3abac239c0553226d175af54536d"
@@ -7055,10 +7087,10 @@
       "checksum": "ed8341d5bbf0eeb3ec8a577287112165"
     },
     "www/script.js": {
-      "checksum": "8d62a3b0dbc549378dbfe1faeef35f12"
+      "checksum": "faa0e839f900b8ccdb80f1a1b147f684"
     },
     "www/styles.css": {
-      "checksum": "153c982cdd428d40470a9aefa96da64a"
+      "checksum": "2722ddf4a5658ae6f51dd19b64e4dd8f"
     }
   },
   "users": null

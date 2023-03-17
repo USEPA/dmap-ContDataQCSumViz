@@ -24,6 +24,7 @@ library(plotly)
 library(xts)
 #library(shinycustomloader)
 library(shinycssloaders)
+library("shinyjqui")
 #
 # ## Server----
 library("readxl")        # to read excel files
@@ -59,6 +60,7 @@ library("daymetr")
 library("lubridate")
 library("promises")
 library("future")
+# library("purrr")
 #library("ggtext")
 plan(multisession)
 #options(scipen=999) 
@@ -85,6 +87,9 @@ source("usgsGage/download_usgs_gage_data.R")
 source("dayMet/fun.DayMetData.R")
 source("dayMet/fun.daymet_raw_plot.R")
 source("constants.R")
+
+# list.files("modules") %>%
+#   purrr::map(~ source(paste0("modules/", .)))
 
 
 

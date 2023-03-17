@@ -5711,7 +5711,7 @@ button.close {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1040;
+  z-index: 2000;
   -webkit-overflow-scrolling: touch;
   outline: 0;
 }
@@ -5780,7 +5780,7 @@ button.close {
 }
 .modal-body {
   position: relative;
-  padding: 20px;
+  padding: 5px 20px 5px 20px;
 }
 .modal-footer {
   padding: 20px;
