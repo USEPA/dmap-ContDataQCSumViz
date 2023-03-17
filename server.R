@@ -76,7 +76,8 @@ function(input, output, session) {
   loaded_data <- reactiveValues()
   raw_data_columns<-reactiveValues()
   dateRange <- reactiveValues()
-  dateButtonClicked <- reactiveValues(activeBtn = "combined")
+  # dateButtonClicked <- reactiveValues(activeBtn = "combined")
+  workflowStatus <- reactiveValues(finish=FALSE)
 
   currentOutPutId <- reactiveValues()
   gageColNames  <- NULL
@@ -3542,9 +3543,9 @@ function(input, output, session) {
           )
         )
       })
-      
     }
-    if(missingInputs == FALSE & tab == "homePage") {
+    shinyjs::alert(workflowStatus$finish)
+    if(missingInputs == FALSE & tab == "homePage" & workflowStatus$finish==FALSE) {
       updateWorkFlowState("step2", "success")
     } else if(missingInputs == TRUE & tab == "homePage") {
       updateWorkFlowState("step2", "error")
@@ -3668,6 +3669,7 @@ function(input, output, session) {
   }
   
   updateWorkFlowState <- function(elementId, state) {
+ 
     if(elementId == "step1" & state == "success") {
       removeCssClasses()
       addSuccessClass(c("step1"))
@@ -3679,6 +3681,7 @@ function(input, output, session) {
       shinyjs::addClass("step1", "btn-danger")
       addPrimaryClass(c("step2","step3","step4","step5"))
       changeButtonState(state="disable", btnList=c("display_raw_ts","runQS","calculateDailyStatistics","saveDailyStatistics"))
+      workflowStatus$finish=FALSE
     }
     
     else if(elementId == "step2" & state == "success") {
@@ -3693,6 +3696,7 @@ function(input, output, session) {
       addSuccessClass(c("step1"))
       changeButtonState(state="disable", btnList=c("display_raw_ts","calculateDailyStatistics","saveDailyStatistics"))
       changeButtonState(state="enable", btnList=c("runQS","display_raw_ts"))
+      workflowStatus$finish=FALSE
     }
     
     else if(elementId == "step3" & state == "success") {
@@ -3707,6 +3711,7 @@ function(input, output, session) {
       addSuccessClass(c("step1","step2"))
       changeButtonState(state="disable", btnList=c("calculateDailyStatistics","saveDailyStatistics"))
       changeButtonState(state="enable", btnList=c("runQS","display_raw_ts"))
+      workflowStatus$finish=FALSE
     }
     
     else if(elementId == "step4" & state == "success") {
@@ -3721,6 +3726,7 @@ function(input, output, session) {
       addPrimaryClass(c("step5"))
       changeButtonState(state="disable", btnList=c("calculateDailyStatistics","saveDailyStatistics"))
       changeButtonState(state="enable", btnList=c("display_raw_ts","runQS"))
+      workflowStatus$finish=FALSE
     }
     
     else if(elementId == "step5" & state == "success") {
@@ -3729,17 +3735,20 @@ function(input, output, session) {
       js$enableTab("DataExploration")
       js$enableTab("CreateReport")
       changeButtonState(state="enable", btnList=c("display_raw_ts","runQS","calculateDailyStatistics","saveDailyStatistics"))
+      workflowStatus$finish = TRUE
     } else if(elementId == "step4" & state == "error") {
       removeCssClasses()
       shinyjs::addClass("step5", "btn-danger")
       addSuccessClass(c("step1","step2","step3","step4"))
       changeButtonState(state="disable", btnList=c("calculateDailyStatistics","saveDailyStatistics"))
       changeButtonState(state="enable", btnList=c("display_raw_ts","runQS","display_raw_ts"))
+      workflowStatus$finish=FALSE
     }
     if(elementId %in% c("step1","step2","step3","step4")) {
         js$disableTab("DataExploration")
         js$disableTab("CreateReport")
-    } 
+    }
+    
   }
   
   changeButtonState <- function(state, btnList) {
