@@ -513,7 +513,7 @@
         "Package": "XLConnect",
         "Type": "Package",
         "Title": "Excel Connector for R",
-        "Version": "1.0.6",
+        "Version": "1.0.7",
         "Authors@R": "c(person(\"Mirai Solutions GmbH\", role = \"aut\",\n                    email = \"xlconnect@mirai-solutions.com\"),\n             person(\"Martin\", \"Studer\", role = \"cre\",\n                    email = \"martin.studer@mirai-solutions.com\"),\n             person(\"The Apache Software Foundation\", role = c(\"ctb\", \"cph\"),\n                    comment = \"Apache POI\"),\n             person(\"Graph Builder\", role = c(\"ctb\", \"cph\"),\n                   comment = \"Curvesapi Java library\"),\n             person(\"Brett Woolridge\", role = c(\"ctb\", \"cph\"),\n                   comment = \"SparseBitSet Java library\"))",
         "URL": "https://mirai-solutions.ch\nhttps://github.com/miraisolutions/xlconnect",
         "BugReports": "https://github.com/miraisolutions/xlconnect/issues",
@@ -526,12 +526,12 @@
         "Copyright": "See file COPYRIGHTS",
         "LazyData": "yes",
         "NeedsCompilation": "no",
-        "Packaged": "2022-10-20 08:36:23 UTC; runner",
+        "Packaged": "2023-01-24 09:55:38 UTC; runner",
         "Author": "Mirai Solutions GmbH [aut],\n  Martin Studer [cre],\n  The Apache Software Foundation [ctb, cph] (Apache POI),\n  Graph Builder [ctb, cph] (Curvesapi Java library),\n  Brett Woolridge [ctb, cph] (SparseBitSet Java library)",
         "Maintainer": "Martin Studer <martin.studer@mirai-solutions.com>",
         "Repository": "CRAN",
-        "Date/Publication": "2022-10-21 08:35:11 UTC",
-        "Built": "R 4.2.2; ; 2023-01-08 02:22:55 UTC; windows"
+        "Date/Publication": "2023-01-24 13:40:16 UTC",
+        "Built": "R 4.2.2; ; 2023-03-16 02:16:35 UTC; windows"
       }
     },
     "anytime": {
@@ -6026,7 +6026,7 @@
         "Package": "tinytex",
         "Type": "Package",
         "Title": "Helper Functions to Install and Maintain TeX Live, and Compile\nLaTeX Documents",
-        "Version": "0.43",
+        "Version": "0.44",
         "Authors@R": "c(\n  person(\"Yihui\", \"Xie\", role = c(\"aut\", \"cre\", \"cph\"), email = \"xie@yihui.name\", comment = c(ORCID = \"0000-0003-0645-5666\")),\n  person(family = \"RStudio, PBC\", role = \"cph\"),\n  person(\"Christophe\", \"Dervieux\", role = \"ctb\", comment = c(ORCID = \"0000-0003-4474-2498\")),\n  person(\"Devon\", \"Ryan\", role = \"ctb\", email = \"dpryan79@gmail.com\", comment = c(ORCID = \"0000-0002-8549-0971\")),\n  person(\"Ethan\", \"Heinzen\", role = \"ctb\"),\n  person(\"Fernando\", \"Cagua\", role = \"ctb\"),\n  person()\n  )",
         "Description": "Helper functions to install and maintain the 'LaTeX' distribution\n  named 'TinyTeX' (<https://yihui.org/tinytex/>), a lightweight, cross-platform,\n  portable, and easy-to-maintain version of 'TeX Live'. This package also\n  contains helper functions to compile 'LaTeX' documents, and install missing\n  'LaTeX' packages automatically.",
         "Imports": "xfun (>= 0.29)",
@@ -6035,14 +6035,14 @@
         "URL": "https://github.com/rstudio/tinytex",
         "BugReports": "https://github.com/rstudio/tinytex/issues",
         "Encoding": "UTF-8",
-        "RoxygenNote": "7.2.2",
+        "RoxygenNote": "7.2.3",
         "NeedsCompilation": "no",
-        "Packaged": "2022-12-13 06:30:05 UTC; yihui",
+        "Packaged": "2023-02-01 18:14:05 UTC; yihui",
         "Author": "Yihui Xie [aut, cre, cph] (<https://orcid.org/0000-0003-0645-5666>),\n  RStudio, PBC [cph],\n  Christophe Dervieux [ctb] (<https://orcid.org/0000-0003-4474-2498>),\n  Devon Ryan [ctb] (<https://orcid.org/0000-0002-8549-0971>),\n  Ethan Heinzen [ctb],\n  Fernando Cagua [ctb]",
         "Maintainer": "Yihui Xie <xie@yihui.name>",
         "Repository": "CRAN",
-        "Date/Publication": "2022-12-13 07:10:02 UTC",
-        "Built": "R 4.2.2; ; 2022-12-20 02:32:21 UTC; windows"
+        "Date/Publication": "2023-02-01 19:00:02 UTC",
+        "Built": "R 4.2.2; ; 2023-03-16 02:50:09 UTC; windows"
       }
     },
     "tzdb": {
@@ -6766,7 +6766,7 @@
       "checksum": "588a23f324477417c7b809502f44ee11"
     },
     "_moved/import_raw_data.R": {
-      "checksum": "794a2e85a98f5845a29d570ca2c12814"
+      "checksum": "e339c783e0f3582cdf12d458b3f9f5e7"
     },
     "_moved/install_packages_for_app.R": {
       "checksum": "cb7c04852f50066a986368dd9458d76a"
@@ -6858,6 +6858,12 @@
     "ContDataQC_test_data/FromTom/GB27_Water_05102022_10252022.xlsx": {
       "checksum": "0f89626c7dc0ba27277dfc8dd6bba057"
     },
+    "ContDataQC_test_data/FromTom/GB27_Water_05102022_10252022_tom2.csv": {
+      "checksum": "a1d36d428e1c97737365ba94e6f7a9fa"
+    },
+    "ContDataQC_test_data/FromTom/new 1.txt": {
+      "checksum": "3d7aaa49ef184af993457906fb5bc561"
+    },
     "ContDataQC_test_data/HISS2 Sites LatLong.csv": {
       "checksum": "8fbbe42df312319b22abdea9cb6089bc"
     },
@@ -6919,7 +6925,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "75ffd3c6a28da5c679c96304deef079a"
+      "checksum": "dd23e67bb1c07e23e2b9178f099ef070"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -6979,7 +6985,7 @@
       "checksum": "7d4daa877a967a564d3cf3916e6d2c73"
     },
     "Output/to_report/13_Table_SiteX_WaterChem.csv": {
-      "checksum": "13495b2ee4c332e7ee9f524261a039d8"
+      "checksum": "d7a03e02658b6dc6a70dc9262597df91"
     },
     "Output/to_report/14_Table_SiteX_Habitat.csv": {
       "checksum": "6795f0bfd740cec81f88b409852e5bcc"
@@ -7015,15 +7021,30 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "e29546a388f1b3dfb23616fd4a3b37d2"
+      "checksum": "03b9b3208c5d8cc637e08417b5cfaaad"
+    },
+    "StreamThermal.crbuoy with site ID.csv.Charles.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "StreamThermal.CTDEEP_15499_WBSalmon_100616_092021.csv.10332638.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
     },
     "StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230213.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230320.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
     },
     "StreamThermal.DATA_QC_QB283_AW_20150303_20201006.csv.QB283.20230308.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
     },
+    "StreamThermal.shortFileForTest.csv.QB283.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
     "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230203.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230320.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
     },
     "sumVizUtils/fun.calculate.time.breaks.R": {
@@ -7033,10 +7054,10 @@
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "test_dailyCheck.RData": {
-      "checksum": "321bdbd0587718d8838680fdaaac1894"
+      "checksum": "11290ba1e676cd068a7ee4b5e6330e6b"
     },
     "ui.R": {
-      "checksum": "4e05d8ae8eebe7fd0227854e9526549a"
+      "checksum": "362c3128288f0a5dbff49cddbd1dae18"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
