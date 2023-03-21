@@ -557,7 +557,8 @@ function(input, output, session) {
               choices = c(
                 "Per site Per parameter" = "save1",
                 "Per site with all parameters" = "save2",
-                "Multiple sites together" = "save3"
+                "Multiple sites together" = "save3",
+                "Save for WQX upload" = "save4"
               ),
               selected = "save2",
               inline = FALSE
@@ -572,20 +573,14 @@ function(input, output, session) {
                            )
             })
           
-          output$display_actionButton_saveDailyStatistics <- renderUI({
-          actionButton(inputId="saveDailyStatistics"
-                         ,label="Save daily statistics"
-                         ,class="action-btn-style"
-                         ,style="padding-left:15px;padding-right:15px;")
-          })
-          
           ## change the actionButton to downloadButton
           output$display_actionButton_saveDailyStatistics <- renderUI({
             downloadButton(outputId = "saveDailyStatistics",
                            label = "Save daily statistics",
                            class="action-btn-style",
-                           style = "padding-left:15px;padding-right:15px;")
+                           style = "padding-left:15px;padding-right:15px;display:none;")
           })
+          
             #click the button to hide the selection box
             shinyjs::runjs("$('#dateTimeBoxButton').click()")
             if(workflowStatus$finish==FALSE) {
@@ -679,6 +674,7 @@ function(input, output, session) {
                                    ,df.input=raw_data
                                    )
       processed$processed_dailyStats <- dailyStats
+      shinyjs::show(id="saveDailyStatistics")
       updateWorkFlowState("step4", "success")
       updateWorkFlowState("step5", "success")
       incProgress(1/1, detail = "Calculated the daily statistics")
@@ -691,7 +687,7 @@ function(input, output, session) {
   })
 
   output$saveDailyStatistics <- downloadHandler(
-
+    
     filename = function(){
       name_in_file <- loaded_data$name
       if (endsWith(loaded_data$name,".csv")) name_in_file <- sub(".csv$","",loaded_data$name)
@@ -701,14 +697,20 @@ function(input, output, session) {
         paste0("saved_dailyStats_",name_in_file,"_dailyStats.csv")
       }else if(input$how_to_save == "save1"){
         paste0("saved_dailyStats_",name_in_file,".zip")
-      }
+      }else if(input$how_to_save == "save4")
+        paste0("saved_dailyStats_wqz_",name_in_file,".csv")
     },
 
     content = function(file){
       if (input$how_to_save == "save2"){
         combined_data <- Reduce(full_join,processed$processed_dailyStats)
         write.csv(combined_data,file,row.names=FALSE)
-      }else if(input$how_to_save == "save1"){
+      } else if(input$how_to_save == "save4"){
+        wqxData <- Reduce(full_join, processed$processed_dailyStats)
+        wqxData  <- wqxData %>%
+          gather(key = "CharacteristicName", value = "Value",-Date)
+        write.csv(wqxData,file,row.names=FALSE)
+      } else if(input$how_to_save == "save1"){
         owd <- setwd(tempdir())
         on.exit(setwd(owd))
         files <- NULL
@@ -2067,7 +2069,7 @@ function(input, output, session) {
   observeEvent(input$run_CDF, {
 
     output$display_plot_CDF <- renderUI({
-      withSpinner(plotOutput("plot_CDF",height="600px",width="1200px"),type=2)
+      withSpinner(plotlyOutput("plot_CDF",height="600px",width="1200px"),type=2)
     })
 
 
@@ -2098,7 +2100,7 @@ function(input, output, session) {
       season.choice = input$CDF_select_season
     }
 
-    output$plot_CDF <- renderPlot({
+    output$plot_CDF <- renderPlotly({
 
       # g <- ggplot(data=data.plot,aes(x=!!sym(mean_col)))+
       #      geom_step(stat="ecdf")
@@ -2119,6 +2121,7 @@ function(input, output, session) {
                                      , Plot.season = isolate(season.choice)
                                      , hist.columnName = NULL
                                      , df.input = data.plot)
+      CDF_plot <- ggplotly(CDF_plot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
       if (is.null(CDF_plot)){
         shinyalert("Warning","No data available to plot for the selected variable/year/season!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
                    confirmButtonText="OK",inputId = "alert_data_not_avail_for_CDF")

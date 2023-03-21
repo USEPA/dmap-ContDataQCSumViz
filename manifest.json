@@ -7021,7 +7021,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "03b9b3208c5d8cc637e08417b5cfaaad"
+      "checksum": "eff29c1869b411ff2afa755fcfec3a2f"
     },
     "StreamThermal.crbuoy with site ID.csv.Charles.20230320.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
@@ -7054,7 +7054,7 @@
       "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "test_dailyCheck.RData": {
-      "checksum": "11290ba1e676cd068a7ee4b5e6330e6b"
+      "checksum": "143ed48e5d45b6a937c16db7ea4a6241"
     },
     "ui.R": {
       "checksum": "362c3128288f0a5dbff49cddbd1dae18"
@@ -7063,7 +7063,7 @@
       "checksum": "f05982d5e94865988ec7a6b899bda136"
     },
     "update_ContDataQC/CompSiteCDF.updated.R": {
-      "checksum": "124b238f16afa4c89efdce758751989c"
+      "checksum": "e75f823091e0322b769a8d4e2d186106"
     },
     "update_ContDataQC/config.R": {
       "checksum": "23bf4005da9d6f81448e4d7530f2e606"
