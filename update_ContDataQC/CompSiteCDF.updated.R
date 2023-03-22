@@ -107,15 +107,24 @@ CompSiteCDF.updated <- function(file.input = NULL
   
   }else{
     if (nrow(data.import)>0){
-    g <- ggplot(data=data.import,aes(x=!!sym(Param.Name),color=paste0(Param.Name," CDF")))+
+      
+    # g <- ggplot(data=data.import,aes(x=!!sym(Param.Name) color=paste0(Param.Name," CDF")))+
+    #      geom_step(stat="ecdf")
+    distinctYear <- unique(data.import$Year)
+
+    g <- ggplot(data=data.import,aes(x=!!sym(Param.Name),color=factor(Year)))+
          geom_step(stat="ecdf")
     inside <- ggplot_build(g)
+    
     matched <- merge(inside$data[[1]],data.frame(x=data.import[,names(data.import)==Param.Name]
                                                  ,data.import[,names(data.import)==Shaded.Names[1]]
-                                                 ,data.import[,names(data.import)==Shaded.Names[2]]),
-                     by=("x"))
+                                                 ,data.import[,names(data.import)==Shaded.Names[2]]
+                                                 ),by="x")
+    
+
     names(matched)[ncol(matched)] <- "data.import.max"
     names(matched)[ncol(matched)-1] <-"data.import.min"
+
     if (grepl("25%",Shaded.Names[1])){
       shading_text <- paste0(Param.Name, " CDF between daily 25th percentiles and 75th percentiles")
     }else if (grepl("min",Shaded.Names[1])){
@@ -123,13 +132,14 @@ CompSiteCDF.updated <- function(file.input = NULL
     }else{
       shading_text <- "Shading"
     }
+
     
     my_plot <- g+
-                geom_ribbon(data=matched,aes(x=x,ymin=ecdf(data.import.min)(x),ymax=ecdf(data.import.max)(x),fill=shading_text),color="transparent",alpha=0.5)+
+                geom_ribbon(data=matched,inherit.aes = FALSE,aes(x=x,ymin=ecdf(data.import.min)(x),ymax=ecdf(data.import.max)(x),fill=shading_text),color="transparent",alpha=0.5)+
                 theme_minimal()+
                 labs(title=Plot.title,y="Proportion <= value")+
-                scale_colour_manual("", values = "black")+
-                scale_fill_manual("", values = "green")+
+                scale_colour_manual("", values = distinctYear)+
+                scale_fill_manual("", values = distinctYear)+
                 theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
                       ,plot.background = element_rect(color="grey20",size=2)
                       ,plot.title = element_text(hjust=0.5)

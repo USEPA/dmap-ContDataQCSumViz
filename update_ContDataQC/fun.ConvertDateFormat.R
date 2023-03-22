@@ -23,6 +23,9 @@ fun.ConvertDateFormat <- function(fun.userDateFormat
   # print(fun.userDateFormat)
   # print(fun.userTimeFormat)
   # print(fun.date.org)
+  
+
+    fun.rawData[fun.userTimeFieldName][is.na(fun.rawData[fun.userTimeFieldName])] <- "00:00:00"
     
     if(fun.date.org == 'combined') {
         tmpDateData <- fun.rawData %>% pull(fun.userDateFieldName)

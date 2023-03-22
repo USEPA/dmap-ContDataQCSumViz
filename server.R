@@ -820,28 +820,6 @@ function(input, output, session) {
         )
     })
     
-    #time series subplots
-    output$time_series_sub_plot_inputs <- renderUI({
-      tagList(
-      selectizeInput("subPlot_variable_name",
-                     label ="Select base file variables",
-                     choices=names(processed$processed_dailyStats),
-                     multiple = TRUE,
-                     selected=names(processed$processed_dailyStats)[1],
-                     options = list(hideSelected = FALSE)),
-      selectizeInput("gaze_subplot_params", label ="Select USGS gage variables",
-                     choices=names(gageRawData$gageData),
-                     multiple = TRUE,
-                     selected=names(gageRawData$gageData)[1],
-                     options = list(hideSelected = FALSE)),
-      selectizeInput("daymet_subplot_params", label ="Select Daymet variables",
-                     choices=dayMetRawData$daymetColumns,
-                     multiple = TRUE,
-                     selected=dayMetRawData$daymetColumns[1],
-                     options = list(hideSelected = FALSE))
-      )
-    })
-  
     
     # END OF USGS gage
     #Daymet
@@ -1587,6 +1565,7 @@ function(input, output, session) {
     shinyjs::runjs("$('#display_time_series').empty()")
     shinyjs::runjs("$('#display_time_series_1').empty()")
     shinyjs::runjs("$('#display_time_series_3').empty()")
+    
     
     if(length(processed$processed_dailyStats) > 0 & length(input$dailyStats_ts_variable_name) > 0) {
       #Display USGS gage stats
