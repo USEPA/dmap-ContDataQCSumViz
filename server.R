@@ -1569,80 +1569,169 @@ function(input, output, session) {
     shinyjs::runjs("$('#display_time_series_1').empty()")
     shinyjs::runjs("$('#display_time_series_3').empty()")
     
-    
+    daymet_data_raw <- NULL
+    gage_data_raw <- NULL
+    base_data_raw <- NULL
+    mergedList <- list()
+    totalH <- 0L
     if(length(processed$processed_dailyStats) > 0 & length(input$dailyStats_ts_variable_name) > 0) {
-      #Display USGS gage stats
-      gagePlot <- display_gage_stats()
+      
+      #test all row data
+      if (!is.null(dayMetRawData$dayMetData) & length(input$daymet_params) > 0) {
+        daymet_data_raw  <- dayMetRawData$dayMetData %>%
+          select(c(input$daymet_params), c("year", "yday")) %>%
+          mutate(Date=as.Date(yday, origin=paste(as.character(year - 1), "-12-31", sep=""))) %>%
+          select(c(input$daymet_params), "Date") %>%
+          gather(key = "parameter", value = "value",-Date)
+          allParames <- daymet_data_raw %>% pull(parameter)
+          
+          totalH <- totalH + length(input$daymet_params)
+          daymet_data_raw$parameter <- paste("DayMet",allParames,sep="_")
+          mergedList[["DayMet"]] <- daymet_data_raw
+      }
+      
 
-      #Display daymet
-      dayMetPlot <- draw_daymet_raw(" ")
       
-      ts_subplot <- NULL
-      mainPlot <- NULL
-      basePlot <- NULL
-      annotations = list()
-      # else if(!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
-      #   print("need to work on it")
-      # }
-      
-      if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading!="newData"){
-        mainPlot <- draw_uploaded_file_ts()
-      } else {
-        basePlot <-  draw_uploaded_file_stats()
+      if(input$gaze_params != "" && length(input$gaze_params) > 0) {
+        #gageGroup <- paste(input$gage_params, "Gage", sep=".")
+        gage_data_raw  <- gageRawData$gagedata %>%
+          select(c(input$gaze_params), c("GageID"), Date=c("Date.Time")) %>%
+          gather(key = "parameter", value = "value",-GageID, -Date)
+        
+          print("ng gage data is")
+          print(gage_data_raw)
+        
+          totalH <- totalH + length(input$gaze_params)
+          allParames <- gage_data_raw %>% pull(parameter)
+          gage_data_raw$parameter <- paste("Gage",allParames,sep="_")
+          mergedList[["Gage"]] <- gage_data_raw
       }
-      
-      if(!is.null(mainPlot) & is.null(basePlot)) {
+     
+      raw_data <- uploaded_data()
+      raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
+                                        ,fun.userTimeFormat =input$selectedTimeFormat
+                                        ,fun.userTimeZone = input$selectedTimeZone
+                                        ,fun.userDateFieldName = input$selectedDateFieldName
+                                        ,fun.userTimeFieldName = input$selectedTimeFieldName
+                                        ,fun.rawData = raw_data
+                                        ,fun.date.org = input$dtNumOfCols)
+     
+       variable_to_plot <- input$dailyStats_ts_variable_name
+       if (!is.null(variable_to_plot) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
        
-        if(!is.null(gagePlot) & !is.null(dayMetPlot)) {
-          ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(gagePlot), ggplotly(dayMetPlot), nrows = 3, shareX = TRUE)
-          annotations <- setAnnotations(3, annotations, titles=c("Uploaded File Map","USGS gage Plot","DayMet Plot"))
-        } else if(is.null(gagePlot) & !is.null(dayMetPlot)) {
-          ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(dayMetPlot), nrows = 2, shareX = TRUE)
-          annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","DayMet Plot"))
-        } else if(!is.null(gagePlot) & is.null(dayMetPlot)) {
-          ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(gagePlot), nrows = 2, shareX = TRUE)
-          annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","USGS gage Plot"))
-         } else if(is.null(gagePlot) & is.null(dayMetPlot)){
-          ts_subplot <- subplot(ggplotly(mainPlot), nrows = 1, shareX = TRUE)
-          annotations <- setAnnotations(1, annotations, titles=c("Uploaded File Map"))
-        }
-        
-      } else if(is.null(mainPlot) & !is.null(basePlot)) {
-        if(!is.null(gagePlot) & !is.null(dayMetPlot)) {
-          ts_subplot <- subplot(ggplotly(basePlot), ggplotly(gagePlot), ggplotly(dayMetPlot), nrows = 3, shareX = TRUE)
-          annotations <- setAnnotations(3, annotations, titles=c("Uploaded File Map","USGS gage Plot","DayMet Plot"))
-        } else if(is.null(gagePlot) & !is.null(dayMetPlot)) {
-          ts_subplot <- subplot(ggplotly(basePlot), ggplotly(dayMetPlot), nrows = 2, shareX = TRUE)
-          annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","DayMet Plot"))
-        } else if(!is.null(gagePlot) & is.null(dayMetPlot)) {
-          ts_subplot <- subplot(ggplotly(basePlot), ggplotly(gagePlot), nrows = 2, shareX = TRUE)
-          annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","USGS gage Plot"))
-        } else if(is.null(gagePlot) & is.null(dayMetPlot)){
-          ts_subplot <- subplot(ggplotly(basePlot), nrows = 1, shareX = TRUE)
-          annotations <- setAnnotations(1, annotations, titles=c("Uploaded File Map"))
-        }
-        
-      }
+         modified_raw_data <- raw_data %>%
+           mutate(date.formatted = as.Date(date.formatted)) %>%
+           complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
+         
+         base_data_raw  <- modified_raw_data %>%
+           select(variable_to_plot, Date= c("date.formatted")) %>%
+           gather(key = "parameter", value = "value", -Date)
+           
+           totalH <- totalH + length(variable_to_plot)
+           allParames <- base_data_raw %>% pull(parameter)
+           base_data_raw$parameter <- paste("BaseFile",allParames,sep="_")
+           mergedList[["BaseFile"]] <- base_data_raw
+       }
+      
+
+      main_range = calculate_time_range(as.list(base_data_raw))
+      mainBreaks = main_range[[1]]
+      main_x_date_label = main_range[[2]]
+      
+      allCom <- ggplot(arrange(bind_rows(mergedList, .id="df"),parameter), aes(x = as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
+        geom_line(aes(colour=parameter)) +
+        labs(title="All Merged", y="Parameters", x="Date") + 
+        scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
+        theme_bw()+
+        theme(
+          strip.background = element_blank()
+          ,strip.text.y = element_blank()
+          ,strip.placement = "outside" 
+          ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+          ,plot.title = element_text(hjust=0.5)
+          ,legend.position="bottom"
+          ,axis.text.x=element_text(angle=65, hjust=10)
+        )
+      allCom = allCom + facet_grid(parameter ~ ., scales = "free_y")
+      
+      
       output$display_time_series <- renderPlotly({
-        ts_subplot %>% plotly::layout(annotations = annotations, legend = list(orientation = "h", x = 0.4, y = -0.3))
+        ggplotly(allCom, height = calulatePlotHeight(totalH)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
       }) 
       overridePotlyStyle("display_time_series")
+
+      
+      #Display USGS gage stats
+      # gagePlot <- display_gage_stats()
+      # #Display daymet
+      # dayMetPlot <- draw_daymet_raw(" ")
+      # 
+      # ts_subplot <- NULL
+      # mainPlot <- NULL
+      # basePlot <- NULL
+      # annotations = list()
+      # # else if(!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
+      # #   print("need to work on it")
+      # # }
+      # 
+      # if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading!="newData"){
+      #   mainPlot <- draw_uploaded_file_ts()
+      # } else {
+      #   basePlot <-  draw_uploaded_file_stats()
+      # }
+      # 
+      # if(!is.null(mainPlot) & is.null(basePlot)) {
+      #  
+      #   if(!is.null(gagePlot) & !is.null(dayMetPlot)) {
+      #     ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(gagePlot), ggplotly(dayMetPlot), nrows = 3, shareX = TRUE)
+      #     annotations <- setAnnotations(3, annotations, titles=c("Uploaded File Map","USGS gage Plot","DayMet Plot"))
+      #   } else if(is.null(gagePlot) & !is.null(dayMetPlot)) {
+      #     ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(dayMetPlot), nrows = 2, shareX = TRUE)
+      #     annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","DayMet Plot"))
+      #   } else if(!is.null(gagePlot) & is.null(dayMetPlot)) {
+      #     ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(gagePlot), nrows = 2, shareX = TRUE)
+      #     annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","USGS gage Plot"))
+      #    } else if(is.null(gagePlot) & is.null(dayMetPlot)){
+      #     ts_subplot <- subplot(ggplotly(mainPlot), nrows = 1, shareX = TRUE)
+      #     annotations <- setAnnotations(1, annotations, titles=c("Uploaded File Map"))
+      #   }
+      #   
+      # } else if(is.null(mainPlot) & !is.null(basePlot)) {
+      #   if(!is.null(gagePlot) & !is.null(dayMetPlot)) {
+      #     ts_subplot <- subplot(ggplotly(basePlot), ggplotly(gagePlot), ggplotly(dayMetPlot), nrows = 3, shareX = TRUE)
+      #     annotations <- setAnnotations(3, annotations, titles=c("Uploaded File Map","USGS gage Plot","DayMet Plot"))
+      #   } else if(is.null(gagePlot) & !is.null(dayMetPlot)) {
+      #     ts_subplot <- subplot(ggplotly(basePlot), ggplotly(dayMetPlot), nrows = 2, shareX = TRUE)
+      #     annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","DayMet Plot"))
+      #   } else if(!is.null(gagePlot) & is.null(dayMetPlot)) {
+      #     ts_subplot <- subplot(ggplotly(basePlot), ggplotly(gagePlot), nrows = 2, shareX = TRUE)
+      #     annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","USGS gage Plot"))
+      #   } else if(is.null(gagePlot) & is.null(dayMetPlot)){
+      #     ts_subplot <- subplot(ggplotly(basePlot), nrows = 1, shareX = TRUE)
+      #     annotations <- setAnnotations(1, annotations, titles=c("Uploaded File Map"))
+      #   }
+      #   
+      # }
+      # output$display_time_series <- renderPlotly({
+      #   ts_subplot %>% plotly::layout(annotations = annotations, legend = list(orientation = "h", x = 0.4, y = -0.3))
+      # })
+      # overridePotlyStyle("display_time_series")
     }
   })
-  setAnnotations <- function(rowNum, annotations, titles){
-    if(rowNum == 3) {
-        annotations[[length(annotations)+1]] <- list(text = titles[1], showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
-        annotations[[length(annotations)+1]] <- list(text = titles[2], showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=0.66, yref="paper",yanchor="top")
-        annotations[[length(annotations)+1]] <- list(text = titles[3],showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=0.33, yref="paper",yanchor="top" )
-    } else if(rowNum == 2) {
-      annotations[[length(annotations)+1]] <- list(text = "Uploaded File Map", showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
-      annotations[[length(annotations)+1]] <- list(text = "DayMet Plot", showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=0.489, yref="paper",yanchor="top")
-      
-    } else if(rowNum == 1) {
-      annotations[[length(annotations)+1]] <- list(text = "Uploaded File Map", showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
-    }
-    return(annotations)
-  }
+  # setAnnotations <- function(rowNum, annotations, titles){
+  #   if(rowNum == 3) {
+  #       annotations[[length(annotations)+1]] <- list(text = titles[1], showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
+  #       annotations[[length(annotations)+1]] <- list(text = titles[2], showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=0.66, yref="paper",yanchor="top")
+  #       annotations[[length(annotations)+1]] <- list(text = titles[3],showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=0.33, yref="paper",yanchor="top" )
+  #   } else if(rowNum == 2) {
+  #     annotations[[length(annotations)+1]] <- list(text = "Uploaded File Map", showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
+  #     annotations[[length(annotations)+1]] <- list(text = "DayMet Plot", showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=0.489, yref="paper",yanchor="top")
+  #     
+  #   } else if(rowNum == 1) {
+  #     annotations[[length(annotations)+1]] <- list(text = "Uploaded File Map", showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
+  #   }
+  #   return(annotations)
+  # }
   
   observeEvent(input$display_ts, {
     

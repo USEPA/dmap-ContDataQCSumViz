@@ -235,25 +235,6 @@ shinyUI(fluidPage(
                       ), # column close
                       br(),
                     ), # tabPanel 1 end
-                    tabPanel("Time series sub plots",
-                      value = "tab_time_series_sub_plot", 
-                      br(),
-                      column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(width = 3,
-                            uiOutput("time_series_sub_plot_inputs")
-                          ),
-                          mainPanel(
-                            width = 9,
-                            column(width = 9, #uiOutput("all_plots_merged")
-                               div("hold on")    
-                                   
-                            )
-                          ) # mainPanel end
-                        )
-                      )
-                    ),
                     ### DE, All, TS Plots ----
                     tabPanel("Time series plots",
                       value = "tab_time_series", br(),
