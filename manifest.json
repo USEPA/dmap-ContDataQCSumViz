@@ -6786,6 +6786,9 @@
     "constants.R": {
       "checksum": "8039952e136cb1ed81a8cd1e6b672b1b"
     },
+    "ContDataQC_test_data/01104455_Gage_20150303_20201028.csv": {
+      "checksum": "9a882d718de77bbe5b43d35fb5752452"
+    },
     "ContDataQC_test_data/CDF_WaterTemp_2014_MA.csv": {
       "checksum": "8ef4e057db706fc575d6a5087f2a30d8"
     },
@@ -6862,13 +6865,16 @@
       "checksum": "a1d36d428e1c97737365ba94e6f7a9fa"
     },
     "ContDataQC_test_data/FromTom/new 1.txt": {
-      "checksum": "3d7aaa49ef184af993457906fb5bc561"
+      "checksum": "8928c9c7a75109e328c877fd7d072057"
     },
     "ContDataQC_test_data/HISS2 Sites LatLong.csv": {
       "checksum": "8fbbe42df312319b22abdea9cb6089bc"
     },
     "ContDataQC_test_data/MA_ParkersBrook_StageDischargeTemp_20121205_20210930.xlsx": {
       "checksum": "eea161aee62248811d444ab82ff56c51"
+    },
+    "ContDataQC_test_data/manyGageTest.csv": {
+      "checksum": "09d6f4bb2029f39f076a2172b191c95c"
     },
     "ContDataQC_test_data/NANJ-331-S.csv": {
       "checksum": "09aab089e7664891f9c2979efc376afa"
@@ -6893,6 +6899,36 @@
     },
     "ContDataQC_test_data/Ranch_OverallSumStats_2001_2022_mod.csv": {
       "checksum": "9e58133d544630f1f62ba1d3929de6b5"
+    },
+    "ContDataQC_test_data/StreamThermal.crbuoy with site ID.csv.Charles.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "ContDataQC_test_data/StreamThermal.CTDEEP_15499_WBSalmon_100616_092021.csv.10332638.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "ContDataQC_test_data/StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230213.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "ContDataQC_test_data/StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "ContDataQC_test_data/StreamThermal.DATA_QC_QB283_AW_20150303_20201006.csv.QB283.20230308.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "ContDataQC_test_data/StreamThermal.shortFileForTest.csv.QB283.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "ContDataQC_test_data/StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230203.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "ContDataQC_test_data/StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "ContDataQC_test_data/test.xlsx": {
+      "checksum": "0c0859de82403b98ac93ea53a7b37e51"
+    },
+    "ContDataQC_test_data/test_dailyCheck.RData": {
+      "checksum": "7814a703c263d03948ac20990e7b73e6"
     },
     "ContDataQC_test_data/Tori/GB27_Water_05102022_10252022.csv": {
       "checksum": "fcbc9d6a7e1f23320d7cd3678a962a4a"
@@ -7021,7 +7057,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "eff29c1869b411ff2afa755fcfec3a2f"
+      "checksum": "282ed360b148f44c58643f3b9379252e"
     },
     "StreamThermal.crbuoy with site ID.csv.Charles.20230320.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
@@ -7057,22 +7093,22 @@
       "checksum": "143ed48e5d45b6a937c16db7ea4a6241"
     },
     "ui.R": {
-      "checksum": "362c3128288f0a5dbff49cddbd1dae18"
+      "checksum": "4e05d8ae8eebe7fd0227854e9526549a"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
     },
     "update_ContDataQC/CompSiteCDF.updated.R": {
-      "checksum": "e75f823091e0322b769a8d4e2d186106"
+      "checksum": "9b27bf0a2827a10208d606d85e924ddd"
     },
     "update_ContDataQC/config.R": {
       "checksum": "23bf4005da9d6f81448e4d7530f2e606"
     },
     "update_ContDataQC/fun.ConvertDateFormat.R": {
-      "checksum": "5d317287c4eaa009723349f778a64f2e"
+      "checksum": "56c243798647a748c135efbcb51e5213"
     },
     "update_ContDataQC/ReportMetaData.R": {
-      "checksum": "272368eb6862ed9e14885e451ece17e2"
+      "checksum": "4d3997b02d528b31a37cf87277d69c3c"
     },
     "update_ContDataQC/SumStats.updated.R": {
       "checksum": "28ec5208d28b02de8d4b245b8cde87b0"
