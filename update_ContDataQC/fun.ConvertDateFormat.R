@@ -24,9 +24,6 @@ fun.ConvertDateFormat <- function(fun.userDateFormat
   # print(fun.userTimeFormat)
   # print(fun.date.org)
   
-
-    #fun.rawData[fun.userTimeFieldName][is.na(fun.rawData[fun.userTimeFieldName])] <- "00:00:00"
-    
     if(fun.date.org == 'combined') {
         tmpDateData <- fun.rawData %>% pull(fun.userDateFieldName)
         if(fun.userTimeFormat == "None") {
@@ -37,8 +34,14 @@ fun.ConvertDateFormat <- function(fun.userDateFormat
         
     } else if (fun.date.org == 'separate' & !is.null(fun.userTimeFieldName)) {
       
+        if(sum(is.na(fun.rawData[fun.userTimeFieldName])) > 0) {
+          fun.rawData[fun.userTimeFieldName][is.na(fun.rawData[fun.userTimeFieldName])] <- "00:00:00"
+        }
+        print(sum(is.na(fun.rawData[fun.userTimeFieldName])))
         tmpDateData <- fun.rawData %>% pull(fun.userDateFieldName)
         tmpTimeDate <- fun.rawData %>% pull(fun.userTimeFieldName)
+
+        
         if(!is.null(fun.userTimeFormat) & fun.userTimeFormat == "None") {
           fun.userTimeFormat <- "Hour, Minute, Second"
           tmpCol <- paste(tmpDateData, "00:00:00", sep=" ")

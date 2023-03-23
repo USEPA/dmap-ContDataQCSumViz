@@ -460,7 +460,7 @@ function(input, output, session) {
                                           ,fun.userTimeFieldName = input$selectedTimeFieldName
                                           ,fun.rawData = raw_data
                                           ,fun.date.org = input$dtNumOfCols)
-          Sys.sleep(2)
+          #Sys.sleep(2)
           print("passed fun.ConvertDateFormat")
           if (!is.null(input$parameters_to_process2) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){    
               raw_data_columns$date_column_name = "date.formatted"
@@ -473,7 +473,7 @@ function(input, output, session) {
                 ,
                 fun.myParam.Name = input$parameters_to_process2
                 ,
-                fun.myDateTime.Name = raw_data_columns$date_column_name
+                fun.myDateTime.Name = "date.formatted"
                 ,
                 fun.myDateTime.Format = "%Y-%m-%d"
                 ,
@@ -593,14 +593,17 @@ function(input, output, session) {
         }
     },error = function(parsingMsg) {
       output$display_validation_msgs <- renderUI({
+        print(parsingMsg)
         prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
       })
     }, warning = function(parsingMsg){
       output$display_validation_msgs <- renderUI({
+        print(parsingMsg)
         prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
       })
     }, message = function(parsingMsg) {
       output$display_validation_msgs <- renderUI({
+        print(parsingMsg)
         prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
       })
     })

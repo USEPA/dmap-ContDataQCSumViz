@@ -87,7 +87,7 @@ ReportMetaData <- function(fun.myFile
   ##FUN.fun.Stats.START
   # 00. Debugging Variables####
   boo_DEBUG <- FALSE
-  userDateFormat <- NULL
+  #userDateFormat <- NULL
   if (boo_DEBUG == TRUE) {
     ##IF.boo_DEBUG.START
     fun.myFile <- "DATA_test2_Aw_20130101_20141231.csv"
@@ -122,7 +122,7 @@ ReportMetaData <- function(fun.myFile
   }
   
   # remove the time part if exist for display do not need time
-  userDateFormat <- removeTimeFormat(fun.myDateTime.Format)
+  #userDateFormat <- removeTimeFormat(fun.myDateTime.Format)
   
   # 2.0. Load File
   # load data (data.frame or from CSV)
@@ -202,6 +202,7 @@ ReportMetaData <- function(fun.myFile
     utils::flush.console()
     myCol <- c(fun.myDateTime.Name, i)
     
+    
     # check NA for each parameter
     # Subset Fields
     df.param <- df.load[, myCol]
@@ -209,10 +210,17 @@ ReportMetaData <- function(fun.myFile
     # 3.2. Add "Date" field
     #fd01 <- ContData.env$myFormat.Date
     myDate.Name <- "Date"
-    
+    print("passed 212")
+  
     #df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name], fd01)
-    df.param[, myDate.Name] <-
-      as.Date(df.param[, fun.myDateTime.Name], userDateFormat)
+    #df.param[, myDate.Name] <-  as.Date(df.param[, fun.myDateTime.Name], userDateFormat)
+    
+    #df.param[, myDate.Name] <-  
+    #lubridate::ymd(df.param[, fun.myDateTime.Name], tz=fun.userTimeZone)
+    
+    df.param[, myDate.Name] <-  date(df.param[, fun.myDateTime.Name])
+    
+    print("passed 217")
     
     # 3.3. Data column to numeric
     df.param[, i] <- suppressWarnings(as.numeric(df.param[, i]))
@@ -235,8 +243,8 @@ ReportMetaData <- function(fun.myFile
       myCol <- c(fun.myDateTime.Name, myParam.Name.Flag)
       df.param.flag <- df.load[, myCol]
       #df.param.flag[,myDate.Name] <- as.Date(df.param.flag[,fun.myDateTime.Name], fd01)
-      df.param.flag[, myDate.Name] <-
-        as.Date(df.param.flag[, fun.myDateTime.Name], userDateFormat)
+      #df.param[, myDate.Name] <-  date(df.param[, fun.myDateTime.Name])
+      df.param.flag[, myDate.Name] <- date(df.param[, fun.myDateTime.Name])
       
       df.toCheck.flag <-
         df.param.flag[, c(myDate.Name, myParam.Name.Flag)]
@@ -275,9 +283,9 @@ ReportMetaData <- function(fun.myFile
 }##FUNCTION.END
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-removeTimeFormat <- function (userFormatString) {
-  if (!is.na (userFormatString)) {
-    dateFormat <- str_split(userFormatString, " ")
-    return(dateFormat[[1]][1])
-  }
-}
+# removeTimeFormat <- function (userFormatString) {
+#   if (!is.na (userFormatString)) {
+#     dateFormat <- str_split(userFormatString, " ")
+#     return(dateFormat[[1]][1])
+#   }
+# }
