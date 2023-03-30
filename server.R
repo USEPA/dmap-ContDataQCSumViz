@@ -158,11 +158,11 @@ function(input, output, session) {
         shinyjs::runjs("$('#quick_summary_table').empty()")
         shinyjs::runjs("$('#quick_summary_table_footnote').empty()")
         updateWorkFlowState("step1","success")
+
         div(id="mainBox",
         fluidRow(
           column(width=12, actionButton(inputId="dateTimeBoxButton", style="float:right;", class="active btn btn-primary", label="Hide Selection", icon= icon("arrow-down")))
         ),
-        
         box(width="100%",class="well displayed",id="dateBox",
             dateAndTimeCommonBox(
                                  dateColumnNumsId="dtNumOfCols",
@@ -222,8 +222,8 @@ function(input, output, session) {
         ) # end of main div
       }
     })
-
-    my_data_continuous <- my_data %>% select(where(is.numeric))
+    
+    my_data_continuous <- my_data %>% dplyr::select(where(is.numeric))
     all_continuous_col_names <- colnames(my_data_continuous)
     uploadedCols <- colnames(my_data)
  
@@ -557,7 +557,7 @@ function(input, output, session) {
               choices = c(
                 "Per site Per parameter" = "save1",
                 "Per site with all parameters" = "save2",
-                "Multiple sites together" = "save3",
+                # "Multiple sites together" = "save3",
                 "Save for WQX upload" = "save4"
               ),
               selected = "save2",
@@ -789,8 +789,8 @@ function(input, output, session) {
     output$time_series_input_3 <- renderUI({
       div(
           radioButtons("dailyStats_shading", "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
-                                                                           "minimum & maximum"="minMax",
-                                                                           "newData"="newData"),
+                                                                           "Mminimum & Maximum"="minMax",
+                                                                           "Discrete Data"="discreteData"),
                        selected = "quantiles"))
 
     })
@@ -1034,16 +1034,16 @@ function(input, output, session) {
                      options = list(hideSelected = FALSE))
     })
 
-    output$thermal_input_2 <- renderUI({
-      variables_avail <- names(uploaded_data())
-      date_keys_in_favor_order <- c("Date.Time","DATE.TIME","Year","YEAR","Date","DATE","MonthDay")
-      possible_date_columns <- date_keys_in_favor_order[date_keys_in_favor_order %in% variables_avail]
-      selectizeInput("thermal_Date_name",label ="Select Date Column",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=possible_date_columns[1],
-                     options = list(hideSelected = FALSE))
-    })
+    # output$thermal_input_2 <- renderUI({
+    #   variables_avail <- names(uploaded_data())
+    #   date_keys_in_favor_order <- c("Date.Time","DATE.TIME","Year","YEAR","Date","DATE","MonthDay")
+    #   possible_date_columns <- date_keys_in_favor_order[date_keys_in_favor_order %in% variables_avail]
+    #   selectizeInput("thermal_Date_name",label ="Select Date Column",
+    #                  choices=variables_avail,
+    #                  multiple = FALSE,
+    #                  selected=possible_date_columns[1],
+    #                  options = list(hideSelected = FALSE))
+    # })
 
     output$thermal_input_3 <- renderUI({
       variables_avail <- names(uploaded_data())
@@ -1383,7 +1383,7 @@ function(input, output, session) {
     my_data <- uploadFile(c(input$uploaded_newData_file), stopExecution = FALSE)
     my_data <- my_data[rowSums(is.na(my_data) | is.null(my_data) | my_data == "") != ncol(my_data),]
     return(my_data)
-    })
+  })
 
 
 
@@ -1398,7 +1398,7 @@ function(input, output, session) {
   })
 
   observeEvent(input$dailyStats_shading,{
-    if (input$dailyStats_shading == 'newData'){
+    if (input$dailyStats_shading == 'newData' | input$dailyStats_shading == 'discreteData'){
       shinyjs::show("cp_new_data")
     }else{
       shinyjs::hide("cp_new_data")
@@ -1426,24 +1426,24 @@ function(input, output, session) {
                                timeFieldParentId="timeFieldDiv2",
                                paramChoices=c("",cols_avail),
                                extraValidationId="display_validation_msgs_new2"),
-          fluidRow(
-            column(width = 4, 
-                   selectizeInput("newData_lower_col",
-                                  label = "Select column to be used as lower bound",
-                                  choices = c("",cols_avail),
-                                  multiple = FALSE,
-                                  selected = NULL,
-                                  options = list(hideSelected = FALSE)
-                   )),
-            column(width = 4, 
-                   selectizeInput("newData_upper_col",
-                                  label = "Select column to be used as upper bound",
-                                  choices = c("",cols_avail),
-                                  multiple = FALSE,
-                                  selected = NULL,
-                                  options = list(hideSelected = FALSE)
-                   ))
-          ),
+          # fluidRow(
+          #   column(width = 4, 
+          #          selectizeInput("newData_lower_col",
+          #                         label = "Select column to be used as lower bound",
+          #                         choices = c("",cols_avail),
+          #                         multiple = FALSE,
+          #                         selected = NULL,
+          #                         options = list(hideSelected = FALSE)
+          #          )),
+          #   column(width = 4, 
+          #          selectizeInput("newData_upper_col",
+          #                         label = "Select column to be used as upper bound",
+          #                         choices = c("",cols_avail),
+          #                         multiple = FALSE,
+          #                         selected = NULL,
+          #                         options = list(hideSelected = FALSE)
+          #          ))
+          # ),
           hr(),
           fluidRow(
             column(width=4,uiOutput("select_new")),
@@ -1757,7 +1757,7 @@ function(input, output, session) {
           }
 
           #Display uploaded file stats
-          if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading != "newData"){
+          if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading != "discreteData"){
             mainPlot <- draw_uploaded_file_ts()
             if(!is.null(mainPlot) & length(input$dailyStats_ts_variable_name) > 0){
               output$display_time_series <-  renderPlotly({
@@ -1765,37 +1765,29 @@ function(input, output, session) {
               })
             }
    
-         } else if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
-           
-           mainPlot <- draw_uploaded_file_ts()
-           if(!is.null(mainPlot) & length(input$dailyStats_ts_variable_name) > 0){
-             output$display_time_series <-  renderPlotly({
-               ggplotly(mainPlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4)) 
-             })
-           }
-           
-           newMainPlot <- draw_new_updated_file_stats(renderStatus=FALSE)
-           if(!is.null(newMainPlot) & length(input$parameters_to_process2_new) > 0){
-             shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
-             output$display_time_series_new <-  renderPlotly({
-               ggplotly(newMainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_new))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
-             })
-           }
-
-         } else {
-               basePlot <-  draw_uploaded_file_stats()
-               if(!is.null(basePlot)) {
-                 output$display_time_series <-  renderPlotly({
-                   ggplotly(basePlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+         } else if (input$dailyStats_shading=="discreteData"){
+             newMainPlot <- draw_new_updated_file_stats(renderStatus=FALSE)
+               if(!is.null(newMainPlot) & length(input$parameters_to_process2_new) > 0){
+                 shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
+                 output$display_time_series_new <-  renderPlotly({
+                   ggplotly(newMainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_new))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
                  })
                }
-         }          
-          overridePotlyStyle("display_time_series")
-          overridePotlyStyle("display_time_series_1")
-          overridePotlyStyle("display_time_series_3")
-          }  else {
-           shinyAlertUI("common_alert_msg", calculateDailyStats, "WARNING")
-          }
+             } else {
+                   basePlot <-  draw_uploaded_file_stats()
+                   if(!is.null(basePlot)) {
+                     output$display_time_series <-  renderPlotly({
+                       ggplotly(basePlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+                     })
+                   }
+             }          
+            overridePotlyStyle("display_time_series")
+            overridePotlyStyle("display_time_series_1")
+            overridePotlyStyle("display_time_series_3")
+            overridePotlyStyle("display_time_series_new")
+            } else {
+             shinyAlertUI("common_alert_msg", calculateDailyStats, "WARNING")
+            }
 
   })  # observeEvent end
   
@@ -3397,39 +3389,68 @@ function(input, output, session) {
      timeFieldNameId="selectedTimeFieldName_new",
      timeFormatId="selectedTimeFormat_new",
      elementId="display_validation_msgs_new"
-   ) == FALSE & validateNewLowerAndUpper("display_validation_msgs_new2") == FALSE){
+   ) == FALSE){
      tryCatch({
-     discrete_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat_new
-                                            ,fun.userTimeFormat =input$selectedTimeFormat_new
-                                            ,fun.userTimeZone = input$selectedTimeZone_new
-                                            ,fun.userDateFieldName = input$selectedDateFieldName_new
-                                            ,fun.userTimeFieldName = input$selectedTimeFieldName_new
-                                            ,fun.rawData = uploaded_newData()
-                                            ,fun.date.org = input$dtNumOfCols1)
+       
+       variable_to_plot <- sort(input$parameters_to_process2_new, decreasing = FALSE)
+       base_vars_to_plot <- sort(input$dailyStats_ts_variable_name, decreasing = FALSE)
+       if(identical(variable_to_plot,base_vars_to_plot)) {
+        discrete_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat_new
+                                              ,fun.userTimeFormat =input$selectedTimeFormat_new
+                                              ,fun.userTimeZone = input$selectedTimeZone_new
+                                              ,fun.userDateFieldName = input$selectedDateFieldName_new
+                                              ,fun.userTimeFieldName = input$selectedTimeFieldName_new
+                                              ,fun.rawData = uploaded_newData()
+                                              ,fun.date.org = input$dtNumOfCols1)
      
      
        if(nrow(discrete_data) != nrow(discrete_data[is.na(discrete_data$date.formatted),])) {
-         variable_to_plot <- input$parameters_to_process2_new
-         mainList <- list()
-         for(varName in variable_to_plot) {
-           mainList[[varName]] <- as.data.frame(discrete_data %>% select(value=varName, lower_col=input$newData_lower_col , upper_col=input$newData_upper_col, Date=date.formatted))
-         }
-         mainMapTitle <- getMapTitle("dynamic", "Discrete data", lowerColumn = input$newData_lower_col, upperColumn = input$newData_upper_col)
-         main_range = calculate_time_range(as.list(bind_rows(mainList, .id="df")))
-         mainBreaks = main_range[[1]]
-         main_x_date_label = main_range[[2]]
-         mainPlot <- prepareBasePlot(dataList= mainList, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks)
-         if(renderStatus == FALSE) {
-           return(mainPlot)
-         } else {
-             if(!is.null(mainPlot) & length(input$parameters_to_process2_new) > 0){
-                 shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
-                 output$display_time_series_new <-  renderPlotly({
-                   ggplotly(mainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_new))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
-                 })
-              }
-         }
-       } 
+         base_data <- uploaded_data()
+         base_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
+                                            ,fun.userTimeFormat =input$selectedTimeFormat
+                                            ,fun.userTimeZone = input$selectedTimeZone
+                                            ,fun.userDateFieldName = input$selectedDateFieldName
+                                            ,fun.userTimeFieldName = input$selectedTimeFieldName
+                                            ,fun.rawData = base_data
+                                            ,fun.date.org = input$dtNumOfCols)
+         
+           if (!is.null(base_vars_to_plot) & nrow(base_data) != nrow(base_data[is.na(base_data$date.formatted),])){
+                discrete_data  <- discrete_data %>%
+                select(variable_to_plot, Date= c("date.formatted")) %>%
+                gather(key = "discrete", value = "value", -Date)
+  
+                base_data_raw  <- base_data %>%
+                  select(base_vars_to_plot, Date= c("date.formatted")) %>%
+                  gather(key = "continuous", value = "value", -Date)
+          
+                mainMapTitle <- "Discrete and continuous data"
+                main_range = calculate_time_range(as.list(base_data_raw))
+                mainBreaks = main_range[[1]]
+                main_x_date_label = main_range[[2]]
+               
+                #FYI filled missing data creats empty facet row
+                # base_data_raw <- base_data_raw %>%
+                #   mutate(Date = as.Date(Date)) %>%
+                #   complete(Date = seq.Date(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by="day"))
+                
+                mainPlot <- prepareDiscretePlot(discrete_data, base_data_raw , mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
+                if(renderStatus == FALSE) {
+                   return(mainPlot)
+                 } else {
+                   if(!is.null(mainPlot) & length(input$parameters_to_process2_new) > 0){
+                     shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
+                     output$display_time_series_new <-  renderPlotly({
+                       ggplotly(mainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_new))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+                     })
+                   }
+                }
+           }
+
+         } 
+       } else {
+         shinyAlertUI("common_alert_msg", discreteVarMismatch, "ERROR")
+         return(mainPlot)
+       }
      },error = function(parsingMsg) {
        print(parsingMsg)
        output$display_validation_msgs_new <- renderUI({
@@ -3450,8 +3471,6 @@ function(input, output, session) {
      })
    }
  }
-  
-  
   
   draw_uploaded_file_ts <- function(){
     mainPlot <- NULL
@@ -3474,6 +3493,28 @@ function(input, output, session) {
       main_x_date_label = main_range[[2]]
       
       mainPlot <- prepareBasePlot(dataList= mainList, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks)
+    return(mainPlot)
+  }
+  prepareDiscretePlot <- function(discreteData,baseData, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
+    mainPlot <- NULL
+    mainPlot <- ggplot() +
+      geom_line(data=baseData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=continuous))+
+      geom_point(data=discreteData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=discrete))+
+      labs(title=mapTitle, x="Date", y="Parameters")+
+      scale_x_datetime(date_labels=xDateLabel,date_breaks=xDateBrakes)+
+      theme_bw()+
+      facet_grid(continuous ~ ., scales = "free_y")+
+      scale_color_discrete(name="")+
+      theme(
+        strip.background = element_blank()
+        ,legend.title=element_blank()
+        ,strip.text.y = element_blank()
+        ,strip.placement = "outside"
+        ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+        ,plot.title = element_text(hjust=0.5)
+        ,legend.position="bottom"
+        ,axis.text.x=element_text(angle=65, hjust=1, vjust=1)
+      ) 
     return(mainPlot)
   }
   
@@ -3554,21 +3595,21 @@ function(input, output, session) {
     }
   }
   
-  validateNewLowerAndUpper <- function(elementId){
-    missingInputs <- FALSE
-    if (input$newData_lower_col == "" | input$newData_upper_col == ""){
-      missingInputs <- TRUE
-      output[[elementId]] <- renderUI({
-        shiny::validate(
-          shiny::need(input$newData_lower_col != "", 'Please lower bound column.'),
-          shiny::need(
-            input$newData_upper_col != "", 'Please select upper bound column.'
-          )
-        )
-      })
-    }
-    return(missingInputs)
-  }
+  # validateNewLowerAndUpper <- function(elementId){
+  #   missingInputs <- FALSE
+  #   if (input$newData_lower_col == "" | input$newData_upper_col == ""){
+  #     missingInputs <- TRUE
+  #     output[[elementId]] <- renderUI({
+  #       shiny::validate(
+  #         shiny::need(input$newData_lower_col != "", 'Please lower bound column.'),
+  #         shiny::need(
+  #           input$newData_upper_col != "", 'Please select upper bound column.'
+  #         )
+  #       )
+  #     })
+  #   }
+  #   return(missingInputs)
+  # }
 
   
   validateUserInputs <- function(dateColumnNums,parmToProcess, dateFieldNameId,dateFormatId,timeFieldNameId,timeFormatId,elementId,tab=""){

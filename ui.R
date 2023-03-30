@@ -271,30 +271,6 @@ shinyUI(fluidPage(
                                     accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
                                   ),
                                   hr(),
-                                  # selectizeInput("newData_lower_col",
-                                  #   label = "Select column to be used as lower bound",
-                                  #   choices = NULL,
-                                  #   multiple = FALSE,
-                                  #   selected = NULL,
-                                  #   options = list(hideSelected = FALSE)
-                                  # ),
-                                  # hr(),
-                                  # selectizeInput("newData_upper_col",
-                                  #   label = "Select column to be used as upper bound",
-                                  #   choices = NULL,
-                                  #   multiple = FALSE,
-                                  #   selected = NULL,
-                                  #   options = list(hideSelected = FALSE)
-                                  # ),
-                                  #hr(),
-                                  # selectizeInput("newData_date_col",
-                                  #   label = "Select date column",
-                                  #   choices = NULL,
-                                  #   multiple = FALSE,
-                                  #   selected = NULL,
-                                  #   options = list(hideSelected = FALSE)
-                                  # ),
-                                  # hr(),
                                   textInput("newData_name", label = "New data name", value = "USGS")
                                 ), # conditionalPanel end
                               ) # div end
@@ -826,64 +802,64 @@ shinyUI(fluidPage(
         ), # tabPanel end Data exploration
 
         # Create Report----
-        tabPanel(
-          title="Create Report",
-          value="CreateReport",
-          fluidPage(
-            fluidRow(
-              tabsetPanel(
-                id = "report_subtabs",
-                ### CR, Single ----
-                tabPanel("SingleSite",
-                  value = "SingleSite_tab", br(),
-                  column(
-                    width = 12,
-                    sidebarLayout(
-                      sidebarPanel(
-                        width = 3,
-                        hr(),
-                        radioButtons("report_format",
-                          "Select report format",
-                          choices = c("pdf" = "pdf", "html" = "html", "word" = "docx"),
-                          selected = "html"
-                        ),
-                        hr(),
-                        textInput(
-                          inputId = "report_name",
-                          label = "Report file name",
-                          value = "myReport"
-                        ),
-                        hr(),
-                        actionButton("createReport", "Create report"),
-                        hr(),
-                        downloadButton("downloadReport", "Download Report")
-                      ),
-                      mainPanel(
-                        width = 9,
-                        column(
-                          width = 12,
-                          uiOutput("display_report_content_1"),
-                          br(),
-                          uiOutput("display_report_content_2")
-                        )
-                      ) # mainPanel end
-                    ) # sidebarLayout end
-                  ), # column close
-                  br(),
-                  column(width = 12, uiOutput("display_table_single_site"))
-                ), # tabPanel close singlesite
-
-                ### CR, Multi----
-                tabPanel("MultiSites",
-                  value = "MultiSites_tab", br(),
-                  br(),
-                  fluidPage(h4(id = "big-heading", "Coming later")),
-                  column(width = 12, uiOutput("display_table_multiple_sites"))
-                ) # tabPanel Multi close
-              ) # tabsetPanel end
-            ) # fluidRow end
-          ) # fluidPage end
-        ) # tabPanel end Create Report
+        # tabPanel(
+        #   title="Create Report",
+        #   value="CreateReport",
+        #   fluidPage(
+        #     fluidRow(
+        #       tabsetPanel(
+        #         id = "report_subtabs",
+        #         ### CR, Single ----
+        #         tabPanel("SingleSite",
+        #           value = "SingleSite_tab", br(),
+        #           column(
+        #             width = 12,
+        #             sidebarLayout(
+        #               sidebarPanel(
+        #                 width = 3,
+        #                 hr(),
+        #                 radioButtons("report_format",
+        #                   "Select report format",
+        #                   choices = c("pdf" = "pdf", "html" = "html", "word" = "docx"),
+        #                   selected = "html"
+        #                 ),
+        #                 hr(),
+        #                 textInput(
+        #                   inputId = "report_name",
+        #                   label = "Report file name",
+        #                   value = "myReport"
+        #                 ),
+        #                 hr(),
+        #                 actionButton("createReport", "Create report"),
+        #                 hr(),
+        #                 downloadButton("downloadReport", "Download Report")
+        #               ),
+        #               mainPanel(
+        #                 width = 9,
+        #                 column(
+        #                   width = 12,
+        #                   uiOutput("display_report_content_1"),
+        #                   br(),
+        #                   uiOutput("display_report_content_2")
+        #                 )
+        #               ) # mainPanel end
+        #             ) # sidebarLayout end
+        #           ), # column close
+        #           br(),
+        #           column(width = 12, uiOutput("display_table_single_site"))
+        #         ), # tabPanel close singlesite
+        # 
+        #         ### CR, Multi----
+        #         tabPanel("MultiSites",
+        #           value = "MultiSites_tab", br(),
+        #           br(),
+        #           fluidPage(h4(id = "big-heading", "Coming later")),
+        #           column(width = 12, uiOutput("display_table_multiple_sites"))
+        #         ) # tabPanel Multi close
+        #       ) # tabsetPanel end
+        #     ) # fluidRow end
+        #   ) # fluidPage end
+        # ) # tabPanel end Create Report
       ) # tabsetPanel close
     )
   )
