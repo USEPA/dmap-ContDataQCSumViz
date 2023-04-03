@@ -151,6 +151,35 @@
         "Built": "R 4.2.2; ; 2022-12-20 01:40:09 UTC; windows"
       }
     },
+    "DEoptimR": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "DEoptimR",
+        "Version": "1.0-11",
+        "Date": "2022-04-03",
+        "Title": "Differential Evolution Optimization in Pure R",
+        "Authors@R": "c(\n    person(c(\"Eduardo\", \"L. T.\"), \"Conceicao\",\n           role = c(\"aut\", \"cre\"),\n           email = \"mail@eduardoconceicao.org\"),\n    person(\"Martin\", \"Maechler\",\n           role = \"ctb\",\n           email = \"maechler@stat.math.ethz.ch\",\n           comment = c(ORCID = \"0000-0002-8685-9910\"))\n    )",
+        "Description": "Differential Evolution (DE) stochastic algorithms for global\n    optimization of problems with and without constraints.\n    The aim is to curate a collection of its state-of-the-art variants that\n    (1) do not sacrifice simplicity of design,\n    (2) are essentially tuning-free, and\n    (3) can be efficiently implemented directly in the R language.\n    Currently, it only provides an implementation of the 'jDE' algorithm by\n    Brest et al. (2006) <doi:10.1109/TEVC.2006.872133>.",
+        "Imports": "stats",
+        "Enhances": "robustbase",
+        "License": "GPL (>= 2)",
+        "Author": "Eduardo L. T. Conceicao [aut, cre],\n  Martin Maechler [ctb] (<https://orcid.org/0000-0002-8685-9910>)",
+        "Maintainer": "Eduardo L. T. Conceicao <mail@eduardoconceicao.org>",
+        "Repository": "CRAN",
+        "Repository/R-Forge/Project": "robustbase",
+        "Repository/R-Forge/Revision": "896",
+        "Repository/R-Forge/DateTimeStamp": "2022-04-03 19:51:52",
+        "Date/Publication": "2022-04-03 20:40:01 UTC",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-04-03 20:11:09 UTC; rforge",
+        "Built": "R 4.2.0; ; 2022-04-24 01:21:00 UTC; windows"
+      }
+    },
     "DT": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -3512,6 +3541,32 @@
         "Built": "R 4.2.2; ; 2022-12-20 04:39:33 UTC; windows"
       }
     },
+    "minpack.lm": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "minpack.lm",
+        "Version": "1.2-3",
+        "Title": "R Interface to the Levenberg-Marquardt Nonlinear Least-Squares\nAlgorithm Found in MINPACK, Plus Support for Bounds",
+        "Author": "Timur V. Elzhov, Katharine M. Mullen, Andrej-Nikolai Spiess, Ben Bolker",
+        "Maintainer": "Katharine M. Mullen <mullenkate@gmail.com>",
+        "Description": "The nls.lm function provides an R interface to lmder and lmdif from the MINPACK library, for solving nonlinear least-squares problems by a modification of the Levenberg-Marquardt algorithm, with support for lower and upper parameter bounds.  The implementation can be used via nls-like calls using the nlsLM function.  ",
+        "Suggests": "MASS",
+        "License": "GPL-3",
+        "Copyright": "inst/COPYRIGHTS",
+        "NeedsCompilation": "yes",
+        "Repository": "CRAN",
+        "Packaged": "2023-01-26 07:01:49 UTC; kmm-windog",
+        "Date/Publication": "2023-01-26 12:40:06 UTC",
+        "Built": "R 4.2.3; x86_64-w64-mingw32; 2023-03-26 02:04:15 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "minqa": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -4364,6 +4419,36 @@
         "Archs": "x64"
       }
     },
+    "qpcR": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "qpcR",
+        "Type": "Package",
+        "LazyLoad": "yes",
+        "LazyData": "yes",
+        "Title": "Modelling and Analysis of Real-Time PCR Data",
+        "Version": "1.4-1",
+        "Date": "2018-05-29",
+        "Author": "Andrej-Nikolai Spiess <a.spiess@uke.uni-hamburg.de>        ",
+        "Maintainer": "Andrej-Nikolai Spiess <a.spiess@uke.uni-hamburg.de>",
+        "Description": "Model fitting, optimal model selection and calculation of various features that are essential in the analysis of quantitative real-time polymerase chain reaction (qPCR).",
+        "License": "GPL (>= 2)",
+        "Depends": "R (>= 2.13.0), MASS, minpack.lm, rgl, robustbase, Matrix",
+        "NeedsCompilation": "yes",
+        "Imports": "methods",
+        "Repository": "CRAN",
+        "Packaged": "2018-06-05 07:13:24 UTC; anspiess",
+        "Date/Publication": "2018-06-14 10:58:00 UTC",
+        "Built": "R 4.2.3; x86_64-w64-mingw32; 2023-03-26 05:51:40 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "rJava": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -4726,6 +4811,41 @@
         "Archs": "x64"
       }
     },
+    "rgl": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "rgl",
+        "Version": "1.1.3",
+        "Title": "3D Visualization Using OpenGL",
+        "Authors@R": "c(person(\"Duncan\", \"Murdoch\", role = c(\"aut\", \"cre\"),\n                     email = \"murdoch.duncan@gmail.com\"),\n              person(\"Daniel\", \"Adler\", role = \"aut\",\n                     email = \"dadler@dyncall.org\"),\n              person(\"Oleg\", \"Nenadic\", role = \"ctb\"),\n              person(\"Simon\", \"Urbanek\", role = \"ctb\"),\n              person(\"Ming\", \"Chen\", role = \"ctb\"),\n              person(\"Albrecht\", \"Gebhardt\", role = \"ctb\"),\n              person(\"Ben\", \"Bolker\", role = \"ctb\"),\n              person(\"Gabor\", \"Csardi\", role = \"ctb\"),\n              person(\"Adam\", \"Strzelecki\", role = \"ctb\"),\n              person(\"Alexander\", \"Senger\", role = \"ctb\"),\n              person(\"The R Core Team\", role = c(\"ctb\", \"cph\")),\n              person(\"Dirk\",\"Eddelbuettel\", role = \"ctb\"),\n              person(\"The authors of Shiny\", role = \"cph\"),\n              person(\"The authors of knitr\", role = \"cph\"),\n              person(\"Jeroen\", \"Ooms\", role = \"ctb\"),\n              person(\"Yohann\", \"Demont\", role = \"ctb\"),\n              person(\"Joshua\", \"Ulrich\", role = \"ctb\"),\n              person(\"Xavier\", \"Fernandez i Marin\", role = \"ctb\"),\n              person(\"George\", \"Helffrich\", role = \"ctb\"),\n              person(\"Ivan\", \"Krylov\", role = \"ctb\"),\n              person(\"Michael\", \"Sumner\", role = \"ctb\"),\n              person(\"Mike\", \"Stein\", role = \"ctb\"))",
+        "Depends": "R (>= 3.3.0)",
+        "Suggests": "MASS, rmarkdown (>= 2.16), deldir (>= 1.0-4), orientlib,\nlattice, misc3d, magick, plotrix (>= 3.7-3), tripack, interp,\nalphashape3d, tcltk, js (>= 1.2), webshot2 (>= 0.1.0), downlit\n(>= 0.4.0), pkgdown (>= 2.0.0), extrafont, shiny,\nmanipulateWidget (>= 0.9.0), testthat, markdown, crosstalk, V8,\nchromote",
+        "Imports": "graphics, grDevices, stats, utils, htmlwidgets (>= 1.6.0),\nhtmltools, knitr (>= 1.33), jsonlite (>= 0.9.20), magrittr, R6,\nbase64enc, mime",
+        "Enhances": "waldo",
+        "Description": "Provides medium to high level functions for 3D interactive graphics, including\n    functions modelled on base graphics (plot3d(), etc.) as well as functions for\n    constructing representations of geometric objects (cube3d(), etc.).  Output\n    may be on screen using OpenGL, or to various standard 3D file formats including\n    WebGL, PLY, OBJ, STL as well as 2D image formats, including PNG, Postscript, SVG, PGF.",
+        "License": "GPL",
+        "URL": "https://github.com/dmurdoch/rgl, https://dmurdoch.github.io/rgl/",
+        "SystemRequirements": "OpenGL and GLU Library (Required for display in R.\nSee \"Installing OpenGL support\" in README.md. Not needed if\nonly browser displays using rglwidget() are wanted.), zlib\n(optional), libpng (>=1.2.9, optional), FreeType (optional),\npandoc (>=1.14, needed for vignettes)",
+        "BugReports": "https://github.com/dmurdoch/rgl/issues",
+        "VignetteBuilder": "knitr, rmarkdown",
+        "Biarch": "true",
+        "RoxygenNote": "7.2.2.9000",
+        "NeedsCompilation": "yes",
+        "Packaged": "2023-03-13 21:32:28 UTC; murdoch",
+        "Author": "Duncan Murdoch [aut, cre],\n  Daniel Adler [aut],\n  Oleg Nenadic [ctb],\n  Simon Urbanek [ctb],\n  Ming Chen [ctb],\n  Albrecht Gebhardt [ctb],\n  Ben Bolker [ctb],\n  Gabor Csardi [ctb],\n  Adam Strzelecki [ctb],\n  Alexander Senger [ctb],\n  The R Core Team [ctb, cph],\n  Dirk Eddelbuettel [ctb],\n  The authors of Shiny [cph],\n  The authors of knitr [cph],\n  Jeroen Ooms [ctb],\n  Yohann Demont [ctb],\n  Joshua Ulrich [ctb],\n  Xavier Fernandez i Marin [ctb],\n  George Helffrich [ctb],\n  Ivan Krylov [ctb],\n  Michael Sumner [ctb],\n  Mike Stein [ctb]",
+        "Maintainer": "Duncan Murdoch <murdoch.duncan@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-03-26 22:30:02 UTC",
+        "Built": "R 4.2.3; x86_64-w64-mingw32; 2023-03-29 07:31:44 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "rlang": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -4796,6 +4916,42 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-12-15 13:10:11 UTC",
         "Built": "R 4.2.2; ; 2023-01-08 04:41:11 UTC; windows"
+      }
+    },
+    "robustbase": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "robustbase",
+        "Version": "0.95-0",
+        "VersionNote": "Released 0.93-9 on 2021-09-27 to CRAN",
+        "Date": "2022-04-02",
+        "Title": "Basic Robust Statistics",
+        "Authors@R": "c(person(\"Martin\",\"Maechler\", role=c(\"aut\",\"cre\"), email=\"maechler@stat.math.ethz.ch\", comment = c(ORCID = \"0000-0002-8685-9910\"))\n         , person(\"Peter\", \"Rousseeuw\", role=\"ctb\", comment = \"Qn and Sn\")\n         , person(\"Christophe\", \"Croux\", role=\"ctb\", comment = \"Qn and Sn\")\n         , person(\"Valentin\", \"Todorov\", role = \"aut\", email = \"valentin.todorov@chello.at\",\n                  comment = \"most robust Cov\")\n         , person(\"Andreas\", \"Ruckstuhl\", role = \"aut\", email = \"andreas.ruckstuhl@zhaw.ch\",\n                  comment = \"nlrob, anova, glmrob\")\n         , person(\"Matias\", \"Salibian-Barrera\", role = \"aut\", email = \"matias@stat.ubc.ca\",\n                  comment = \"lmrob orig.\")\n         , person(\"Tobias\", \"Verbeke\", role = c(\"ctb\",\"fnd\"), email = \"tobias.verbeke@openanalytics.eu\",\n                  comment = \"mc, adjbox\")\n         , person(\"Manuel\", \"Koller\", role = \"aut\", email = \"koller.manuel@gmail.com\",\n                  comment = \"mc, lmrob, psi-func.\")\n         , person(c(\"Eduardo\", \"L. T.\"), \"Conceicao\", role = \"aut\", email = \"mail@eduardoconceicao.org\",\n                  comment = \"MM-, tau-, CM-, and MTL- nlrob\")\n         , person(\"Maria\", \"Anna di Palma\", role = \"ctb\", comment = \"initial version of Comedian\")\n          )",
+        "URL": "https://robustbase.R-forge.R-project.org/",
+        "BugReports": "https://R-forge.R-project.org/tracker/?atid=302&group_id=59",
+        "Description": "\"Essential\" Robust Statistics.\n Tools allowing to analyze data with robust methods.  This includes\n regression methodology including model selections and multivariate\n statistics where we strive to cover the book \"Robust Statistics,\n Theory and Methods\" by 'Maronna, Martin and Yohai'; Wiley 2006.",
+        "Depends": "R (>= 3.5.0)",
+        "Imports": "stats, graphics, utils, methods, DEoptimR",
+        "Suggests": "grid, MASS, lattice, boot, cluster, Matrix, robust,\nfit.models, MPV, xtable, ggplot2, GGally, RColorBrewer,\nreshape2, sfsmisc, catdata, doParallel, foreach, skewt",
+        "SuggestsNote": "mostly only because of vignette graphics and simulation",
+        "Enhances": "robustX, rrcov, matrixStats, quantreg, Hmisc",
+        "EnhancesNote": "linked to in man/*.Rd",
+        "LazyData": "yes",
+        "NeedsCompilation": "yes",
+        "License": "GPL (>= 2)",
+        "Packaged": "2022-04-02 12:47:01 UTC; maechler",
+        "Author": "Martin Maechler [aut, cre] (<https://orcid.org/0000-0002-8685-9910>),\n  Peter Rousseeuw [ctb] (Qn and Sn),\n  Christophe Croux [ctb] (Qn and Sn),\n  Valentin Todorov [aut] (most robust Cov),\n  Andreas Ruckstuhl [aut] (nlrob, anova, glmrob),\n  Matias Salibian-Barrera [aut] (lmrob orig.),\n  Tobias Verbeke [ctb, fnd] (mc, adjbox),\n  Manuel Koller [aut] (mc, lmrob, psi-func.),\n  Eduardo L. T. Conceicao [aut] (MM-, tau-, CM-, and MTL- nlrob),\n  Maria Anna di Palma [ctb] (initial version of Comedian)",
+        "Maintainer": "Martin Maechler <maechler@stat.math.ethz.ch>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-04-02 21:50:02 UTC",
+        "Built": "R 4.2.3; x86_64-w64-mingw32; 2023-03-26 02:02:08 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
       }
     },
     "roxygen2": {
@@ -6780,9 +6936,6 @@
     "_moved/SiteSummary_YD.Rmd": {
       "checksum": "34a4484a74f12f566189b70ec50719e3"
     },
-    "01104455_Gage_20150303_20201028.csv": {
-      "checksum": "9a882d718de77bbe5b43d35fb5752452"
-    },
     "constants.R": {
       "checksum": "e64b21183f56c3f9e0c569462a87cda2"
     },
@@ -6885,6 +7038,9 @@
     "ContDataQC_test_data/newData_Water.Temp.C_2018_dummy.csv": {
       "checksum": "2f7d2ecebcf7484db66b9357d004546b"
     },
+    "ContDataQC_test_data/ngTest.csv": {
+      "checksum": "c8181f38fd6cf44fe38ac808d99b35ab"
+    },
     "ContDataQC_test_data/NY_Biscuit_01434025_Gage_20150101_20220101.csv": {
       "checksum": "34c1ba59a45e9565cb2bbf19cbb6efe9"
     },
@@ -6899,6 +7055,9 @@
     },
     "ContDataQC_test_data/Ranch_OverallSumStats_2001_2022_mod.csv": {
       "checksum": "9e58133d544630f1f62ba1d3929de6b5"
+    },
+    "ContDataQC_test_data/shortTestFile.csv": {
+      "checksum": "5d157c8cd2db0d11aedacd6f96ee0efc"
     },
     "ContDataQC_test_data/StreamThermal.crbuoy with site ID.csv.Charles.20230320.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
@@ -6961,7 +7120,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "dd23e67bb1c07e23e2b9178f099ef070"
+      "checksum": "d48f6d54abda9e8277c7d470101d3c17"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -7057,52 +7216,16 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "754ddca0e71ac57798b3100d3a3f9611"
-    },
-    "StreamThermal.crbuoy with site ID.csv.Charles.20230320.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.CTDEEP_15499_WBSalmon_100616_092021.csv.10332638.20230320.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.CTDEEP_15499_WBSalmon_100616_092021.csv.10332638.20230328.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230213.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230320.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.DATA_QC_QB283_AW_20150303_20201006.csv.QB283.20230308.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.shortFileForTest.csv.QB283.20230320.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.shortFileForTest.csv.QB283.20230328.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230203.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230320.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230324.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
+      "checksum": "063de4dc6e2bcd7c8d490a167fbe4cfb"
     },
     "sumVizUtils/fun.calculate.time.breaks.R": {
       "checksum": "bbad3d7c1d53dc1a63b2b07007d579a6"
-    },
-    "test.xlsx": {
-      "checksum": "0c0859de82403b98ac93ea53a7b37e51"
     },
     "test_dailyCheck.RData": {
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
     },
     "ui.R": {
-      "checksum": "737d9ce120e37a1a0f7e98763ad40fdd"
+      "checksum": "9a90be7a4568cceca72f3edca6ee06c3"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
