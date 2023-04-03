@@ -63,6 +63,7 @@ library("future")
 library("tinytex")
 # library("purrr")
 #library("ggtext")
+library("qpcR")
 plan(multisession)
 #options(scipen=999) 
 

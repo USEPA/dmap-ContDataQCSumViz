@@ -73,6 +73,7 @@ function(input, output, session) {
   conflict_prefer("box", "shinydashboard")
   conflict_prefer("dataTableOutput", "DT")
   conflict_prefer("yday", "data.table")
+  conflict_prefer("select", "dplyr")
   loaded_data <- reactiveValues()
   raw_data_columns<-reactiveValues()
   dateRange <- reactiveValues()
@@ -1656,7 +1657,7 @@ function(input, output, session) {
       
       
       output$display_time_series <- renderPlotly({
-        ggplotly(allCom, height = calulatePlotHeight(totalH)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+        ggplotly(allCom, height = calulatePlotHeight(totalH*2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
       }) 
       overridePotlyStyle("display_time_series")
 
@@ -1770,10 +1771,10 @@ function(input, output, session) {
                if(!is.null(newMainPlot) & length(input$parameters_to_process2_new) > 0){
                  shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
                  output$display_time_series_new <-  renderPlotly({
-                   ggplotly(newMainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_new))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+                   ggplotly(newMainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_new) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
                  })
                }
-             } else {
+          } else {
                    basePlot <-  draw_uploaded_file_stats()
                    if(!is.null(basePlot)) {
                      output$display_time_series <-  renderPlotly({
@@ -3415,25 +3416,32 @@ function(input, output, session) {
                                             ,fun.date.org = input$dtNumOfCols)
          
            if (!is.null(base_vars_to_plot) & nrow(base_data) != nrow(base_data[is.na(base_data$date.formatted),])){
-                discrete_data  <- discrete_data %>%
-                select(variable_to_plot, Date= c("date.formatted")) %>%
-                gather(key = "discrete", value = "value", -Date)
-  
-                base_data_raw  <- base_data %>%
-                  select(base_vars_to_plot, Date= c("date.formatted")) %>%
-                  gather(key = "continuous", value = "value", -Date)
+             
+             
+             
+               mergedData <- NULL
+               for(varName in input$dailyStats_ts_variable_name) {
+                    step1 <- base_data %>% select('continuous_value'=c(varName),'Date' = c(date.formatted))
+                    step2 <- discrete_data %>% select('discrete_value' = c(varName), 'discrete_Date' = c(date.formatted))
+                    tempdf <- as.data.frame(qpcR:::cbind.na(step1,step2))
+                    mergedData[[varName]] <- tempdf
+               }
+                combinded_df <- bind_rows(mergedData, .id="df")
+                print(combinded_df)
+                print(colnames(combinded_df))
+
           
                 mainMapTitle <- "Discrete and continuous data"
-                main_range = calculate_time_range(as.list(base_data_raw))
+                main_range = calculate_time_range(as.list(combinded_df))
                 mainBreaks = main_range[[1]]
                 main_x_date_label = main_range[[2]]
                
-                #FYI filled missing data creats empty facet row
+                #FYI missing data fill creates empty facet row
                 # base_data_raw <- base_data_raw %>%
                 #   mutate(Date = as.Date(Date)) %>%
                 #   complete(Date = seq.Date(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by="day"))
-                
-                mainPlot <- prepareDiscretePlot(discrete_data, base_data_raw , mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
+               mainPlot <- prepareDiscretePlot(combinded_df, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
+               
                 if(renderStatus == FALSE) {
                    return(mainPlot)
                  } else {
@@ -3471,6 +3479,48 @@ function(input, output, session) {
      })
    }
  }
+ 
+ 
+ prepareDiscretePlot <- function(mergedDataSet, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
+   mainPlot <- NULL
+   discrete <- mergedDataSet$df
+   mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE) +
+     geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=continuous_value, colour=df))+
+     geom_point(na.rm = TRUE, aes(x=as.POSIXct(discrete_Date,format="%Y-%m-%d"),size=0.5, y=discrete_value, color=discrete, shape=discrete))+
+     labs(title=mapTitle, x="Date", y="Parameters")+
+     scale_x_datetime(date_labels=xDateLabel,date_breaks=xDateBrakes)+
+     theme_bw()+
+     facet_grid(df ~ ., scales = "free_y")+
+     scale_color_discrete(name="continuous")+
+     theme(
+       strip.background = element_blank()
+       ,legend.title=element_blank() 
+       ,strip.text.y = element_blank()
+       ,strip.placement = "outside"
+       ,text=element_text(size=10,face = "bold", color="cornflowerblue")
+       ,plot.title = element_text(hjust=0.5)
+       ,legend.position="bottom"
+       ,axis.text.x=element_text(angle=65, hjust=1, vjust=1)
+     ) 
+   return(mainPlot)
+ }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
   
   draw_uploaded_file_ts <- function(){
     mainPlot <- NULL
@@ -3495,29 +3545,8 @@ function(input, output, session) {
       mainPlot <- prepareBasePlot(dataList= mainList, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks)
     return(mainPlot)
   }
-  prepareDiscretePlot <- function(discreteData,baseData, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
-    mainPlot <- NULL
-    mainPlot <- ggplot() +
-      geom_line(data=baseData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=continuous))+
-      geom_point(data=discreteData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=discrete))+
-      labs(title=mapTitle, x="Date", y="Parameters")+
-      scale_x_datetime(date_labels=xDateLabel,date_breaks=xDateBrakes)+
-      theme_bw()+
-      facet_grid(continuous ~ ., scales = "free_y")+
-      scale_color_discrete(name="")+
-      theme(
-        strip.background = element_blank()
-        ,legend.title=element_blank()
-        ,strip.text.y = element_blank()
-        ,strip.placement = "outside"
-        ,text=element_text(size=10,face = "bold", color="cornflowerblue")
-        ,plot.title = element_text(hjust=0.5)
-        ,legend.position="bottom"
-        ,axis.text.x=element_text(angle=65, hjust=1, vjust=1)
-      ) 
-    return(mainPlot)
-  }
-  
+
+
   prepareBasePlot <- function(dataList, mapTitle, xDateLabel, xDateBrakes) {
     mainPlot <- NULL
     mainPlot <- ggplot(bind_rows(dataList, .id="df"), dynamicTicks = TRUE) +

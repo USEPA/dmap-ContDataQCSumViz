@@ -294,15 +294,15 @@ shinyUI(fluidPage(
                             width = 9,
                             fluidRow(column(width = 12, uiOutput("dateAndTimeBox"))),
                             br(),
-                            fluidRow(column(width = 9, plotlyOutput("display_time_series"))),
+                            fluidRow(column(width = 12, plotlyOutput("display_time_series"))),
                             br(),
-                            fluidRow(column(width = 9, plotlyOutput("display_time_series_new"))),
+                            fluidRow(column(width = 12, plotlyOutput("display_time_series_new"))),
                             br(),
-                            fluidRow(column(width = 9, plotlyOutput("display_time_series_1"))),
+                            fluidRow(column(width = 12, plotlyOutput("display_time_series_1"))),
                             br(),
-                            fluidRow(column(width = 9, uiOutput("display_time_series_2"))),
+                            fluidRow(column(width = 12, uiOutput("display_time_series_2"))),
                             br(),
-                            fluidRow(column(width = 9, plotlyOutput("display_time_series_3")))
+                            fluidRow(column(width = 12, plotlyOutput("display_time_series_3")))
                           ) # mainPanel end
                         ) # sidebarLayout end
                       ), # column close
