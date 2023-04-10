@@ -4586,13 +4586,13 @@
       "description": {
         "Package": "readr",
         "Title": "Read Rectangular Text Data",
-        "Version": "2.1.3",
-        "Authors@R": "c(\n    person(\"Hadley\", \"Wickham\", , \"hadley@rstudio.com\", role = \"aut\"),\n    person(\"Jim\", \"Hester\", role = \"aut\"),\n    person(\"Romain\", \"Francois\", role = \"ctb\"),\n    person(\"Jennifer\", \"Bryan\", , \"jenny@rstudio.com\", role = c(\"aut\", \"cre\"),\n           comment = c(ORCID = \"0000-0002-6983-2759\")),\n    person(\"Shelby\", \"Bearrows\", role = \"ctb\"),\n    person(\"RStudio\", role = c(\"cph\", \"fnd\")),\n    person(\"https://github.com/mandreyel/\", role = \"cph\",\n           comment = \"mio library\"),\n    person(\"Jukka\", \"Jylänki\", role = c(\"ctb\", \"cph\"),\n           comment = \"grisu3 implementation\"),\n    person(\"Mikkel\", \"Jørgensen\", role = c(\"ctb\", \"cph\"),\n           comment = \"grisu3 implementation\")\n  )",
+        "Version": "2.1.4",
+        "Authors@R": "c(\n    person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = \"aut\"),\n    person(\"Jim\", \"Hester\", role = \"aut\"),\n    person(\"Romain\", \"Francois\", role = \"ctb\"),\n    person(\"Jennifer\", \"Bryan\", , \"jenny@posit.co\", role = c(\"aut\", \"cre\"),\n           comment = c(ORCID = \"0000-0002-6983-2759\")),\n    person(\"Shelby\", \"Bearrows\", role = \"ctb\"),\n    person(\"Posit, PBC\", role = c(\"cph\", \"fnd\")),\n    person(\"https://github.com/mandreyel/\", role = \"cph\",\n           comment = \"mio library\"),\n    person(\"Jukka\", \"Jylänki\", role = c(\"ctb\", \"cph\"),\n           comment = \"grisu3 implementation\"),\n    person(\"Mikkel\", \"Jørgensen\", role = c(\"ctb\", \"cph\"),\n           comment = \"grisu3 implementation\")\n  )",
         "Description": "The goal of 'readr' is to provide a fast and friendly way to\n    read rectangular data (like 'csv', 'tsv', and 'fwf').  It is designed\n    to flexibly parse many types of data found in the wild, while still\n    cleanly failing when data unexpectedly changes.",
         "License": "MIT + file LICENSE",
         "URL": "https://readr.tidyverse.org, https://github.com/tidyverse/readr",
         "BugReports": "https://github.com/tidyverse/readr/issues",
-        "Depends": "R (>= 3.4)",
+        "Depends": "R (>= 3.5)",
         "Imports": "cli (>= 3.2.0), clipr, crayon, hms (>= 0.4.1), lifecycle (>=\n0.2.0), methods, R6, rlang, tibble, utils, vroom (>= 1.6.0)",
         "Suggests": "covr, curl, datasets, knitr, rmarkdown, spelling, stringi,\ntestthat (>= 3.1.2), tzdb (>= 0.1.1), waldo, withr, xml2",
         "LinkingTo": "cpp11, tzdb (>= 0.1.1)",
@@ -4602,15 +4602,14 @@
         "Config/testthat/parallel": "false",
         "Encoding": "UTF-8",
         "Language": "en-US",
-        "RoxygenNote": "7.2.1",
-        "SystemRequirements": "C++11",
+        "RoxygenNote": "7.2.3",
         "NeedsCompilation": "yes",
-        "Packaged": "2022-09-30 21:23:56 UTC; jenny",
-        "Author": "Hadley Wickham [aut],\n  Jim Hester [aut],\n  Romain Francois [ctb],\n  Jennifer Bryan [aut, cre] (<https://orcid.org/0000-0002-6983-2759>),\n  Shelby Bearrows [ctb],\n  RStudio [cph, fnd],\n  https://github.com/mandreyel/ [cph] (mio library),\n  Jukka Jylänki [ctb, cph] (grisu3 implementation),\n  Mikkel Jørgensen [ctb, cph] (grisu3 implementation)",
-        "Maintainer": "Jennifer Bryan <jenny@rstudio.com>",
+        "Packaged": "2023-02-10 00:05:55 UTC; jenny",
+        "Author": "Hadley Wickham [aut],\n  Jim Hester [aut],\n  Romain Francois [ctb],\n  Jennifer Bryan [aut, cre] (<https://orcid.org/0000-0002-6983-2759>),\n  Shelby Bearrows [ctb],\n  Posit, PBC [cph, fnd],\n  https://github.com/mandreyel/ [cph] (mio library),\n  Jukka Jylänki [ctb, cph] (grisu3 implementation),\n  Mikkel Jørgensen [ctb, cph] (grisu3 implementation)",
+        "Maintainer": "Jennifer Bryan <jenny@posit.co>",
         "Repository": "CRAN",
-        "Date/Publication": "2022-10-01 13:40:02 UTC",
-        "Built": "R 4.2.2; x86_64-w64-mingw32; 2022-12-20 04:39:39 UTC; windows",
+        "Date/Publication": "2023-02-10 09:20:02 UTC",
+        "Built": "R 4.2.3; x86_64-w64-mingw32; 2023-04-02 04:21:06 UTC; windows",
         "ExperimentalWindowsRuntime": "ucrt",
         "Archs": "x64"
       }
@@ -6916,16 +6915,16 @@
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
     ".RData": {
-      "checksum": "739579f1289846f57f2a331efd66f1c5"
+      "checksum": "77e0e7ca1bfd6e97b3a12437cea91d88"
     },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
     },
     "_moved/import_raw_data.R": {
-      "checksum": "e339c783e0f3582cdf12d458b3f9f5e7"
+      "checksum": "18e23c1777ea3a86ef1745d2731832ce"
     },
     "_moved/install_packages_for_app.R": {
-      "checksum": "cb7c04852f50066a986368dd9458d76a"
+      "checksum": "7dc482713a942006f4e315ee0d0d8f78"
     },
     "_moved/myReport.html": {
       "checksum": "0fda7d5c154e04ea4515346fba73b586"
@@ -6937,7 +6936,7 @@
       "checksum": "34a4484a74f12f566189b70ec50719e3"
     },
     "constants.R": {
-      "checksum": "e64b21183f56c3f9e0c569462a87cda2"
+      "checksum": "d0f31983ce18b04e65e421772315cd5c"
     },
     "ContDataQC_test_data/01104455_Gage_20150303_20201028.csv": {
       "checksum": "9a882d718de77bbe5b43d35fb5752452"
@@ -6984,6 +6983,9 @@
     "ContDataQC_test_data/FromJen/VA_Instructions_ContDataSumViz_20221228.pdf": {
       "checksum": "79286a8314b099164bc99f28e3b8d111"
     },
+    "ContDataQC_test_data/FromTom/crbuoy .csv": {
+      "checksum": "830ad412f84dbf8e32e94d349572df77"
+    },
     "ContDataQC_test_data/FromTom/CRBuoy discrete different data and time format.csv": {
       "checksum": "f55de7679f388cead1e828017d276a21"
     },
@@ -7022,6 +7024,9 @@
     },
     "ContDataQC_test_data/HISS2 Sites LatLong.csv": {
       "checksum": "8fbbe42df312319b22abdea9cb6089bc"
+    },
+    "ContDataQC_test_data/Leah/BCGLSpCfinal_7-06-18.csv": {
+      "checksum": "2b2b9485523c3bae758120dacf871db8"
     },
     "ContDataQC_test_data/MA_ParkersBrook_StageDischargeTemp_20121205_20210930.xlsx": {
       "checksum": "eea161aee62248811d444ab82ff56c51"
@@ -7120,7 +7125,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "d48f6d54abda9e8277c7d470101d3c17"
+      "checksum": "143f125c888ab1bfea82139000c49ba6"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -7216,16 +7221,22 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "063de4dc6e2bcd7c8d490a167fbe4cfb"
+      "checksum": "ee73f58366ffb9dc52ea61af28a1eaf1"
+    },
+    "StreamThermal.CRBuoy discrete different data and time format.csv.Charles.20230410.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
     },
     "sumVizUtils/fun.calculate.time.breaks.R": {
       "checksum": "bbad3d7c1d53dc1a63b2b07007d579a6"
+    },
+    "sumVizUtils/fun.findVariableToProcess.R": {
+      "checksum": "703f9f5e1872c17701ce31350b4c3010"
     },
     "test_dailyCheck.RData": {
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
     },
     "ui.R": {
-      "checksum": "9a90be7a4568cceca72f3edca6ee06c3"
+      "checksum": "315988ac063a2e2a812295d8df22446f"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -7261,7 +7272,7 @@
       "checksum": "0b29ec94c8c8c810e3e5f37c7701b717"
     },
     "www/app.css": {
-      "checksum": "336ec99b0d1becf389957918d349ceee"
+      "checksum": "86709f5ac7dc02921ced6aebd1480f20"
     },
     "www/ContDataSumViz_banner.png": {
       "checksum": "af6a3abac239c0553226d175af54536d"
@@ -7282,7 +7293,7 @@
       "checksum": "ed8341d5bbf0eeb3ec8a577287112165"
     },
     "www/script.js": {
-      "checksum": "faa0e839f900b8ccdb80f1a1b147f684"
+      "checksum": "dfa2e0d938e2735cab6ffcc3e9516937"
     },
     "www/styles.css": {
       "checksum": "2722ddf4a5658ae6f51dd19b64e4dd8f"

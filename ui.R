@@ -22,25 +22,27 @@
 app_jscode <-
   "shinyjs.disableTab = function(name) {
     var tab = $('.nav li a[data-value=' + name + ']');
-    tab.bind('click.tab', function(e) {
+    $(tab).hide();
+   /* tab.bind('click.tab', function(e) {
       e.preventDefault();
       return false;
     });
-    tab.addClass('disabled');
+    tab.addClass('disabled');*/
   }
   shinyjs.enableTab = function(name) {
     var tab = $('.nav li a[data-value=' + name + ']');
-    tab.unbind('click.tab');
-    tab.removeClass('disabled');
+    $(tab).show();
+    // tab.unbind('click.tab');
+    // tab.removeClass('disabled');
   }"
 ## css snipit that makes it LOOK like we are/n't able click the tab (with outchanging functionality)
-app_css <-
-  ".nav li a.disabled {
-    background-color: #aaa !important;
-    color: #333 !important;
-    cursor: not-allowed !important;
-    border-color: #aaa !important;
-  }"
+# app_css <-
+#   ".nav li a.disabled {
+#     background-color: #aaa !important;
+#     color: #333 !important;
+#     cursor: not-allowed !important;
+#     border-color: #aaa !important;
+#   }"
 
 
 # Define UI for application
@@ -48,8 +50,8 @@ options(spinner.color.background = "#ffffff", spinner.size = 1)
 shinyUI(fluidPage(
   theme = "styles.css",
   useShinyjs(),
-  shinyjs::extendShinyjs(text = app_jscode, functions = c("disableTab","enableTab","removeAllClasses")),
-  shinyjs::inlineCSS(app_css),
+  shinyjs::extendShinyjs(text = app_jscode, functions = c("disableTab","enableTab")),
+  #shinyjs::inlineCSS(app_css),
   tags$head(tags$script(src="script.js")),
   tags$head( tags$link(rel="stylesheet", type="text/css", href="app.css")),
   mainPanel(
@@ -77,66 +79,58 @@ shinyUI(fluidPage(
       column(
         width = 12,
         br(),
-        div("Please complete below steps before proceeding to 'Data Exploration' and 'Create Report' tabs:", class="text-info", style="font-weight:bold"),
+        div("Please complete below steps before proceeding to Data Exploration:", class="text-info", style="font-weight:bold"),
         br()
       )
     ),
     fluidRow(
       column(
-        width = 1,
+        width = 2,
         div(
-            circleButton(inputId="step1",icon = icon("upload"),status="primary", size="sm"),
-            div("Step 1: Upload file", style="white-space:nowrap;font-weight:bold")
-          ),
-        ),
-        column(width = 1,
-          HTML('<i id="arrow1" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>')
+            span(circleButton(inputId="step1",icon = icon("upload"),status="primary", size="xs")),
+            span("Step 1: Upload file", style="font-weight:bold; word-wrap: break-word;margin-right:30px;"),
+            span(HTML('<i id="arrow1" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>'))
+          )
         ),
         column(
-          width = 1,
+          width = 2,
           div(
-            circleButton(inputId = "step2",icon = icon("calendar"),status = "primary", size="sm"),
-            div("Step 2: Select date and time",style="white-space:nowrap;font-weight:bold")
+                span(circleButton(inputId = "step2",icon = icon("calendar"),status = "primary", size="xs")),
+                span("Step 2: Select date and time",style="font-weight:bold; word-wrap: break-word;margin-right:30px;"),
+                span(HTML('<i id="arrow2" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>'))
           )
         ),# end of column
-        column(width = 1,
-               HTML('<i id="arrow2" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>')
-        ),
         column(
-          width = 1,
+          width = 2,
           div(
-            circleButton(inputId = "step3",icon = icon("tasks"),status = "primary", size="sm"),
-            div("Step 3: Run meta data",style="white-space:nowrap;font-weight:bold")
+            span(circleButton(inputId = "step3",icon = icon("tasks"),status = "primary", size="xs")),
+            span("Step 3: Run meta summary",style="font-weight:bold; word-wrap: break-word;margin-right:30px;"),
+            span(HTML('<i id="arrow3" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>'))
           )
         ),# end of column
-        column(width = 1,
-               HTML('<i id="arrow3" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>')
-        ),
         column(
-          width = 1,
+          width = 3,
           div(
-            circleButton(inputId = "step4",icon = icon("calculator"),status = "primary",size="sm"),
-            div("Step 4: Run daily statistics",style="white-space:nowrap;font-weight:bold;")
+            span(circleButton(inputId = "step4",icon = icon("calculator"),status = "primary",size="xs")),
+            span("Step 4: Calculate daily statistics",style="font-weight:bold; word-wrap: break-word;margin-right:30px;"),
+            span(HTML('<i id="arrow4" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>'))
           )
         ),# end of column
-        column(width = 1,
-               HTML('<i id="arrow4" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>')
-        ),
       column(
-        width = 1,
+        width = 3,
         div(
-          circleButton(inputId = "step5",icon = icon("check"),status = "primary", size="sm"),
-          div("Step 5: Visualize data",style="white-space:nowrap;font-weight:bold;")
+          span(circleButton(inputId = "step5",icon = icon("check"),status = "primary", size="xs")),
+          span("Step 5: Visualize data",style="font-weight:bold; word-wrap: break-word;")
         )
       )# end of column
-        
     ),
     fluidRow(
       p(),
-      tabsetPanel(
+      tabsetPanel(id="mainTabs",
         # Upload Data----
         tabPanel(
-          "Upload Data",
+          title="Upload Data",
+          value="uploadData",
           fluidPage(
             fluidRow(
               column(
@@ -144,31 +138,37 @@ shinyUI(fluidPage(
                 sidebarLayout(
                   sidebarPanel(
                     width = 3,
-                    fileInput("uploaded_data_file",
-                      label = h4(
-                        id = "big-heading",
-                        "Upload your data"
-                      ),
+                    div(class="panel panel-default",
+                        div(class="panel-heading", "Step 1: Upload File", style="font-weight:bold;", icon("info-circle", style = "color: #2fa4e7", id="fileHelp")),
+                        div(class="panel-body",
+                    tagList(
+                      bsPopover(id="fileHelp", title="Microsoft Excel and .csv files known issues", content = "Microsoft Excel corrupts .csv files when reopened by double clicking its icon or by using the File Open dialog. You can avoid this by using the Text or Data Import Wizard from the Excel Data Tab.", 
+                                placement = "right", trigger = "hover"),
+                      fileInput("uploaded_data_file",
+                      label = HTML("<b>Upload your data in .csv format</b>"),
                       multiple = FALSE,
+                      buttonLabel=list(tags$b("Browse"),tags$i(class = "fa-solid fa-folder")),
                       accept = c(
                         "text/csv",
                         "text/comma-separated-values,text/plain",
                         ".csv"
                       )
-                    ),
+                    )),
+                    uiOutput("displayFC")
+                    )),
                     hr(),
                     tagList(
-                    actionButton(
-                      inputId = "uploadId",
-                      label = "Use this file",
-                      class = "action-btn-style"
-                    ),
-                    actionButton(inputId="displayidLeft",label = "Display file contents",style="display:none", class="action-btn-style")
-                     ),
-                    hr(),
-                    uiOutput("siteType"),
-                    hr(),
-                    uiOutput("manage"),
+                      uiOutput("display_runmetasummary"),
+                      hr(),
+                      uiOutput("display_actionButton_calculateDailyStatistics"),
+                      hr(),
+                      uiOutput("display_actionButton_saveDailyStatistics")
+                      )
+                    #,
+                    # hr(),
+                    # uiOutput("siteType"),
+                    # hr(),
+                    # uiOutput("manage"),
                     # hr(),
                     # uiOutput("select"),
                     # hr(),
@@ -179,13 +179,17 @@ shinyUI(fluidPage(
                     uiOutput("display_raw_ts")
                   ) # mainPanel end
                 ) # sidebarLayout end
-              ), # column close
-
+              )# column close
               # column(
               #   width = 12,
               #   tableOutput("contents")
               # ), # column close
-            ) # fluidRow close
+            ),
+     
+        
+
+                     
+           
           ) # fluidPage close
         ), # tabPanel end
 
@@ -799,7 +803,8 @@ shinyUI(fluidPage(
               ) # tabsetPanel end
             ) # fluidRow close
           ) # fluidPage close
-        ), # tabPanel end Data exploration
+        )# tabPanel end Data exploration
+
 
         # Create Report----
         # tabPanel(
@@ -861,6 +866,7 @@ shinyUI(fluidPage(
         #   ) # fluidPage end
         # ) # tabPanel end Create Report
       ) # tabsetPanel close
-    )
+    ),
+    fluidRow(column(width=12))
   )
 ))

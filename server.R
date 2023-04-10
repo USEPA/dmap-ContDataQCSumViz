@@ -68,12 +68,13 @@ function(input, output, session) {
   #open logfile
   #logfile <- log_open(logf)
   #log_print("I do log")
-  
   useShinyjs()
+  js$disableTab("DataExploration")
   conflict_prefer("box", "shinydashboard")
   conflict_prefer("dataTableOutput", "DT")
   conflict_prefer("yday", "data.table")
   conflict_prefer("select", "dplyr")
+  
   loaded_data <- reactiveValues()
   raw_data_columns<-reactiveValues()
   dateRange <- reactiveValues()
@@ -82,8 +83,6 @@ function(input, output, session) {
   gageColNames  <- NULL
   daymetCols <- NULL
   consoleUSGS <- NULL
-
-
   selected_to_plot <- reactiveValues(all_selected=data.frame())
   processed <- reactiveValues(processed_dailyStats=list(),
                               ST.freq=data.frame(),
@@ -96,12 +95,13 @@ function(input, output, session) {
   dayMetRawData <- reactiveValues(dayMetData = data.frame(),
                                   daymetColumns = as.character())
   
+  formated_raw_data <- reactiveValues(derivedDF = data.frame(),
+                                baseColNames = as.character())
+  
 
   to_download <- reactiveValues()
   saveToReport <- reactiveValues(metadataTable=data.frame())
   
-  js$disableTab("DataExploration")
-  js$disableTab("CreateReport")
   
 
   #  Upload Data##############################
@@ -122,49 +122,51 @@ function(input, output, session) {
        }
        return(my_data)
   })
+  
+  getFormattedRawData <- function() {
+    return(fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
+                                                         ,fun.userTimeFormat =input$selectedTimeFormat
+                                                         ,fun.userTimeZone = input$selectedTimeZone
+                                                         ,fun.userDateFieldName = input$selectedDateFieldName
+                                                         ,fun.userTimeFieldName = input$selectedTimeFieldName
+                                                         ,fun.rawData = uploaded_data()
+                                                         ,fun.date.org = input$dtNumOfCols))
+  }
+
 
   ## Copy uploaded files to local folder
-  observeEvent(input$uploadId,{
+  observeEvent(input$uploaded_data_file,{
     
     shinyjs::runjs("$('#display_validation_msgs').empty()")
     my_data <- uploaded_data()
     output$display_raw_ts <- renderUI({
 
       if (length(my_data) > 0 ) {
-        ## this part is to find any column name related to Date or Time
-        all_date_related_keys <- c("Date.Time","DATE.TIME","Year","YEAR","Date","DATE","MonthDay","MONTHDAY","Time","TIME","Month","Day","RAW.Date.Time","mm.dd.yyyy.HH.MM.SS")
-        date_keys_in_favor_order <- c("Date.Time","DATE.TIME","Date","DATE","Year","YEAR","MonthDay","mm.dd.yyyy.HH.MM.SS")
         my_colnames <- colnames(my_data)
-
-        ## get possible date columns in order according to "date_keys_in_favor_order"
-        possible_date_columns <- date_keys_in_favor_order[date_keys_in_favor_order %in% my_colnames]
-        all_date_columns <- all_date_related_keys[all_date_related_keys %in% my_colnames]
-
-        if (length(possible_date_columns) == 0 | identical(length(possible_date_columns),integer(0))){
-          print("inside shinyalert loop now...")
-          shinyAlertUI("common_alert_msg", noDateColumn, "WARNING")
-        } else{
-          raw_data_columns$date_column_name <- possible_date_columns[1]
-        }
         shinyjs::show(id="displayidLeft")
-        
-       
-         ## this part is to find any column name related to "ID" or "Flag"
-        idx_no_ID_Flag <- !str_detect(my_colnames,"ID") & !str_detect(my_colnames,"SITE") & !str_detect(my_colnames,"Flag") & !str_detect(my_colnames,"Comment")
-        not_ID_or_Flag_cols <- my_colnames[idx_no_ID_Flag]
-        parameters_cols_best_guess <- not_ID_or_Flag_cols[!not_ID_or_Flag_cols %in% all_date_columns]
-        parmsToProcess <- parameters_cols_best_guess
-        print(parameters_cols_best_guess)
-       
+        parmsToProcess <- fun.findVariableToProcess(my_colnames, getDateCols= FALSE)
         shinyjs::runjs("$('#quick_summary_table').empty()")
         shinyjs::runjs("$('#quick_summary_table_footnote').empty()")
         updateWorkFlowState("step1","success")
-
+        shinyjs::show(id="dateTimeBoxButton")
+        
+        
+        output$display_runmetasummary <-
+          renderUI({
+              actionButton(inputId="runQS", label="Step 3: Run meta summary",class="btn btn-primary")
+          })
+        
         div(id="mainBox",
-        fluidRow(
-          column(width=12, actionButton(inputId="dateTimeBoxButton", style="float:right;", class="active btn btn-primary", label="Hide Selection", icon= icon("arrow-down")))
-        ),
-        box(width="100%",class="well displayed",id="dateBox",
+        div(class = "panel panel-default",width = "100%",
+            div(class = "panel-heading",
+              span("Step 2: Select Date and Time", style="font-weight:bold;"),
+              span(
+                actionButton(inputId="dateTimeBoxButton", 
+                             style="float:right;", class="btn btn-primary btn-xs", 
+                             label="Hide Selection", icon= icon("arrow-down"))
+                )
+            ),
+            box(width="100%",class="displayed",id="dateBox",
             dateAndTimeCommonBox(
                                  dateColumnNumsId="dtNumOfCols",
                                  parmToProcessId="parameters_to_process2",
@@ -176,20 +178,15 @@ function(input, output, session) {
                                  validationDivId="display_validation_msgs",
                                  timeFieldParentId="timeFieldDiv",
                                  paramChoices=parmsToProcess),
-            hr(),
+            hr(style="margin:0px;padding:0px;"),
             fluidRow(
-              column(width=4,uiOutput("select")),
-            ),
-            fluidRow(
-              column(width=2, actionButton(inputId="runQS", label="Run meta summary",class="action-btn-style")),
-              column(width=2, actionButton(inputId="showrawTS", label="Display time series",class="action-btn-style")),
-              column(width=2, uiOutput("display_button")),
-              column(width=6, div(id="dummy"))
+              column(width=2, actionButton(inputId="showrawTS", label="Display time series",class="btn btn-primary"),style="margin:5px;")
             ),
             fluidRow(
-              column(width=12, uiOutput("contents"), style="overflow-x:scroll")
+              column(width=12, uiOutput("contents"), style="overflow-x:auto")
             ),
-            ),
+            )
+        ), # end of parent div,
             fluidRow(column(width=12,
                     box(width="100%", id="statsBox", 
                      tags$head(tags$style(HTML("#quick_summary_table {
@@ -199,18 +196,18 @@ function(input, output, session) {
                                                       }
                                                       "))),
                       fluidRow(column(width=12,uiOutput("display_quick_summary_table")), # column close
-                               column(width=12,uiOutput("display_footnote_text"),class="panel panel-default text-info fs-6")
+                               column(width=12,uiOutput("display_footnote_text"),class="text-info fs-6")
                               ), #fluidRow end
                       fluidRow(column(width=8,style="padding:20px;",
                                 uiOutput("display_fill_data"),
                                 uiOutput("display_checkBoxes_dailyStats_1"),
                                 uiOutput("display_radioButtons_dailyStats_2")
                              ), # column close
-                             column(width=4,style="padding:25px;",uiOutput("display_actionButton_calculateDailyStatistics")
-                             ), # column close
-                             column(width=4,div(style="margin-bottom:20px")),
-                             column(width=4,style="padding:30px;",uiOutput("display_actionButton_saveDailyStatistics")
-                             ), # column close
+                             #column(width=4,style="padding:25px;",uiOutput("display_actionButton_calculateDailyStatistics")
+                             #), # column close
+                             #column(width=4,div(style="margin-bottom:20px")),
+                             #column(width=4,style="padding:30px;",uiOutput("display_actionButton_saveDailyStatistics")
+                             #), # column close
                      ) #fluidRow end
                     ) # end of statsBox
                 )
@@ -276,31 +273,28 @@ function(input, output, session) {
   #
   # })
 
-  output$manage <- renderUI({
-    data <- uploaded_data() ## datasetlist()
-    print(length(data))
-    selectInput("dataset", "Dataset", choices = loaded_data$name, selected = loaded_data$name)  ## names(data) if use datasetlist()
-  })
-
-  output$siteType <- renderUI({
-    data <- uploaded_data() ## datasetlist()
-    selectInput("siteType_input",label="Single site or multiple sites",
-                choices = c("Single site","Multiple sites"),
-                selected = "Single site")
-  })
-  
-  output$select <- renderUI({
-    data <- uploaded_data() ## datasetlist()
-    radioButtons("disp", "Display", choices = c(Head = "head",Tail="tail",ColumnNames="Column names"), inline = TRUE,
-                 selected = "head")
-  })
-
-  # output$display_button <- renderUI({
+  # output$manage <- renderUI({
   #   data <- uploaded_data() ## datasetlist()
-  #   if (length(data) > 0 ) {
-  #   actionButton(inputId = "displayid",label = "Display file contents",class="action-btn-style")
-  #   }
+  #   print(length(data))
+  #   selectInput("dataset", "Dataset", choices = loaded_data$name, selected = loaded_data$name)  ## names(data) if use datasetlist()
   # })
+  # 
+  # output$siteType <- renderUI({
+  #   data <- uploaded_data() ## datasetlist()
+  #   selectInput("siteType_input",label="Single site or multiple sites",
+  #               choices = c("Single site","Multiple sites"),
+  #               selected = "Single site")
+  # })
+  
+  output$displayFC <- renderUI({
+    data <- uploaded_data() ## datasetlist()
+    tagList(
+    hr(),
+    radioButtons("disp", "Display file information", choices = c(Head = "head",Tail="tail",ColumnNames="Column names"), inline = TRUE,
+                 selected = "head"),
+    actionButton(inputId="displayidLeft",label = "Display file contents", class="btn btn-primary")
+    )
+  })
 
   observeEvent(input$displayidLeft, {
     #shinyjs::runjs("$('#dateTimeBoxButton').click()")
@@ -344,7 +338,7 @@ function(input, output, session) {
     shinyjs::show(id="display_all_raw_ts_div")
     raw_data <- uploaded_data()
     #Missing site id is just a warning
-    validateSiteId(raw_data)
+    #validateSiteId(raw_data)
     
     #display_validation_msgs dateBox
     if (validateUserInputs(
@@ -360,25 +354,18 @@ function(input, output, session) {
       tryCatch({
         my_raw_choices = input$parameters_to_process2
         shinyjs::runjs("$('#display_validation_msgs').empty()")
-        raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
-                                          ,fun.userTimeFormat =input$selectedTimeFormat
-                                          ,fun.userTimeZone = input$selectedTimeZone
-                                          ,fun.userDateFieldName = input$selectedDateFieldName
-                                          ,fun.userTimeFieldName = input$selectedTimeFieldName
-                                          ,fun.rawData = raw_data
-                                          ,fun.date.org = input$dtNumOfCols)
+        formated_raw_data$derivedDF <-  getFormattedRawData()
+        raw_data <- formated_raw_data$derivedDF
+        #print(formated_raw_data$derivedDF)
     
         if (!is.null(my_raw_choices) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
           
-              # fullSeq <- seq.Date(min(as.Date(raw_data$date.formatted, "%Y-%m-%d"), na.rm = TRUE), max(as.Date(raw_data$date.formatted,"%Y-%m-%d"), na.rm = TRUE), by = 1)
-              # modified_raw_data <- raw_data %>% complete(date.formatted = fullSeq)
-             
-              modified_raw_data <- raw_data %>%
+                modified_raw_data <- raw_data %>%
                 mutate(date.formatted = as.Date(date.formatted)) %>%
                 complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
- 
-              uploaded_raw_data  <- modified_raw_data %>%
-                select(my_raw_choices, Date= c("date.formatted")) %>%
+
+                uploaded_raw_data  <- modified_raw_data %>%
+                select(c(input$parameters_to_process2), "Date" = c(date.formatted)) %>%
                 gather(key = "parameter", value = "value", -Date)
               
               main_range = calculate_time_range(as.list(uploaded_raw_data))
@@ -435,7 +422,7 @@ function(input, output, session) {
     tryCatch({
       raw_data <- uploaded_data()
       #It does not stop user, just warns them
-      validateSiteId(raw_data)
+      #validateSiteId(raw_data)
       #display_validation_msgs dateBox
       if (validateUserInputs(
                              dateColumnNums="dtNumOfCols",
@@ -452,16 +439,10 @@ function(input, output, session) {
          output$display_quick_summary_table <- renderUI({
             column(12, align = "center", withSpinner(tableOutput("quick_summary_table")))
           })
-
-
-          raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
-                                          ,fun.userTimeFormat =input$selectedTimeFormat
-                                          ,fun.userTimeZone = input$selectedTimeZone
-                                          ,fun.userDateFieldName = input$selectedDateFieldName
-                                          ,fun.userTimeFieldName = input$selectedTimeFieldName
-                                          ,fun.rawData = raw_data
-                                          ,fun.date.org = input$dtNumOfCols)
-          #Sys.sleep(2)
+          # update the reactiveValues
+          formated_raw_data$derivedDF <-  getFormattedRawData()
+          #now shorten the varname
+          raw_data <- formated_raw_data$derivedDF
           print("passed fun.ConvertDateFormat")
           if (!is.null(input$parameters_to_process2) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){    
               raw_data_columns$date_column_name = "date.formatted"
@@ -519,11 +500,13 @@ function(input, output, session) {
           total_N_days <- as.integer(difftime(max_date, min_date, units = "days"))
 
           output$display_footnote_text <- renderUI({
-            tagList(
-              HTML(paste0("<b>Period of record:</b> ",  min_date, "<b> to </b>", max_date)),
-              br(),
-              HTML(paste0("<b>Total number of days in this period: </b>", total_N_days, " days"))
-            )
+            
+              div(class="panel panel-default", style="padding:10px;",
+                HTML(paste0("<b>Period of record:</b> ",  min_date, "<b> to </b>", max_date)),
+                br(),
+                HTML(paste0("<b>Total number of days in this period: </b>", total_N_days, " days"))
+              )
+            
           })
          
            output$display_fill_data <- renderUI({
@@ -569,8 +552,8 @@ function(input, output, session) {
           output$display_actionButton_calculateDailyStatistics <-
             renderUI({
               actionButton(inputId = "calculateDailyStatistics",
-                           label = "Calculate daily statistics",
-                           class="action-btn-style"
+                           label = "Step 4: Calculate daily statistics",
+                           class="btn btn-primary"
                            )
             })
           
@@ -578,7 +561,7 @@ function(input, output, session) {
           output$display_actionButton_saveDailyStatistics <- renderUI({
             downloadButton(outputId = "saveDailyStatistics",
                            label = "Save daily statistics",
-                           class="action-btn-style",
+                           class="btn btn-primary",
                            style = "padding-left:15px;padding-right:15px;display:none;")
           })
           
@@ -626,15 +609,9 @@ function(input, output, session) {
     
     withProgress(message = paste("Calculating the daily statistics"), value = 0, {
       incProgress(0, detail = "now... ")
-    raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
-                                      ,fun.userTimeFormat =input$selectedTimeFormat
-                                      ,fun.userTimeZone = input$selectedTimeZone
-                                      ,fun.userDateFieldName = input$selectedDateFieldName
-                                      ,fun.userTimeFieldName = input$selectedTimeFieldName
-                                      ,fun.rawData = raw_data
-                                      ,fun.date.org = input$dtNumOfCols)
-    
-    #print(head(raw_data))
+    raw_data <- formated_raw_data$derivedDF
+    #print(head(raw_data)) 
+    ##print(formated_raw_data$derivedDF)
     dateRange$min <- min(as.Date(raw_data$date.formatted), na.rm = TRUE)
     dateRange$max <- max(as.Date(raw_data$date.formatted), na.rm = TRUE)
     variables_to_calculate <- input$parameters_to_process2
@@ -702,7 +679,7 @@ function(input, output, session) {
       }else if(input$how_to_save == "save1"){
         paste0("saved_dailyStats_",name_in_file,".zip")
       }else if(input$how_to_save == "save4")
-        paste0("saved_dailyStats_wqz_",name_in_file,".csv")
+        paste0("saved_dailyStats_wqx_",name_in_file,".csv")
     },
 
     content = function(file){
@@ -764,7 +741,7 @@ function(input, output, session) {
     })
 
     output$summary_table_input_4 <- renderUI({
-      actionButton(inputId="display_table", label="Summarise",class="action-btn-style")
+      actionButton(inputId="display_table", label="Summarise",class="btn btn-primary")
     })
 
 
@@ -802,8 +779,8 @@ function(input, output, session) {
 
     output$time_series_input_5 <- renderUI({
       tagList(
-      actionButton(inputId="display_ts",label="Display",class="action-btn-style"),
-      actionButton(inputId="display_subplot_ts", label="Display Subplots",class="action-btn-style"),
+      actionButton(inputId="display_ts",label="Display",class="btn btn-primary"),
+      actionButton(inputId="display_subplot_ts", label="Display Subplots",class="btn btn-primary"),
       )
     })
 
@@ -819,8 +796,8 @@ function(input, output, session) {
                           multiple = TRUE,
                           selected=NULL,
                           options = list(hideSelected = FALSE)),
-        actionButton(inputId="display_gage_ts", label="Get USGS gage data",class="action-btn-style"),
-        actionButton(inputId="display_gage_raw", label="View USGS raw data",class="action-btn-style")
+        actionButton(inputId="display_gage_ts", label="Get USGS gage data",class="btn btn-primary"),
+        actionButton(inputId="display_gage_raw", label="View USGS raw data",class="btn btn-primary")
         )
     })
     
@@ -837,8 +814,8 @@ function(input, output, session) {
                        multiple = TRUE,
                        selected=daymetCols[1],
                        options = list(hideSelected = FALSE)),
-        actionButton(inputId="get_daymet_data", label="Get Daymet data",class="action-btn-style"),
-        actionButton(inputId="display_daymet_raw", label="View Daymet raw data",class="action-btn-style")
+        actionButton(inputId="get_daymet_data", label="Get Daymet data",class="btn btn-primary"),
+        actionButton(inputId="display_daymet_raw", label="View Daymet raw data",class="btn btn-primary")
       )
     })
     #end of Daymet
@@ -882,7 +859,7 @@ function(input, output, session) {
     })
 
     output$time_series_overlay_input_5 <- renderUI({
-      actionButton(inputId="display_ts_overlay", label="Display",class="action-btn-style")
+      actionButton(inputId="display_ts_overlay", label="Display",class="btn btn-primary")
     })
 
     ############ DE, ALL, box plots" << All parameters ############
@@ -922,7 +899,7 @@ function(input, output, session) {
 
 
     output$box_input_5 <- renderUI({
-      actionButton(inputId="display_box", label="Display",class="action-btn-style")
+      actionButton(inputId="display_box", label="Display",class="btn btn-primary")
     })
 
 
@@ -975,7 +952,7 @@ function(input, output, session) {
     })
 
     output$display_CDF_button <- renderUI({
-      actionButton(inputId="run_CDF", label="Run and display",class="action-btn-style")
+      actionButton(inputId="run_CDF", label="Run and display",class="btn btn-primary")
     })
 
     ############  DE, ALL, Raster graphs" << All parameters ############
@@ -1013,7 +990,7 @@ function(input, output, session) {
     })
 
     output$raster_input_6 <- renderUI({
-      actionButton(inputId="run_raster", label="Display",class="action-btn-style")
+      actionButton(inputId="run_raster", label="Display",class="btn btn-primary")
     })
 
 
@@ -1064,11 +1041,11 @@ function(input, output, session) {
     })
 
     output$display_run_thermal_button <- renderUI({
-      actionButton(inputId="display_thermal", label="Display streamThermal",class="action-btn-style")
+      actionButton(inputId="display_thermal", label="Display streamThermal",class="btn btn-primary")
     })
 
     output$display_save_thermal_button <- renderUI({
-      downloadButton(outputId="save_thermal", label="Save thermal statistics to excel",class="action-btn-style")
+      downloadButton(outputId="save_thermal", label="Save thermal statistics to excel",class="btn btn-primary")
     })
 
     output$display_help_text_thermal_statistics <- renderUI({
@@ -1121,7 +1098,7 @@ function(input, output, session) {
     })
 
     output$display_thermal_sensitivity_button <- renderUI({
-      actionButton(inputId="display_thermal_sensitivity", label="Display thermal sensitivity",class="action-btn-style")
+      actionButton(inputId="display_thermal_sensitivity", label="Display thermal sensitivity",class="btn btn-primary")
     })
 
     output$display_help_text_air_water <- renderUI({
@@ -1175,7 +1152,7 @@ function(input, output, session) {
     })
 
     output$display_water_temp_class_button <- renderUI({
-      actionButton(inputId="display_water_class", label="Display water temperature class",class="action-btn-style")
+      actionButton(inputId="display_water_class", label="Display water temperature class",class="btn btn-primary")
     })
 
     output$display_help_text_water_temp_class <- renderUI({
@@ -1217,12 +1194,12 @@ function(input, output, session) {
     })
 
     output$display_IHA_button <- renderUI({
-      actionButton(inputId="display_IHA", label="Display IHA tables",class="action-btn-style")
+      actionButton(inputId="display_IHA", label="Display IHA tables",class="btn btn-primary")
     })
 
 
     output$display_save_IHA_button <- renderUI({
-      downloadButton(outputId="save_IHA", label="Save IHA results to excel",class="action-btn-style")
+      downloadButton(outputId="save_IHA", label="Save IHA results to excel",class="btn btn-primary")
     })
 
     output$display_help_text_IHA <- renderUI({
@@ -1410,11 +1387,18 @@ function(input, output, session) {
     cols_avail <- colnames(uploaded_newData())
     fileContentForDisplay <- head(uploaded_newData())
      output$dateAndTimeBox <- renderUI({
+
      div(id="dt_new",
-         fluidRow(
-           column(width=12, actionButton(inputId="dateTimeBoxButton_new", style="float:right;", class="active btn btn-primary", label="Hide Selection", icon= icon("arrow-down")))
-         ),
-      box(width="100%",class="well displayed",id="dateBox_new",
+           div(class = "panel panel-default",width = "100%",
+               div(class = "panel-heading",
+                   span("Step 2: Select Date and Time for discrete data", style="font-weight:bold;"),
+                   span(
+                     actionButton(inputId="dateTimeBoxButton_new", 
+                                  style="float:right;", class="btn btn-primary btn-xs", 
+                                  label="Hide Selection", icon= icon("arrow-down"))
+                   )
+               ),
+      box(width="100%",class="displayed",id="dateBox_new",
           dateAndTimeCommonBox(
                                dateColumnNumsId="dtNumOfCols1",
                                parmToProcessId="parameters_to_process2_new",
@@ -1450,7 +1434,7 @@ function(input, output, session) {
             column(width=4,uiOutput("select_new")),
           ),
           # fluidRow(
-          #   column(width=2, actionButton(inputId="display_new_data", label="Display",class="action-btn-style")),
+          #   column(width=2, actionButton(inputId="display_new_data", label="Display",class="btn btn-primary")),
           #   column(width=6, div(id="dummy"))
           # ),
           fluidRow(
@@ -1461,6 +1445,7 @@ function(input, output, session) {
            style="overflow-x:scroll")
           )
       )
+      ) # end of box
      )
     })
   
@@ -1607,15 +1592,8 @@ function(input, output, session) {
           gage_data_raw$parameter <- paste("Gage",allParames,sep="_")
           mergedList[["Gage"]] <- gage_data_raw
       }
-     
-      raw_data <- uploaded_data()
-      raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
-                                        ,fun.userTimeFormat =input$selectedTimeFormat
-                                        ,fun.userTimeZone = input$selectedTimeZone
-                                        ,fun.userDateFieldName = input$selectedDateFieldName
-                                        ,fun.userTimeFieldName = input$selectedTimeFieldName
-                                        ,fun.rawData = raw_data
-                                        ,fun.date.org = input$dtNumOfCols)
+       raw_data <- formated_raw_data$derivedDF
+       ##print(formated_raw_data$derivedDF)
      
        variable_to_plot <- input$dailyStats_ts_variable_name
        if (!is.null(variable_to_plot) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
@@ -1625,7 +1603,7 @@ function(input, output, session) {
            complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
          
          base_data_raw  <- modified_raw_data %>%
-           select(variable_to_plot, Date= c("date.formatted")) %>%
+           select(c(input$dailyStats_ts_variable_name), Date= c("date.formatted")) %>%
            gather(key = "parameter", value = "value", -Date)
            
            totalH <- totalH + length(variable_to_plot)
@@ -2289,22 +2267,7 @@ function(input, output, session) {
       })
     
       myData <- uploaded_data()
-      
-      raw_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
-                                        ,fun.userTimeFormat =input$selectedTimeFormat
-                                        ,fun.userTimeZone = input$selectedTimeZone
-                                        ,fun.userDateFieldName = input$selectedDateFieldName
-                                        ,fun.userTimeFieldName = input$selectedTimeFieldName
-                                        ,fun.rawData = myData
-                                        ,fun.date.org = input$dtNumOfCols)
-    
-      # streamThermal_exported <- Export.StreamThermal(myData
-      #                                                ,fun.col.SiteID = input$thermal_SiteID_name
-      #                                                ,fun.col.Date = input$thermal_Date_name
-      #                                                ,fun.col.Temp = input$thermal_Temp_name
-      #                                                )
-      
-      streamThermal_exported <- Export.StreamThermal(raw_data
+      streamThermal_exported <- Export.StreamThermal(formated_raw_data$derivedDF
                                                      ,fun.col.SiteID = input$thermal_SiteID_name
                                                      ,fun.col.Date = "date.formatted"
                                                      ,fun.col.Temp = input$thermal_Temp_name
@@ -2708,7 +2671,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_1 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_1", label="Show/hide plot",class="action-btn-style")
+                      actionButton(inputId="display_IHA_plot_1", label="Show/hide plot",class="btn btn-primary")
       )) # column and fluidRow close
     })
 
@@ -2718,7 +2681,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_2 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_2", label="Show/hide plot",class="action-btn-style")
+                      actionButton(inputId="display_IHA_plot_2", label="Show/hide plot",class="btn btn-primary")
       )) # column and fluidRow close
     })
 
@@ -2728,7 +2691,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_3 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_3", label="Show/hide plot",class="action-btn-style")
+                      actionButton(inputId="display_IHA_plot_3", label="Show/hide plot",class="btn btn-primary")
       )) # column and fluidRow close
     })
 
@@ -2738,7 +2701,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_4 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_4", label="Show/hide plot",class="action-btn-style")
+                      actionButton(inputId="display_IHA_plot_4", label="Show/hide plot",class="btn btn-primary")
       )) # column and fluidRow close
     })
 
@@ -2748,7 +2711,7 @@ function(input, output, session) {
 
     output$display_IHA_plot_button_5 <-renderUI({
       fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_5", label="Show/hide plot",class="action-btn-style")
+                      actionButton(inputId="display_IHA_plot_5", label="Show/hide plot",class="btn btn-primary")
       )) # column and fluidRow close
     })
 
@@ -3174,8 +3137,6 @@ function(input, output, session) {
     #if (!file.exists("Output/reports")) dir.create(file.path("Output/reports"),showWarnings = FALSE, recursive = TRUE)
     ## copy template file to a temporary directory so that the output file will be saved there
     ## in case user do not have written permission to the app directory when deployed
-    print("ng the temp dir")
-    print(tempdir())
     tempRMD <- file.path(tempdir(),"SiteSummary.Rmd")
     file.copy("_moved/SiteSummary.Rmd",tempRMD,overwrite= TRUE)
     build_summary_updated(dir_data="Output/to_report/"
@@ -3406,23 +3367,13 @@ function(input, output, session) {
      
      
        if(nrow(discrete_data) != nrow(discrete_data[is.na(discrete_data$date.formatted),])) {
-         base_data <- uploaded_data()
-         base_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat
-                                            ,fun.userTimeFormat =input$selectedTimeFormat
-                                            ,fun.userTimeZone = input$selectedTimeZone
-                                            ,fun.userDateFieldName = input$selectedDateFieldName
-                                            ,fun.userTimeFieldName = input$selectedTimeFieldName
-                                            ,fun.rawData = base_data
-                                            ,fun.date.org = input$dtNumOfCols)
-         
+         base_data <- formated_raw_data$derivedDF
            if (!is.null(base_vars_to_plot) & nrow(base_data) != nrow(base_data[is.na(base_data$date.formatted),])){
-             
-             
              
                mergedData <- NULL
                for(varName in input$dailyStats_ts_variable_name) {
-                    step1 <- base_data %>% select('continuous_value'=c(varName),'Date' = c(date.formatted))
-                    step2 <- discrete_data %>% select('discrete_value' = c(varName), 'discrete_Date' = c(date.formatted))
+                    step1 <- base_data %>% select("continuous_value"=all_of(varName),"Date" = c(date.formatted))
+                    step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "discrete_Date" = c(date.formatted))
                     tempdf <- as.data.frame(qpcR:::cbind.na(step1,step2))
                     mergedData[[varName]] <- tempdf
                }
@@ -3430,16 +3381,12 @@ function(input, output, session) {
                 print(combinded_df)
                 print(colnames(combinded_df))
 
-          
+                # shared x axis so calculate using base data file
                 mainMapTitle <- "Discrete and continuous data"
                 main_range = calculate_time_range(as.list(combinded_df))
                 mainBreaks = main_range[[1]]
                 main_x_date_label = main_range[[2]]
-               
-                #FYI missing data fill creates empty facet row
-                # base_data_raw <- base_data_raw %>%
-                #   mutate(Date = as.Date(Date)) %>%
-                #   complete(Date = seq.Date(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by="day"))
+
                mainPlot <- prepareDiscretePlot(combinded_df, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
                
                 if(renderStatus == FALSE) {
@@ -3505,24 +3452,7 @@ function(input, output, session) {
    return(mainPlot)
  }
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-  
-  draw_uploaded_file_ts <- function(){
+   draw_uploaded_file_ts <- function(){
     mainPlot <- NULL
     mainMapTitle <- getMapTitle(input$dailyStats_shading, input$dailyStats_ts_title,lowerColumn = NULL, upperColumn = NULL)
     statsList <- processed$processed_dailyStats
@@ -3610,19 +3540,19 @@ function(input, output, session) {
     }
   }
   
-  validateSiteId <- function(raw_data) {
-    my_colnames <- names(raw_data)
-    idx_ID_col <- str_detect(my_colnames, regex('site', ignore_case = T))
-    total_siteids_found <- sum(idx_ID_col, na.rm=TRUE)
-    print(total_siteids_found)
-
-    # loaded_data$siteID <- unique(raw_data[idx_ID_col])
-    if (total_siteids_found > 1) {
-      shinyAlertUI("common_alert_msg", siteIdNotOne, "WARNING")
-    } else if (total_siteids_found  == 0) {
-      shinyAlertUI("common_alert_msg", noSiteIdFound, "WARNING")
-    }
-  }
+  # validateSiteId <- function(raw_data) {
+  #   my_colnames <- names(raw_data)
+  #   idx_ID_col <- str_detect(my_colnames, regex('site', ignore_case = T))
+  #   total_siteids_found <- sum(idx_ID_col, na.rm=TRUE)
+  #   print(total_siteids_found)
+  # 
+  #   # loaded_data$siteID <- unique(raw_data[idx_ID_col])
+  #   if (total_siteids_found > 1) {
+  #     shinyAlertUI("common_alert_msg", siteIdNotOne, "WARNING")
+  #   } else if (total_siteids_found  == 0) {
+  #     shinyAlertUI("common_alert_msg", noSiteIdFound, "WARNING")
+  #   }
+  # }
   
   # validateNewLowerAndUpper <- function(elementId){
   #   missingInputs <- FALSE
@@ -3763,64 +3693,119 @@ function(input, output, session) {
   
   dateAndTimeCommonBox <- function(dateColumnNumsId,parmToProcessId, dateFieldNameId, dateFormatId, timeFieldNameId, timeFormatId,
                                    timeZoneId, validationDivId, timeFieldParentId,paramChoices,extraValidationId="") {
-        div(width="100%",
-        fluidRow(
-          column(width = 12,
-                 radioButtons(dateColumnNumsId, label="", choices = c("Date and time uploaded in one column"="combined",
-                                                                    "Date and time uploaded in two separate columns"="separate"), inline = TRUE,
-                              selected = "combined")
-                 
+    # div(class = "panel panel-default",width = "100%",
+    #   div("Step 2: Select Date and Time", class = "panel-heading", style="font-weight:bold;"),
+      div(
+        width = "99%",
+        class = "panel-body",
+        fluidRow(column(
+          width = 12,
+          radioButtons(
+            dateColumnNumsId,
+            label = NULL,
+            choiceNames = list(
+              tags$span(style = "font-weight: bold;", "Date and time uploaded in one column"),
+              tags$span(style = "font-weight: bold;", "Date and time uploaded in two separate columns")
+            ),
+            choiceValues = c("combined", "separate"),
+            inline = TRUE,
+            selected = "combined"
           )
-        ),
+          
+        )),
+        fluidRow(column(width = 12, uiOutput(validationDivId)),
+                 column(width = 12, uiOutput(extraValidationId)),),
         fluidRow(
-          column(width=12,uiOutput(validationDivId)),
-          column(width=12,uiOutput(extraValidationId)),
-        ),
-        fluidRow(
-          column(width=4, selectizeInput(parmToProcessId,label ="Select parameters to process",
-                                         choices=paramChoices,
-                                         multiple = TRUE,
-                                         options = list(hideSelected = FALSE,plugins=list('remove_button'))
-          )),
-          column(width=4,selectInput(dateFieldNameId,label="Date Field Name",choices=c("",paramChoices))),
-          tags$div(id=timeFieldParentId, style="display:none", column(width=4,selectInput(timeFieldNameId,label="Time Field Name",choices=c("",paramChoices)))),
-        ),
-        fluidRow(
-          column(width=4,
-                 selectizeInput(
-                   dateFormatId,
-                   label = "Date Format",
-                   choices = c(c('Year, Month, Day'),c('Year, Day, Month'),c('Month, Day, Year'),
-                               c('Day, Month, Year'),c('Year, Month, Day'),
-                               c('Abbreviated month, Day of the month, Year')),
-                   multiple = FALSE,
-                   options = list(
-                     hideSelected = FALSE,
-                     plugins = list('remove_button')
-                   )
-                 )),
-          column(width=4,selectizeInput(
-            timeFormatId,
-            label = "Time Format",
-            choices = c('Hour, Minute, Second','Hour, Minute','Hour in 12-hour format, Minute, AM/PM','Hour in 12-hour format, Minute, Second, AM/PM', 'None'),
-            multiple = FALSE,
-            options = list(
-              hideSelected = FALSE,
-              plugins = list('remove_button')
+          column(
+            width = 4,
+            selectizeInput(
+              parmToProcessId,
+              label = "Select parameters to process",
+              choices = paramChoices,
+              multiple = TRUE,
+              options = list(
+                hideSelected = FALSE,
+                plugins = list('remove_button')
+              )
             )
-          )),
-          column(width=4, selectizeInput(
-            timeZoneId,
-            label = "Time Zone",
-            choices = c('UTC','HST', 'AKST', 'PST', 'MST', 'CST', 'EST','EDT'),
-            multiple = FALSE,
-            options = list(
-              hideSelected = FALSE,
-              plugins = list('remove_button')
+          ),
+          column(
+            width = 4,
+            selectInput(
+              dateFieldNameId,
+              label = "Date Field Name",
+              choices = c("", paramChoices)
             )
-          )),
+          ),
+          tags$div(
+            id = timeFieldParentId,
+            style = "display:none",
+            column(
+              width = 4,
+              selectInput(
+                timeFieldNameId,
+                label = "Time Field Name",
+                choices = c("", paramChoices)
+              )
+            )
+          ),
+        ),
+        fluidRow(
+          column(
+            width = 4,
+            selectizeInput(
+              dateFormatId,
+              label = "Date Format",
+              choices = c(
+                c('Year, Month, Day'),
+                c('Year, Day, Month'),
+                c('Month, Day, Year'),
+                c('Day, Month, Year'),
+                c('Year, Month, Day'),
+                c('Abbreviated month, Day of the month, Year')
+              ),
+              multiple = FALSE,
+              options = list(
+                hideSelected = FALSE,
+                plugins = list('remove_button')
+              )
+            )
+          ),
+          column(
+            width = 4,
+            selectizeInput(
+              timeFormatId,
+              label = "Time Format",
+              choices = c(
+                'Hour, Minute, Second',
+                'Hour, Minute',
+                'Hour in 12-hour format, Minute, AM/PM',
+                'Hour in 12-hour format, Minute, Second, AM/PM',
+                'None'
+              ),
+              multiple = FALSE,
+              options = list(
+                hideSelected = FALSE,
+                plugins = list('remove_button')
+              )
+            )
+          ),
+          column(
+            width = 4,
+            selectizeInput(
+              timeZoneId,
+              label = "Time Zone",
+              choices = c('UTC', 'HST', 'AKST', 'PST', 'MST', 'CST', 'EST', 'EDT'),
+              multiple = FALSE,
+              options = list(
+                hideSelected = FALSE,
+                plugins = list('remove_button')
+              )
+            )
+          ),
         )
-    )
+      )
+    #)
   }
   
   updateWorkFlowState <- function(elementId, state) {
@@ -3829,8 +3814,8 @@ function(input, output, session) {
       removeCssClasses()
       addSuccessClass(c("step1"))
       addPrimaryClass(c("step2","step3","step4","step5"))
-      changeButtonState(state="disable", btnList=c("display_raw_ts","calculateDailyStatistics","saveDailyStatistics"))
-      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS"))
+      changeButtonState(state="disable", btnList=c("runQS","display_raw_ts","calculateDailyStatistics","saveDailyStatistics"))
+      changeButtonState(state="enable", btnList=c("display_raw_ts"))
     } else if(elementId == "step1" & state == "error") {
       removeCssClasses()
       shinyjs::addClass("step1", "btn-danger")
@@ -3888,7 +3873,7 @@ function(input, output, session) {
       removeCssClasses()
       addSuccessClass(c("step1","step2","step3","step4","step5"))
       js$enableTab("DataExploration")
-      js$enableTab("CreateReport")
+      # js$enableTab("CreateReport")
       changeButtonState(state="enable", btnList=c("display_raw_ts","runQS","calculateDailyStatistics","saveDailyStatistics"))
       workflowStatus$finish = TRUE
     } else if(elementId == "step4" & state == "error") {
@@ -3901,7 +3886,6 @@ function(input, output, session) {
     }
     if(elementId %in% c("step1","step2","step3","step4")) {
         js$disableTab("DataExploration")
-        js$disableTab("CreateReport")
     }
     
   }

@@ -41,3 +41,17 @@
   cursor: not-allowed;
 }
 
+.fa-folder {color:#F8D775}
+.popover{width:200px;height:250px;}
+
+#mainTabs {
+  margin-bottom:20px;
+}
+
+.radio-inline {
+    text-align: center;
+    margin-left: 10px;
+    margin-right: 0px;
+    padding: 10px;
+    }
+

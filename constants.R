@@ -12,3 +12,6 @@ siteIdNotOne <- "More than one site ID is detected, please confirm if the loaded
 noSiteIdFound <- "No site ID is detected, please confirm if the loaded data has the SiteID column."
 homePageStep1Title <- "Step 1: Select parameters to process, date and time column names"
 discreteVarMismatch <- "Continuous 'variables to process' and Discrete 'variables to process' are not matching."
+csvFileAndExcelissue <- "Warning: Microsoft Excel corrupts .csv file when	 re-imported into Excel.  If you re-open the file by double-clicking its icon or by using the:
+File > Open dialog, Excel tries to 'help' you by changing the formats.  You can avoid this by using the Text or Data Import Wizard from the Data Tab.
+You can tell the Wizard that the files are Text"
