@@ -150,7 +150,7 @@ function(input, output, session) {
         updateWorkFlowState("step1","success")
         shinyjs::show(id="dateTimeBoxButton")
         
-        
+        #goes to left panel
         output$display_runmetasummary <-
           renderUI({
               actionButton(inputId="runQS", label="Step 3: Run meta summary",class="btn btn-primary")
@@ -180,13 +180,14 @@ function(input, output, session) {
                                  paramChoices=parmsToProcess),
             hr(style="margin:0px;padding:0px;"),
             fluidRow(
-              column(width=2, actionButton(inputId="showrawTS", label="Display time series",class="btn btn-primary"),style="margin:5px;")
+              div(width="85%", actionButton(inputId="showrawTS", label="Display time series",class="btn btn-primary"),style="margin:5px 15px 5px 25px;")
             ),
             fluidRow(
-              column(width=12, uiOutput("contents"), style="overflow-x:auto")
+              div(width="85%", uiOutput("contents"), style="overflow-x:auto;margin:0px 15px 0px 15px;")
             ),
-            )
+            ) # end of box
         ), # end of parent div,
+
             fluidRow(column(width=12,
                     box(width="100%", id="statsBox", 
                      tags$head(tags$style(HTML("#quick_summary_table {
