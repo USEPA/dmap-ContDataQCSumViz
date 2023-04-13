@@ -7224,7 +7224,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "6b05bf4cbb63cb98324037369e96613b"
+      "checksum": "85cc0f3b3d7bb1c0df2a3d1aaa40e99a"
     },
     "StreamThermal.CRBuoy discrete different data and time format.csv.Charles.20230410.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
@@ -7236,10 +7236,10 @@
       "checksum": "703f9f5e1872c17701ce31350b4c3010"
     },
     "test_dailyCheck.RData": {
-      "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
+      "checksum": "53c3dc5e52451f6709c61ae198971a82"
     },
     "ui.R": {
-      "checksum": "02e54e668201eb06e0cb3d8aa7a7d787"
+      "checksum": "0d16f372d3f5514d4f6a05a0f6dfe043"
     },
     "ui_bk.R": {
       "checksum": "de66c83247280672557f497633f82105"

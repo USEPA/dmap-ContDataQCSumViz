@@ -1803,7 +1803,7 @@ function(input, output, session) {
           gage_data_raw$parameter <- paste("Gage",allParames,sep="_")
           mergedList[["Gage"]] <- gage_data_raw
       }
-       raw_data <- formated_raw_data$derivedDF
+      raw_data <- formated_raw_data$derivedDF
        ##print(formated_raw_data$derivedDF)
        variable_to_plot <- input$dailyStats_ts_variable_name2
        if (!is.null(variable_to_plot) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){

@@ -175,7 +175,7 @@ shinyUI(fluidPage(
               ),
               mainPanel(
                 width = 9,
-                column(width = 9, plotlyOutput("display_downloaded_data")),
+                column(width = 12, plotlyOutput("display_downloaded_data")),
                 # column(width = 9, plotlyOutput("display_gage_data")),
                 # column(width = 9, plotlyOutput("display_daymet_data")),
                 # column(width = 9, plotlyOutput("display_gage_daymet_base_merged"))
