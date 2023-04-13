@@ -14,8 +14,6 @@ fun.dayMetRawPlot <- function(
     daymet_data_merged <- fun.daymet.data
         
         if(fun.daymet.vars.to.process != "" && length(fun.daymet.vars.to.process) > 0) {
-          
-          
           # daymetProcessed$dayMetData <- dayMetData$data%>% select(year, yday, precip="prcp..mm.day.") %>%
           #   mutate(Date=as.Date(yday, origin=paste(as.character(year - 1), "-12-31", sep="")))
           

@@ -22,28 +22,14 @@
 app_jscode <-
   "shinyjs.disableTab = function(name) {
     var tab = $('.nav li a[data-value=' + name + ']');
-    $(tab).hide();
-   /* tab.bind('click.tab', function(e) {
-      e.preventDefault();
-      return false;
-    });
-    tab.addClass('disabled');*/
+    $(tab).css({'visibility' : 'hidden' })
+   // $(tab).hide();
   }
   shinyjs.enableTab = function(name) {
     var tab = $('.nav li a[data-value=' + name + ']');
-    $(tab).show();
-    // tab.unbind('click.tab');
-    // tab.removeClass('disabled');
+    $(tab).css({'visibility' : 'visible' })
+    // $(tab).show();
   }"
-## css snipit that makes it LOOK like we are/n't able click the tab (with outchanging functionality)
-# app_css <-
-#   ".nav li a.disabled {
-#     background-color: #aaa !important;
-#     color: #333 !important;
-#     cursor: not-allowed !important;
-#     border-color: #aaa !important;
-#   }"
-
 
 # Define UI for application
 options(spinner.color.background = "#ffffff", spinner.size = 1)
@@ -51,7 +37,6 @@ shinyUI(fluidPage(
   theme = "styles.css",
   useShinyjs(),
   shinyjs::extendShinyjs(text = app_jscode, functions = c("disableTab","enableTab")),
-  #shinyjs::inlineCSS(app_css),
   tags$head(tags$script(src="script.js")),
   tags$head( tags$link(rel="stylesheet", type="text/css", href="app.css")),
   mainPanel(
@@ -79,7 +64,8 @@ shinyUI(fluidPage(
       column(
         width = 12,
         br(),
-        div("Please complete below steps before proceeding to Data Exploration:", class="text-info", style="font-weight:bold"),
+        div("Please complete up to  step:3 before proceeding to 'Discrete Data Exploration' tab and 
+             up to step:4 before proceeding to 'Continuous Data Exploration' tab :", class="text-info", style="font-weight:bold"),
         br()
       )
     ),
@@ -127,7 +113,6 @@ shinyUI(fluidPage(
     fluidRow(
       p(),
       tabsetPanel(id="mainTabs",
-        # Upload Data----
         tabPanel(
           title="Upload Data",
           value="uploadData",
@@ -141,21 +126,21 @@ shinyUI(fluidPage(
                     div(class="panel panel-default",
                         div(class="panel-heading", "Step 1: Upload File", style="font-weight:bold;", icon("info-circle", style = "color: #2fa4e7", id="fileHelp")),
                         div(class="panel-body",
-                    tagList(
-                      bsPopover(id="fileHelp", title="Microsoft Excel and .csv files known issues", content = "Microsoft Excel corrupts .csv files when reopened by double clicking its icon or by using the File Open dialog. You can avoid this by using the Text or Data Import Wizard from the Excel Data Tab.", 
-                                placement = "right", trigger = "hover"),
-                      fileInput("uploaded_data_file",
-                      label = HTML("<b>Upload your data in .csv format</b>"),
-                      multiple = FALSE,
-                      buttonLabel=list(tags$b("Browse"),tags$i(class = "fa-solid fa-folder")),
-                      accept = c(
-                        "text/csv",
-                        "text/comma-separated-values,text/plain",
-                        ".csv"
-                      )
-                    )),
-                    uiOutput("displayFC")
-                    )),
+                            tagList(
+                              bsPopover(id="fileHelp", title="Microsoft Excel and .csv files known issues", content = "Microsoft Excel corrupts .csv files when reopened by double clicking its icon or by using the File Open dialog. You can avoid this by using the Text or Data Import Wizard from the Excel Data Tab.", 
+                                        placement = "right", trigger = "hover"),
+                              fileInput("uploaded_data_file",
+                                        label = HTML("<b>Upload your data in .csv format</b>"),
+                                        multiple = FALSE,
+                                        buttonLabel=list(tags$b("Browse"),tags$i(class = "fa-solid fa-folder")),
+                                        accept = c(
+                                          "text/csv",
+                                          "text/comma-separated-values,text/plain",
+                                          ".csv"
+                                        )
+                              )),
+                            uiOutput("displayFC")
+                        )),
                     hr(),
                     tagList(
                       uiOutput("display_runmetasummary"),
@@ -163,16 +148,7 @@ shinyUI(fluidPage(
                       uiOutput("display_actionButton_calculateDailyStatistics"),
                       hr(),
                       uiOutput("display_actionButton_saveDailyStatistics")
-                      )
-                    #,
-                    # hr(),
-                    # uiOutput("siteType"),
-                    # hr(),
-                    # uiOutput("manage"),
-                    # hr(),
-                    # uiOutput("select"),
-                    # hr(),
-                    # uiOutput("display_button")
+                    )
                   ),
                   mainPanel(
                     width = 9,
@@ -180,22 +156,75 @@ shinyUI(fluidPage(
                   ) # mainPanel end
                 ) # sidebarLayout end
               )# column close
-              # column(
-              #   width = 12,
-              #   tableOutput("contents")
-              # ), # column close
-            ),
-     
-        
-
-                     
-           
+            )
           ) # fluidPage close
         ), # tabPanel end
-
+        tabPanel(
+          title="Download Data",
+          value="downloadData",
+          fluidPage(
+            fluidRow(
+          column(
+            width = 12,
+            sidebarLayout(
+              sidebarPanel(
+                width = 3,
+                uiOutput("gage_panel"),
+                uiOutput("daymet_panel"),
+                uiOutput("base_gage_daymet_panel")
+              ),
+              mainPanel(
+                width = 9,
+                column(width = 9, plotlyOutput("display_downloaded_data")),
+                # column(width = 9, plotlyOutput("display_gage_data")),
+                # column(width = 9, plotlyOutput("display_daymet_data")),
+                # column(width = 9, plotlyOutput("display_gage_daymet_base_merged"))
+              ) # mainPanel end
+            ) # sidebarLayout end
+          )# column close
+          ) # raw
+          ) # page
+        ),
+        tabPanel(
+          title="Discrete Data Exploration",
+          value="discreateDataEx",
+          column(
+            width = 12,
+            sidebarLayout(
+              sidebarPanel(
+                width = 3,
+                div(class="panel panel-default",
+                    div(class="panel-heading", "Upload discrete data in .csv format", style="font-weight:bold;", icon("info-circle", style = "color: #2fa4e7", id="discreteHelp")),
+                    div(class="panel-body",
+                        tagList(
+                          bsPopover(id="discreteHelp", title="Discrete data rules", content = "\\'Base parameters to process\\' and \\'discrete parameters to process\\' must match.", 
+                                    placement = "right", trigger = "hover"),
+                          fileInput("uploaded_discrete_file",
+                                    label = NULL,
+                                    multiple = FALSE,
+                                    buttonLabel=list(tags$b("Browse"),tags$i(class = "fa-solid fa-folder")),
+                                    accept = c(
+                                      "text/csv",
+                                      "text/comma-separated-values,text/plain",
+                                      ".csv"
+                                    ),
+                                    
+                          ),
+                          hr(),
+                          uiOutput("baseParameters"))
+                    )),
+              ),
+              mainPanel(
+                width = 9,
+                column(width = 12, uiOutput("discreteDateAndTimeBox")),
+                fluidRow(column(width = 12, plotlyOutput("display_time_series_discrete"))),
+              ) # mainPanel end
+            ) # sidebarLayout end
+          ), # column close
+        ),
         # Data Exploration ----
         tabPanel(
-          title="Data Exploration",
+          title="Continuous Data Exploration",
           value="DataExploration",
           fluidPage(
             fluidRow(
@@ -248,12 +277,6 @@ shinyUI(fluidPage(
                           sidebarPanel(
                             width = 3,
                             uiOutput("time_series_input_1"),
-                            hr(),
-                            uiOutput("time_series_input_7"),
-                            uiOutput("usgs_gaze_options"),
-                            #uiOutput("time_series_input_10"),
-                            hr(),
-                            uiOutput("day_met_section"),
                             hr(),
                             uiOutput("time_series_input_2"),
                             div(
@@ -484,7 +507,7 @@ shinyUI(fluidPage(
                           ) # mainPanel end
                         ) # sidebarLayout end
                       ), # column close
-                    ), # tabPanel 6 end Raster
+                    ), # tabPanel 6 end Raste
 
                     ### DE, All, Climate Spiral ----
                     # tabPanel("Climate spiral", value="tab_climate",br(),

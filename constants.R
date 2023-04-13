@@ -1,5 +1,4 @@
 wrongDataFormat <- "Data format is not valid. \n Either file extension is wrong or data format is not valid."
-noDateColumn <- "We assume the dataset you uploaded contains at lease one date time column, but no date time column is identified, please check."
 invalidDateFormt <- "Selected date format is not matching with the uploaded file dates."
 invalidNewDateFormt <- "New date format is not matching with the first uploaded file date format. New date format should in "
 noGageIdFound <- "Enter a gage id"
@@ -15,3 +14,5 @@ discreteVarMismatch <- "Continuous 'variables to process' and Discrete 'variable
 csvFileAndExcelissue <- "Warning: Microsoft Excel corrupts .csv file when	 re-imported into Excel.  If you re-open the file by double-clicking its icon or by using the:
 File > Open dialog, Excel tries to 'help' you by changing the formats.  You can avoid this by using the Text or Data Import Wizard from the Data Tab.
 You can tell the Wizard that the files are Text"
+selectBaseVars <- "Please select variables to plot."
+selectGageVars <- "Please select USGS gage variables to plot."

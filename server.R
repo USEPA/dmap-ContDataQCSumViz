@@ -69,7 +69,6 @@ function(input, output, session) {
   #logfile <- log_open(logf)
   #log_print("I do log")
   useShinyjs()
-  js$disableTab("DataExploration")
   conflict_prefer("box", "shinydashboard")
   conflict_prefer("dataTableOutput", "DT")
   conflict_prefer("yday", "data.table")
@@ -237,6 +236,10 @@ function(input, output, session) {
   observeEvent(input$dateTimeBoxButton,{
     hideShowDateTimeBox("dateTimeBoxButton")
   })
+  observeEvent(input$dateTimeBoxButton_discrete,{
+    hideShowDateTimeBox("dateTimeBoxButton_discrete")
+  })
+  
   observeEvent(input$dateTimeBoxButton_new,{
     hideShowDateTimeBox("dateTimeBoxButton_new")
   })
@@ -245,6 +248,8 @@ function(input, output, session) {
     boxId <- "dateBox"
     if(grepl( "_new", buttonId, fixed = TRUE)) {
       boxId <- "dateBox_new"
+    } else if(grepl( "discrete", buttonId, fixed = TRUE)) {
+      boxId <- "dateBox_discrete"
     }
     if(input[[buttonId]] %% 2 == 1){
       shinyjs::hide(id = boxId)
@@ -288,6 +293,9 @@ function(input, output, session) {
   # })
   
   output$displayFC <- renderUI({
+    
+    
+    
     data <- uploaded_data() ## datasetlist()
     tagList(
     hr(),
@@ -444,6 +452,8 @@ function(input, output, session) {
           formated_raw_data$derivedDF <-  getFormattedRawData()
           #now shorten the varname
           raw_data <- formated_raw_data$derivedDF
+          dateRange$min <- min(as.Date(raw_data$date.formatted), na.rm = TRUE)
+          dateRange$max <- max(as.Date(raw_data$date.formatted), na.rm = TRUE)
           print("passed fun.ConvertDateFormat")
           if (!is.null(input$parameters_to_process2) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){    
               raw_data_columns$date_column_name = "date.formatted"
@@ -781,33 +791,62 @@ function(input, output, session) {
     output$time_series_input_5 <- renderUI({
       tagList(
       actionButton(inputId="display_ts",label="Display",class="btn btn-primary"),
-      actionButton(inputId="display_subplot_ts", label="Display Subplots",class="btn btn-primary"),
+     # actionButton(inputId="display_subplot_ts", label="Display Subplots",class="btn btn-primary"),
       )
     })
 
-
-    ##USGS Gage
-    output$time_series_input_7 <- renderUI({
-      tagList(
-        tags$h5("USGS Gage"),
-        textInput(inputId="gage_id", label="Gage Id",value=""), 
-        a("View Gage Ids", href="https://waterdata.usgs.gov/nwis/rt", target="_blank"), 
-        selectizeInput("gaze_params", label ="Select USGS gage variables",
-                          choices=gageColNames,
-                          multiple = TRUE,
-                          selected=NULL,
-                          options = list(hideSelected = FALSE)),
-        actionButton(inputId="display_gage_ts", label="Get USGS gage data",class="btn btn-primary"),
-        actionButton(inputId="display_gage_raw", label="View USGS raw data",class="btn btn-primary")
-        )
+    output$testing2 <- renderUI({
+      div("coming soon")
     })
+
+    #USGS Gage
+    output$gage_panel <- renderUI({
+      div(class="panel panel-default", style="padding:10px;",
+          div(class = "panel-heading", style="padding:10px 5px 10px 10px;",
+              span("USGS Gage data", style="font-weight:bold;"),
+              a("View Gage Ids", href="https://waterdata.usgs.gov/nwis/rt", target="_blank", style="float:right")
+             ),
+          div(style="padding:5px;",
+            textInput(inputId="gage_id", label="Gage Id",value=""),
+            selectizeInput("gaze_params", label ="Select USGS gage variables",
+                              choices=gageColNames,
+                              multiple = TRUE,
+                              selected=NULL,
+                              options = list(hideSelected = FALSE)),
+            actionButton(inputId="display_gage_ts", label="Download USGS gage data",class="btn btn-primary"),
+            actionButton(inputId="display_gage_raw", label="View USGS raw data",class="btn btn-primary")
+          )
+      )
+    })
+    
+   output$base_gage_daymet_panel <- renderUI({
+      variables_avail <- input$parameters_to_process2
+      div(class="panel panel-default", style="padding:10px;",
+          div(class = "panel-heading", style="padding:10px 5px 10px 10px;",
+              span("View Base, Gage and DayMet data merged in a subplot", style="font-weight:bold;", icon("info-circle", style = "color: #2fa4e7", id="baseDataDef"))
+          ),
+          bsPopover(id="baseDataDef", title="What is base data\\?", content = "Base data is uploaded on the \\'Upload Data\\' tab.", 
+                    placement = "right", trigger = "hover"),
+          div(style="padding:5px;",
+              selectizeInput("dailyStats_ts_variable_name2",label ="Select base variable names",
+                             choices=variables_avail,
+                             multiple = TRUE,
+                             selected=variables_avail[1],
+                             options = list(hideSelected = FALSE)),
+              actionButton(inputId="display_subplot_ts", label="View Base, Gage and DayMet Merged",class="btn btn-primary")
+          )
+      )
+    })
+    
     
     
     # END OF USGS gage
     #Daymet
-    output$day_met_section <- renderUI({
-      tagList(
-        tags$h5("DayMet"),
+    output$daymet_panel <- renderUI({
+      div(class="panel panel-default", style="padding:10px;",
+          div(class = "panel-heading", style="padding:10px 5px 10px 10px;",
+              span("DayMet data", style="font-weight:bold;")),
+        div(style="padding:5px;",
         textInput(inputId="daymet_lat", label="Site Latitude",value=""),
         textInput(inputId="daymet_long", label="Site Longitude",value=""), 
         selectizeInput("daymet_params", label ="Select Daymet variables",
@@ -815,9 +854,10 @@ function(input, output, session) {
                        multiple = TRUE,
                        selected=daymetCols[1],
                        options = list(hideSelected = FALSE)),
-        actionButton(inputId="get_daymet_data", label="Get Daymet data",class="btn btn-primary"),
+        actionButton(inputId="get_daymet_data", label="Download Daymet data",class="btn btn-primary"),
         actionButton(inputId="display_daymet_raw", label="View Daymet raw data",class="btn btn-primary")
       )
+     ) #end of parent div
     })
     #end of Daymet
     
@@ -1383,7 +1423,173 @@ function(input, output, session) {
       shinyjs::hide("cp_new_data")
     }
   })
-
+  
+  #Discrete Data Exploration
+  
+  uploaded_discreteData<-eventReactive(c(input$uploaded_discrete_file),{
+    discrete_data <- uploadFile(c(input$uploaded_discrete_file), stopExecution = FALSE)
+    discrete_data <- discrete_data[rowSums(is.na(discrete_data) | is.null(discrete_data) | discrete_data == "") != ncol(discrete_data),]
+    return(discrete_data)
+  })
+  
+  observeEvent(input$uploaded_discrete_file,{
+    cols_avail <- colnames(uploaded_discreteData())
+    fileContentForDisplay <- head(uploaded_discreteData())
+    output$discreteDateAndTimeBox <- renderUI({
+      div(id="dt_discrete",
+          div(class = "panel panel-default",width = "100%",
+              div(class = "panel-heading",style="width:100%;",
+                  span("Select Date and Time for discrete data", style="font-weight:bold;"),
+                  span(
+                    actionButton(inputId="dateTimeBoxButton_discrete", 
+                                 style="float:right;", class="btn btn-primary btn-xs", 
+                                 label="Hide Selection", icon= icon("arrow-down"))
+                  )
+              ),
+              box(width="100%",class="displayed",id="dateBox_discrete",
+                  dateAndTimeCommonBox(
+                    dateColumnNumsId="dtNumOfColsDis",
+                    parmToProcessId="parameters_to_process2_discrete",
+                    dateFieldNameId="selectedDateFieldName_discrete",
+                    dateFormatId="selectedDateFormat_discrete",
+                    timeFieldNameId="selectedTimeFieldName_discrete",
+                    timeFormatId="selectedTimeFormat_discrete",
+                    timeZoneId="selectedTimeZone_discrete",
+                    validationDivId="display_validation_msgs_discrete",
+                    timeFieldParentId="timeFieldDiv3",
+                    paramChoices=c("",cols_avail),
+                    extraValidationId="display_validation_msgs_discrete2"),
+                  hr(style="margin:0px;padding:0px;"),
+                  fluidRow(
+                    div(width="85%", actionButton(inputId="display_discrete_data", label="Display", class="btn btn-primary"),style="margin:5px 15px 5px 25px;")
+                  ),
+                  hr(style="margin:0px;padding:0px;"),
+                  fluidRow(
+                    column(width=12, 
+                           tags$div(renderTable({
+                             fileContentForDisplay
+                           },type="html",bordered = TRUE,striped=TRUE,align="c")),
+                           style="overflow-x:auto;margin:0px 15px 0px 15px;")
+                  )
+              )
+          ) # end of box
+      )
+    })
+    
+  })
+  
+  # observeEvent(input$display_discrete_data, {
+  #   newMainPlot <- draw_discrete_stats(renderStatus=FALSE)
+  #   if(!is.null(newMainPlot) & length(input$parameters_to_process2_discrete) > 0){
+  #     output$display_time_series_new <-  renderPlotly({
+  #       ggplotly(newMainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_discrete) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+  #     })
+  #   }
+  # })
+  
+  
+  output$baseParameters <- renderUI({
+    baseParams <- input$parameters_to_process2
+    selectizeInput(
+      "discreteBaseId",
+      label = "Select continuous parameters to process",
+      choices = baseParams,
+      multiple = TRUE,
+      selected = baseParams[1],
+      options = list(
+        hideSelected = FALSE,
+        plugins = list('remove_button')
+      )
+    )
+  })
+  
+  
+ # draw_discrete_stats <- function(renderStatus=FALSE){
+  observeEvent(input$display_discrete_data, {
+    shinyjs::runjs("$('#display_validation_msgs_discrete').empty()")
+    mainPlot <- NULL
+    if (validateUserInputs(
+      dateColumnNums="dtNumOfColsDis",
+      parmToProcess="parameters_to_process2_discrete",
+      dateFieldNameId="selectedDateFieldName_discrete",
+      dateFormatId="selectedDateFormat_discrete",
+      timeFieldNameId="selectedTimeFieldName_discrete",
+      timeFormatId="selectedTimeFormat_discrete",
+      elementId="display_validation_msgs_discrete"
+    ) == FALSE){
+      tryCatch({
+        variable_to_plot <- sort(input$parameters_to_process2_discrete, decreasing = FALSE)
+        base_vars_to_plot <- sort(input$discreteBaseId, decreasing = FALSE)
+        if(identical(variable_to_plot,base_vars_to_plot)) {
+          discrete_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat_discrete
+                                                 ,fun.userTimeFormat =input$selectedTimeFormat_discrete
+                                                 ,fun.userTimeZone = input$selectedTimeZone_discrete
+                                                 ,fun.userDateFieldName = input$selectedDateFieldName_discrete
+                                                 ,fun.userTimeFieldName = input$selectedTimeFieldName_discrete
+                                                 ,fun.rawData = uploaded_discreteData()
+                                                 ,fun.date.org = input$dtNumOfColsDis)
+          
+          if(nrow(discrete_data) != nrow(discrete_data[is.na(discrete_data$date.formatted),])) {
+            base_data <- formated_raw_data$derivedDF
+            if (!is.null(base_vars_to_plot) & nrow(base_data) != nrow(base_data[is.na(base_data$date.formatted),])){
+              
+              mergedData <- NULL
+              for(varName in input$discreteBaseId) {
+                step1 <- base_data %>% select("continuous_value"=all_of(varName),"Date" = c(date.formatted))
+                step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "discrete_Date" = c(date.formatted))
+                tempdf <- as.data.frame(qpcR:::cbind.na(step1,step2))
+                mergedData[[varName]] <- tempdf
+              }
+              combinded_df <- bind_rows(mergedData, .id="df")
+              print(combinded_df)
+              print(colnames(combinded_df))
+              
+              # shared x axis so calculate using base data file
+              mainMapTitle <- "Discrete and continuous data"
+              main_range = calculate_time_range(as.list(combinded_df))
+              mainBreaks = main_range[[1]]
+              main_x_date_label = main_range[[2]]
+              
+              mainPlot <- prepareDiscretePlot(combinded_df, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
+              if(!is.null(mainPlot) & length(input$parameters_to_process2_discrete) > 0){
+                shinyjs::runjs("$('#dateTimeBoxButton_discrete').click()")
+                output$display_time_series_discrete <-  renderPlotly({
+                  ggplotly(mainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_discrete)*2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+                })
+                overridePotlyStyle("display_time_series_discrete")
+              }
+            }
+          } 
+        } else {
+          shinyAlertUI("common_alert_msg", discreteVarMismatch, "ERROR")
+          return(mainPlot)
+        }
+      },error = function(parsingMsg) {
+        print(parsingMsg)
+        output$display_validation_msgs_discrete <- renderUI({
+          print(parsingMsg)
+          prepareDateFormatErrorMsg(parsingMsg)
+        })
+      }, warning = function(parsingMsg){
+        print(parsingMsg)
+        output$display_validation_msgs_discrete <- renderUI({
+          prepareDateFormatErrorMsg(parsingMsg)
+        })
+      }, message = function(parsingMsg) {
+        print(parsingMsg)
+        output$display_validation_msgs_discrete <- renderUI({
+          prepareDateFormatErrorMsg(parsingMsg)
+        })
+      })
+    }
+  })
+ 
+  # End of Discrete data related functions
+  
+  
+  
+  # continuous Data Exploration with New File
+  
   observeEvent(input$uploaded_newData_file,{
     cols_avail <- colnames(uploaded_newData())
     fileContentForDisplay <- head(uploaded_newData())
@@ -1511,6 +1717,13 @@ function(input, output, session) {
       shinyjs::show("timeFieldDiv2")
   })
   
+  observeEvent(input$dtNumOfColsDis, {
+    if(isolate(input$dtNumOfColsDis) == "combined")
+      shinyjs::hide("timeFieldDiv3")
+    else if(isolate(input$dtNumOfColsDis) == "separate") 
+      shinyjs::show("timeFieldDiv3")
+  })
+  
   
   #Download USGS gage data
   observeEvent(input$display_gage_ts, {
@@ -1522,7 +1735,6 @@ function(input, output, session) {
       defaultTimeZone = "America/New_York"
      
       withProgress(message = paste("Getting USGS data"), value = 0, {
-        #gageRawData$gagedata <- read.csv("01104455_Gage_20150303_20201028.csv",header=has_header, comment.char = '#', fileEncoding='latin1')
         incProgress(0, detail = paste("Retrieving records for site ", input$gage_id))
           #Actually gets the gage data from the USGS NWIS system
           gageRawData$gagedata <- fun.GageData(
@@ -1561,7 +1773,7 @@ function(input, output, session) {
     base_data_raw <- NULL
     mergedList <- list()
     totalH <- 0L
-    if(length(processed$processed_dailyStats) > 0 & length(input$dailyStats_ts_variable_name) > 0) {
+    if(length(input$dailyStats_ts_variable_name2) > 0) {
       
       #test all row data
       if (!is.null(dayMetRawData$dayMetData) & length(input$daymet_params) > 0) {
@@ -1577,12 +1789,10 @@ function(input, output, session) {
           mergedList[["DayMet"]] <- daymet_data_raw
       }
       
-
-      
       if(input$gaze_params != "" && length(input$gaze_params) > 0) {
         #gageGroup <- paste(input$gage_params, "Gage", sep=".")
         gage_data_raw  <- gageRawData$gagedata %>%
-          select(c(input$gaze_params), c("GageID"), Date=c("Date.Time")) %>%
+          select(all_of(input$gaze_params), all_of("GageID"), 'Date'=all_of("Date.Time")) %>%
           gather(key = "parameter", value = "value",-GageID, -Date)
         
           print("ng gage data is")
@@ -1595,8 +1805,7 @@ function(input, output, session) {
       }
        raw_data <- formated_raw_data$derivedDF
        ##print(formated_raw_data$derivedDF)
-     
-       variable_to_plot <- input$dailyStats_ts_variable_name
+       variable_to_plot <- input$dailyStats_ts_variable_name2
        if (!is.null(variable_to_plot) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
        
          modified_raw_data <- raw_data %>%
@@ -1604,7 +1813,7 @@ function(input, output, session) {
            complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
          
          base_data_raw  <- modified_raw_data %>%
-           select(c(input$dailyStats_ts_variable_name), Date= c("date.formatted")) %>%
+           select(any_of(variable_to_plot), Date= c("date.formatted")) %>%
            gather(key = "parameter", value = "value", -Date)
            
            totalH <- totalH + length(variable_to_plot)
@@ -1635,84 +1844,16 @@ function(input, output, session) {
       allCom = allCom + facet_grid(parameter ~ ., scales = "free_y")
       
       
-      output$display_time_series <- renderPlotly({
+      output$display_downloaded_data <- renderPlotly({
         ggplotly(allCom, height = calulatePlotHeight(totalH*2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
       }) 
-      overridePotlyStyle("display_time_series")
-
-      
-      #Display USGS gage stats
-      # gagePlot <- display_gage_stats()
-      # #Display daymet
-      # dayMetPlot <- draw_daymet_raw(" ")
-      # 
-      # ts_subplot <- NULL
-      # mainPlot <- NULL
-      # basePlot <- NULL
-      # annotations = list()
-      # # else if(!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading=="newData"){
-      # #   print("need to work on it")
-      # # }
-      # 
-      # if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading!="newData"){
-      #   mainPlot <- draw_uploaded_file_ts()
-      # } else {
-      #   basePlot <-  draw_uploaded_file_stats()
-      # }
-      # 
-      # if(!is.null(mainPlot) & is.null(basePlot)) {
-      #  
-      #   if(!is.null(gagePlot) & !is.null(dayMetPlot)) {
-      #     ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(gagePlot), ggplotly(dayMetPlot), nrows = 3, shareX = TRUE)
-      #     annotations <- setAnnotations(3, annotations, titles=c("Uploaded File Map","USGS gage Plot","DayMet Plot"))
-      #   } else if(is.null(gagePlot) & !is.null(dayMetPlot)) {
-      #     ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(dayMetPlot), nrows = 2, shareX = TRUE)
-      #     annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","DayMet Plot"))
-      #   } else if(!is.null(gagePlot) & is.null(dayMetPlot)) {
-      #     ts_subplot <- subplot(ggplotly(mainPlot), ggplotly(gagePlot), nrows = 2, shareX = TRUE)
-      #     annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","USGS gage Plot"))
-      #    } else if(is.null(gagePlot) & is.null(dayMetPlot)){
-      #     ts_subplot <- subplot(ggplotly(mainPlot), nrows = 1, shareX = TRUE)
-      #     annotations <- setAnnotations(1, annotations, titles=c("Uploaded File Map"))
-      #   }
-      #   
-      # } else if(is.null(mainPlot) & !is.null(basePlot)) {
-      #   if(!is.null(gagePlot) & !is.null(dayMetPlot)) {
-      #     ts_subplot <- subplot(ggplotly(basePlot), ggplotly(gagePlot), ggplotly(dayMetPlot), nrows = 3, shareX = TRUE)
-      #     annotations <- setAnnotations(3, annotations, titles=c("Uploaded File Map","USGS gage Plot","DayMet Plot"))
-      #   } else if(is.null(gagePlot) & !is.null(dayMetPlot)) {
-      #     ts_subplot <- subplot(ggplotly(basePlot), ggplotly(dayMetPlot), nrows = 2, shareX = TRUE)
-      #     annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","DayMet Plot"))
-      #   } else if(!is.null(gagePlot) & is.null(dayMetPlot)) {
-      #     ts_subplot <- subplot(ggplotly(basePlot), ggplotly(gagePlot), nrows = 2, shareX = TRUE)
-      #     annotations <- setAnnotations(2, annotations, titles=c("Uploaded File Map","USGS gage Plot"))
-      #   } else if(is.null(gagePlot) & is.null(dayMetPlot)){
-      #     ts_subplot <- subplot(ggplotly(basePlot), nrows = 1, shareX = TRUE)
-      #     annotations <- setAnnotations(1, annotations, titles=c("Uploaded File Map"))
-      #   }
-      #   
-      # }
-      # output$display_time_series <- renderPlotly({
-      #   ts_subplot %>% plotly::layout(annotations = annotations, legend = list(orientation = "h", x = 0.4, y = -0.3))
-      # })
-      # overridePotlyStyle("display_time_series")
+      overridePotlyStyle("display_downloaded_data")
+    } else {
+      shinyAlertUI("common_alert_msg", selectBaseVars, "WARNING")
     }
   })
-  # setAnnotations <- function(rowNum, annotations, titles){
-  #   if(rowNum == 3) {
-  #       annotations[[length(annotations)+1]] <- list(text = titles[1], showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
-  #       annotations[[length(annotations)+1]] <- list(text = titles[2], showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=0.66, yref="paper",yanchor="top")
-  #       annotations[[length(annotations)+1]] <- list(text = titles[3],showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=0.33, yref="paper",yanchor="top" )
-  #   } else if(rowNum == 2) {
-  #     annotations[[length(annotations)+1]] <- list(text = "Uploaded File Map", showarrow = FALSE,x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
-  #     annotations[[length(annotations)+1]] <- list(text = "DayMet Plot", showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=0.489, yref="paper",yanchor="top")
-  #     
-  #   } else if(rowNum == 1) {
-  #     annotations[[length(annotations)+1]] <- list(text = "Uploaded File Map", showarrow = FALSE, x = 1, xref = "paper", xanchor="right",y=1, yref="paper",yanchor="top")
-  #   }
-  #   return(annotations)
-  # }
-  
+
+
   observeEvent(input$display_ts, {
     
           shinyjs::runjs("$('#display_time_series').empty()")
@@ -3235,17 +3376,22 @@ function(input, output, session) {
 
   
   observeEvent(input$display_gage_raw, {
-    if (input$gage_id != "" & length(input$gage_id) > 0 & nrow(gageRawData$gagedata) > 0 ) {
+    if (input$gage_id != "" & length(input$gage_id) > 0 & nrow(gageRawData$gagedata) > 0 & length(input$gaze_params) > 0) {
        gageRawPlot <- fun.gageRawPlot(fun.gage.data = gageRawData$gagedata,
                              fun.gage.vars.to.process = input$gaze_params,
                              fun.internal = TRUE)
 
-      output$display_time_series_1 <- renderPlotly({
-        ggplotly(gageRawPlot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+      output$display_downloaded_data <- renderPlotly({
+        ggplotly(gageRawPlot, height = calulatePlotHeight(length(input$gaze_params) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
       })
+      overridePotlyStyle("display_downloaded_data")
     } else {
       if (input$gage_id != "" & input$gage_id > 0 & nrow(gageRawData$gagedata) == 0) {
         shinyAlertUI("common_alert_msg", noGagaDataDownloaded, "WARNING")
+      } else if (input$gage_id != "" & input$gage_id > 0 & length(input$gaze_params) == 0){
+        shinyAlertUI("common_alert_msg", selectGageVars, "WARNING")
+      } else if (input$gage_id == "") {
+        shinyAlertUI("common_alert_msg", noGageIdFound, "WARNING")
       }
     }
   })
@@ -3289,9 +3435,11 @@ function(input, output, session) {
   observeEvent(input$display_daymet_raw, {
     dayMetPlotRaw <- draw_daymet_raw("DayMet Raw Data Plot")
     if (!is.null(dayMetPlotRaw) & length(input$daymet_params) > 0) {
-      output$display_time_series_3 <- renderPlotly({
-        ggplotly(dayMetPlotRaw, height = calulatePlotHeight(length(input$daymet_params))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
-      })  
+      #output$display_time_series_3 <- renderPlotly({
+      output$display_downloaded_data <- renderPlotly({
+        ggplotly(dayMetPlotRaw, height = calulatePlotHeight(length(input$daymet_params) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+      })
+      overridePotlyStyle("display_daymet_data")
     } else {
       alertMsg <- NULL
       if (is.null(dayMetRawData$dayMetData)) {
@@ -3339,7 +3487,6 @@ function(input, output, session) {
    return(basePlot)
    
  } 
- 
 
  draw_new_updated_file_stats <- function(renderStatus=FALSE){
    mainPlot <- NULL
@@ -3844,7 +3991,9 @@ function(input, output, session) {
       removeCssClasses()
       addSuccessClass(c("step1","step2","step3"))
       addPrimaryClass(c("step4","step5"))
-      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS","display_raw_ts"))
+      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS"))
+      js$enableTab("downloadData")
+      js$enableTab("discreateDataEx")
     } else if(elementId == "step3" & state == "error") {
       removeCssClasses()
       shinyjs::addClass("step3", "btn-danger")
@@ -3887,6 +4036,10 @@ function(input, output, session) {
     }
     if(elementId %in% c("step1","step2","step3","step4")) {
         js$disableTab("DataExploration")
+    }
+    if(elementId %in% c("step1","step2")) {
+      js$disableTab("downloadData")
+      js$disableTab("discreateDataEx")
     }
     
   }
