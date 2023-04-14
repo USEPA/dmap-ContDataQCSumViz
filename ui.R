@@ -297,9 +297,9 @@ shinyUI(fluidPage(
                                     label = "Upload your new data", multiple = FALSE,
                                     accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
                                   ),
-                                  hr(),
-                                  textInput("newData_name", label = "New data name", value = "USGS")
-                                ), # conditionalPanel end
+                                  # hr(),
+                                  # textInput("newData_name", label = "New data name", value = "USGS")
+                                ) # conditionalPanel end
                               ) # div end
                             ), # shinyjs:: hidden end
 
