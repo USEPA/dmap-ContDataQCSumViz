@@ -6915,7 +6915,7 @@
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
     ".RData": {
-      "checksum": "77e0e7ca1bfd6e97b3a12437cea91d88"
+      "checksum": "96619894872a44d4d99568584740366e"
     },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
@@ -6984,7 +6984,7 @@
       "checksum": "79286a8314b099164bc99f28e3b8d111"
     },
     "ContDataQC_test_data/FromTom/crbuoy .csv": {
-      "checksum": "830ad412f84dbf8e32e94d349572df77"
+      "checksum": "e58faf2eb32be1e68777b62e9e0eed0d"
     },
     "ContDataQC_test_data/FromTom/CRBuoy discrete different data and time format.csv": {
       "checksum": "f55de7679f388cead1e828017d276a21"
@@ -7018,9 +7018,6 @@
     },
     "ContDataQC_test_data/FromTom/GB27_Water_05102022_10252022_tom2.csv": {
       "checksum": "a1d36d428e1c97737365ba94e6f7a9fa"
-    },
-    "ContDataQC_test_data/FromTom/new 1.txt": {
-      "checksum": "8928c9c7a75109e328c877fd7d072057"
     },
     "ContDataQC_test_data/HISS2 Sites LatLong.csv": {
       "checksum": "8fbbe42df312319b22abdea9cb6089bc"
@@ -7125,7 +7122,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "63928584d6a64da467896c519a543085"
+      "checksum": "143f125c888ab1bfea82139000c49ba6"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -7151,11 +7148,17 @@
     "manyGageTest.csv": {
       "checksum": "09d6f4bb2029f39f076a2172b191c95c"
     },
+    "modules/dateAndTimeModule.R": {
+      "checksum": "494ff415f0cc7e501b3c6e4d55afee96"
+    },
     "modules/dateAndTimePopUp.R": {
       "checksum": "c602709363e3605404e20d237a97dce8"
     },
-    "modules/usgsGageModule.R": {
-      "checksum": "43348c1015a7be543da7e3c0914088f9"
+    "modules/fileUploadModule.R": {
+      "checksum": "62e948ce71d071b4b6923e515e22dc75"
+    },
+    "modules/validateDateAndTimeModule.R": {
+      "checksum": "0b491fd4e5c302c7f7d3b451947cbd14"
     },
     "Output/reports/myReport.html": {
       "checksum": "409c923b7b56ece270a890064d734b9a"
@@ -7224,7 +7227,7 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "22db072903ed14f8a48bfbb24a5ba371"
+      "checksum": "155583bd262b24ddc1e919dc404db84f"
     },
     "StreamThermal.CRBuoy discrete different data and time format.csv.Charles.20230410.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
@@ -7236,13 +7239,10 @@
       "checksum": "703f9f5e1872c17701ce31350b4c3010"
     },
     "test_dailyCheck.RData": {
-      "checksum": "960a687808d82e8e4809ce8e58f8d432"
+      "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
     },
     "ui.R": {
-      "checksum": "bbe1a1dd09e802c9c2baaca65559b2eb"
-    },
-    "ui_bk.R": {
-      "checksum": "de66c83247280672557f497633f82105"
+      "checksum": "fd84e580fba4ff1553fe913f0502ba83"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -7260,7 +7260,7 @@
       "checksum": "0d248184aaa58d2d1a755b399a058a4c"
     },
     "update_ContDataQC/SumStats.updated.R": {
-      "checksum": "28ec5208d28b02de8d4b245b8cde87b0"
+      "checksum": "d9605ee2e6b29a647debed625c26667d"
     },
     "usgsGage/download_usgs_gage_data.R": {
       "checksum": "fc07a28f5b5cd5c5ffad617ad3f9cb55"

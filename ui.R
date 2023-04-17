@@ -64,8 +64,7 @@ shinyUI(fluidPage(
       column(
         width = 12,
         br(),
-        div("Please complete up to  step:3 before proceeding to 'Discrete Data Exploration' tab and 
-             up to step:4 before proceeding to 'Continuous Data Exploration' tab :", class="text-info", style="font-weight:bold"),
+        div("Please complete below steps before proceeding to 'Data Exploration' :", class="text-info", style="font-weight:bold"),
         br()
       )
     ),
@@ -160,7 +159,7 @@ shinyUI(fluidPage(
           ) # fluidPage close
         ), # tabPanel end
         tabPanel(
-          title="Download Data",
+          title="USGS & Daymet Exploration",
           value="downloadData",
           fluidPage(
             fluidRow(

@@ -369,13 +369,19 @@ function(input, output, session) {
         #print(formated_raw_data$derivedDF)
     
         if (!is.null(my_raw_choices) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
-          
-                modified_raw_data <- raw_data %>%
+            
+            d <- as.Date(raw_data$date.formatted)
+            date_temp <- seq(min(d), max(d), by = 1) 
+            allMissing <- date_temp[!date_temp %in% d] 
+            
+            if(length(allMissing) > 0) {
+              raw_data <- raw_data %>%
                 mutate(date.formatted = as.Date(date.formatted)) %>%
                 complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
-
-                uploaded_raw_data  <- modified_raw_data %>%
-                select(c(input$parameters_to_process2), "Date" = c(date.formatted)) %>%
+            }
+          
+             uploaded_raw_data  <- raw_data %>%
+             select(c(input$parameters_to_process2), "Date" = c(date.formatted)) %>%
                 gather(key = "parameter", value = "value", -Date)
               
               main_range = calculate_time_range(as.list(uploaded_raw_data))
@@ -808,12 +814,14 @@ function(input, output, session) {
              ),
           div(style="padding:5px;",
             textInput(inputId="gage_id", label="Gage Id",value=""),
+            actionButton(inputId="display_gage_ts", label="Download USGS gage data",class="btn btn-primary")
+          ),
+          div(id="gageVarsDiv" , style="padding:5px;display:none",
             selectizeInput("gaze_params", label ="Select USGS gage variables",
                               choices=gageColNames,
                               multiple = TRUE,
                               selected=NULL,
                               options = list(hideSelected = FALSE)),
-            actionButton(inputId="display_gage_ts", label="Download USGS gage data",class="btn btn-primary"),
             actionButton(inputId="display_gage_raw", label="View USGS raw data",class="btn btn-primary")
           )
       )
@@ -848,15 +856,17 @@ function(input, output, session) {
               span("DayMet data", style="font-weight:bold;")),
         div(style="padding:5px;",
         textInput(inputId="daymet_lat", label="Site Latitude",value=""),
-        textInput(inputId="daymet_long", label="Site Longitude",value=""), 
+        textInput(inputId="daymet_long", label="Site Longitude",value=""),
+        actionButton(inputId="get_daymet_data", label="Download Daymet data",class="btn btn-primary")
+        ),
+        div(id="daymetVarsDiv", style="padding:5px;display:none",
         selectizeInput("daymet_params", label ="Select Daymet variables",
                        choices=daymetCols,
                        multiple = TRUE,
                        selected=daymetCols[1],
                        options = list(hideSelected = FALSE)),
-        actionButton(inputId="get_daymet_data", label="Download Daymet data",class="btn btn-primary"),
         actionButton(inputId="display_daymet_raw", label="View Daymet raw data",class="btn btn-primary")
-      )
+        )
      ) #end of parent div
     })
     #end of Daymet
@@ -1544,8 +1554,7 @@ function(input, output, session) {
                 mergedData[[varName]] <- tempdf
               }
               combinded_df <- bind_rows(mergedData, .id="df")
-              print(combinded_df)
-              print(colnames(combinded_df))
+
               
               # shared x axis so calculate using base data file
               mainMapTitle <- "Discrete and continuous data"
@@ -1553,11 +1562,23 @@ function(input, output, session) {
               mainBreaks = main_range[[1]]
               main_x_date_label = main_range[[2]]
               
-              mainPlot <- prepareDiscretePlot(combinded_df, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
+              # d <- as.Date(combinded_df$Date)
+              # date_temp <- seq(min(d), max(d), by = 1)
+              # allMissing <- date_temp[!date_temp %in% d]
+              # 
+              # if(length(allMissing) > 0) {
+              #   combinded_df <- combinded_df %>%
+              #     mutate(Date = as.Date(Date)) %>%
+              #     complete(Date = seq.Date(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by="day"))
+              # }
+ 
+              
+            mainPlot <- prepareDiscretePlot(combinded_df, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
               if(!is.null(mainPlot) & length(input$parameters_to_process2_discrete) > 0){
                 shinyjs::runjs("$('#dateTimeBoxButton_discrete').click()")
                 output$display_time_series_discrete <-  renderPlotly({
-                  ggplotly(mainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_discrete)*2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+                  ggplotly(mainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_discrete)*2)) %>% 
+                    plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
                 })
                 overridePotlyStyle("display_time_series_discrete")
               }
@@ -1778,6 +1799,7 @@ function(input, output, session) {
       allVars <- colnames(gageRawData$gagedata)
       varsToPlot <- allVars[!(allVars %in% c("SiteID","GageID","Date.Time"))]
       updateSelectizeInput(session, 'gaze_params', choices = varsToPlot, selected = varsToPlot[1])
+      shinyjs::show(id="gageVarsDiv")
 
       #Names the single column of the R console output data.frame
       colnames(consoleUSGS$disp) <- "R console messages for all USGS data retrieval:"
@@ -1831,11 +1853,17 @@ function(input, output, session) {
        variable_to_plot <- input$dailyStats_ts_variable_name2
        if (!is.null(variable_to_plot) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
        
-         modified_raw_data <- raw_data %>%
-           mutate(date.formatted = as.Date(date.formatted)) %>%
-           complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
+        d <- as.Date(raw_data$date.formatted)
+         date_temp <- seq(min(d), max(d), by = 1) 
+         allMissing <- date_temp[!date_temp %in% d] 
          
-         base_data_raw  <- modified_raw_data %>%
+         if(length(allMissing) > 0) {
+           raw_data <- raw_data %>%
+             mutate(date.formatted = as.Date(date.formatted)) %>%
+             complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
+         }
+         
+         base_data_raw  <- raw_data %>%
            select(any_of(variable_to_plot), Date= c("date.formatted")) %>%
            gather(key = "parameter", value = "value", -Date)
            
@@ -3428,6 +3456,7 @@ function(input, output, session) {
         dayMetRawData$daymetColumns <- rawResult$daymetColumns
         updateSelectizeInput(session, 'daymet_params', choices = dyametCols, selected = dyametCols[1])
         print(dayMetRawData$dayMetData)
+        shinyjs::show(id="daymetVarsDiv")
        
         #Fills in the progress bar once the operation is complete
         incProgress(1/1, detail = paste("Retrieved records for Latitude and Longitude ",input$daymet_lat, input$daymet_long))
@@ -3587,7 +3616,7 @@ function(input, output, session) {
    discrete <- mergedDataSet$df
    mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE) +
      geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=continuous_value, colour=df))+
-     geom_point(na.rm = TRUE, aes(x=as.POSIXct(discrete_Date,format="%Y-%m-%d"),size=0.5, y=discrete_value, color=discrete, shape=discrete))+
+     geom_point(na.rm = TRUE, aes(x=as.POSIXct(discrete_Date,format="%Y-%m-%d"), y=discrete_value, shape=discrete))+
      labs(title=mapTitle, x="Date", y="Parameters")+
      scale_x_datetime(date_labels=xDateLabel,date_breaks=xDateBrakes)+
      theme_bw()+
@@ -3596,7 +3625,7 @@ function(input, output, session) {
      theme(
        strip.background = element_blank()
        ,legend.title=element_blank() 
-       ,strip.text.y = element_blank()
+       #,strip.text.y = element_blank()
        ,strip.placement = "outside"
        ,text=element_text(size=10,face = "bold", color="cornflowerblue")
        ,plot.title = element_text(hjust=0.5)
