@@ -483,7 +483,7 @@ function(input, output, session) {
                 ,
                 df.input = raw_data
               ) 
-              save(dailyCheck, file="test_dailyCheck.RData")
+              #save(dailyCheck, file="test_dailyCheck.RData")
               print("passed ReportMetaData")
               
               getQuickSummary <- lapply(dailyCheck, myQuickSummary)
@@ -784,8 +784,7 @@ function(input, output, session) {
     output$time_series_input_3 <- renderUI({
       div(
           radioButtons("dailyStats_shading", "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
-                                                                           "Mminimum & Maximum"="minMax",
-                                                                           "New Data"="newData"),
+                                                                           "Mminimum & Maximum"="minMax"),
                        selected = "quantiles"))
 
     })
@@ -904,7 +903,7 @@ function(input, output, session) {
     output$time_series_overlay_input_4 <- renderUI({
           radioButtons("overlay_shading", "Add shading with", choices = c("none"="none"
                                                                           ,"overall minimum and maximum(all years)"="overall"
-                                                                          ,"newData"="newData"),
+                                                                          ),
                        selected = "none")
 
     })
@@ -968,8 +967,8 @@ function(input, output, session) {
     output$CDF_input_2 <- renderUI({
       div(br(),
           radioButtons("CDF_shading", "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
-                                                                    "minimum & maximum"="minMax",
-                                                                    "newData"="newData"),
+                                                                    "minimum & maximum"="minMax"
+                                                                    ),
                        selected = "minMax"))
 
     })
@@ -1922,6 +1921,7 @@ function(input, output, session) {
             }
    
          } else if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading == "newData"){
+           # this option is removed from the front end for now
              newMainPlot <- display_new_data(renderStatus=FALSE)
                if(!is.null(newMainPlot) & length(input$parameters_to_process2_new) > 0){
                  shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
@@ -2092,6 +2092,7 @@ function(input, output, session) {
       }) # renderPlot close
 
     }else if ((input$dailyStats_ts_overlay_metrics=="mean"|input$dailyStats_ts_overlay_metrics=="median")&input$overlay_shading=="newData") {
+      # This option is removed from the front end for now
       overlay_data <- uploaded_overlay_newData()
 
 
