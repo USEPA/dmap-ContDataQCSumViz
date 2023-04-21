@@ -32,6 +32,7 @@ packages <- c("devtools"        # install helper for non CRAN libraries
          , "shinydashboard"
          , "shinyjs"
          , "shinyBS"
+		 , "shinyvalidate"
          , "shinyalert"
          , "conflicted"     # deal with package conflicts 
          , "survival"
