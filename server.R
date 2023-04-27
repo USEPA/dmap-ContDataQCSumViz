@@ -1553,11 +1553,11 @@ function(input, output, session) {
                 mergedData[[varName]] <- tempdf
               }
               combinded_df <- bind_rows(mergedData, .id="df")
+              # combinded_df <-combinded_df[order(combinded_df$Date, combinded_df$discrete_Date),]
+              # print(head(combinded_df))
               combinded_df$bothValues <- c(paste("\nContinuous Value: ", combinded_df$continuous_value, "\n",
                                                       "Discrete Value: ", combinded_df$discrete_value, "\n"
                                               ))
-              
-
 
               
               # shared x axis so calculate using base data file
@@ -3619,7 +3619,8 @@ function(input, output, session) {
  prepareDiscretePlot <- function(mergedDataSet, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
    mainPlot <- NULL
    discrete <- mergedDataSet$df
-   mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(name=bothValues, group=df)) +
+   #mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(name=bothValues, group=df)) +
+     mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(group=df)) +
      geom_line(inherit.aes = FALSE, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=continuous_value, colour=df))+
      geom_point(inherit.aes = TRUE, aes(x=(as.POSIXct(discrete_Date,format="%Y-%m-%d")), y=discrete_value, shape=discrete, colour="black"))+
      labs(title=mapTitle, x="Date", y="Parameters")+
