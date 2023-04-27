@@ -1548,14 +1548,33 @@ function(input, output, session) {
               mergedData <- NULL
               for(varName in input$discreteBaseId) {
                 step1 <- base_data %>% select("continuous_value"=all_of(varName),"Date" = c(date.formatted))
-                step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "discrete_Date" = c(date.formatted))
+                
+                #step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "discrete_Date" = c(date.formatted))
+                
+                step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "Date" = c(date.formatted))
+                
+                step2 <-  step2 %>% dplyr::left_join(step1,by = "Date") %>% 
+                          dplyr::select(discrete_value,"Matching_Continuous_value" = continuous_value, "discrete_Date" = c(Date))
+ 
+                d <- as.Date(step1$Date)
+                date_temp <- seq(min(d), max(d), by = 1)
+                allMissing <- date_temp[!date_temp %in% d]
+
+                if(length(allMissing) > 0) {
+                  step1 <- step1 %>%
+                    mutate(Date = as.Date(Date)) %>%
+                    complete(Date = seq.Date(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by="day"))
+                }
+                
                 tempdf <- as.data.frame(qpcR:::cbind.na(step1,step2))
                 mergedData[[varName]] <- tempdf
               }
               combinded_df <- bind_rows(mergedData, .id="df")
+              
+             
               # combinded_df <-combinded_df[order(combinded_df$Date, combinded_df$discrete_Date),]
               # print(head(combinded_df))
-              combinded_df$bothValues <- c(paste("\nContinuous Value: ", combinded_df$continuous_value, "\n",
+              combinded_df$bothValues <- c(paste("\nContinuous Value: ", combinded_df$Matching_Continuous_value, "\n",
                                                       "Discrete Value: ", combinded_df$discrete_value, "\n"
                                               ))
 
@@ -3619,8 +3638,8 @@ function(input, output, session) {
  prepareDiscretePlot <- function(mergedDataSet, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
    mainPlot <- NULL
    discrete <- mergedDataSet$df
-   #mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(name=bothValues, group=df)) +
-     mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(group=df)) +
+     mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(name=bothValues, group=df)) +
+     #mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(group=df)) +
      geom_line(inherit.aes = FALSE, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=continuous_value, colour=df))+
      geom_point(inherit.aes = TRUE, aes(x=(as.POSIXct(discrete_Date,format="%Y-%m-%d")), y=discrete_value, shape=discrete, colour="black"))+
      labs(title=mapTitle, x="Date", y="Parameters")+
