@@ -82,6 +82,8 @@ source("update_ContDataQC/build_summary_updated.R")
 source("update_ContDataQC/fun.ConvertDateFormat.R")
 source("sumVizUtils/fun.calculate.time.breaks.R")
 source("sumVizUtils/fun.findVariableToProcess.R")
+source("sumVizUtils/fun.getMetaSummary.R")
+
 
 source("usgsGage/fun.GageData.R")
 source("usgsGage/fun.gage_raw_plot.R")
