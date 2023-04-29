@@ -3847,6 +3847,42 @@
         "Built": "R 4.2.2; ; 2022-12-20 01:43:30 UTC; windows"
       }
     },
+    "padr": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "padr",
+        "Type": "Package",
+        "Title": "Quickly Get Datetime Data Ready for Analysis",
+        "Version": "0.6.2",
+        "Author": "Edwin Thoen",
+        "Maintainer": "Edwin Thoen <edwinthoen@gmail.com>",
+        "Description": "Transforms datetime data into a format ready for analysis.\n    It offers two core functionalities; aggregating data to a higher level interval\n    (thicken) and imputing records where observations were absent (pad). ",
+        "License": "MIT + file LICENSE",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "Depends": "R (>= 3.0.0)",
+        "Imports": "Rcpp, dplyr (>= 1.0.0), lubridate, rlang",
+        "Suggests": "ggplot2, testthat, knitr, rmarkdown, lazyeval, tidyr,\ndata.table",
+        "RoxygenNote": "7.1.0",
+        "LinkingTo": "Rcpp",
+        "VignetteBuilder": "knitr",
+        "URL": "https://github.com/EdwinTh/padr",
+        "BugReports": "https://github.com/EdwinTh/padr/issues",
+        "ByteCompile": "true",
+        "NeedsCompilation": "yes",
+        "Packaged": "2022-11-23 15:08:44 UTC; edwinthoen",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-11-23 16:00:02 UTC",
+        "Built": "R 4.2.3; x86_64-w64-mingw32; 2023-04-26 01:52:46 UTC; windows",
+        "ExperimentalWindowsRuntime": "ucrt",
+        "Archs": "x64"
+      }
+    },
     "parallelly": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -6924,7 +6960,7 @@
       "checksum": "18e23c1777ea3a86ef1745d2731832ce"
     },
     "_moved/install_packages_for_app.R": {
-      "checksum": "cb7c04852f50066a986368dd9458d76a"
+      "checksum": "b3b33363cbdb3601b894d9015d400639"
     },
     "_moved/myReport.html": {
       "checksum": "0fda7d5c154e04ea4515346fba73b586"
@@ -7125,7 +7161,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "143f125c888ab1bfea82139000c49ba6"
+      "checksum": "f56cf3f7492ee72d28300056bbd1ac82"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -7230,13 +7266,16 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "e5e46eee0b296266cbd78e82a860036f"
+      "checksum": "2133dcfe676ea5bde42a81dc6d3d9117"
     },
     "StreamThermal.CRBuoy discrete different data and time format.csv.Charles.20230410.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
     },
     "sumVizUtils/fun.calculate.time.breaks.R": {
       "checksum": "bbad3d7c1d53dc1a63b2b07007d579a6"
+    },
+    "sumVizUtils/fun.fillMissingData.R": {
+      "checksum": "69dae1dbd41d0289bc94275936953f2e"
     },
     "sumVizUtils/fun.findVariableToProcess.R": {
       "checksum": "703f9f5e1872c17701ce31350b4c3010"
@@ -7263,7 +7302,7 @@
       "checksum": "0d248184aaa58d2d1a755b399a058a4c"
     },
     "update_ContDataQC/SumStats.updated.R": {
-      "checksum": "d9605ee2e6b29a647debed625c26667d"
+      "checksum": "fd288809c72850c755c761e3d9799280"
     },
     "usgsGage/download_usgs_gage_data.R": {
       "checksum": "fc07a28f5b5cd5c5ffad617ad3f9cb55"

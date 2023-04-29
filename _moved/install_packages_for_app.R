@@ -40,6 +40,7 @@ packages <- c("devtools"        # install helper for non CRAN libraries
          , "XLConnect"      # read Excel files
          , "zip"            # read/save zip files
          , "logr"
+         , "padr"
          
 )
 

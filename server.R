@@ -370,19 +370,26 @@ function(input, output, session) {
     
         if (!is.null(my_raw_choices) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
             
-            d <- as.Date(raw_data$date.formatted)
-            date_temp <- seq(min(d), max(d), by = 1) 
-            allMissing <- date_temp[!date_temp %in% d] 
-            
-            if(length(allMissing) > 0) {
-              raw_data <- raw_data %>%
-                mutate(date.formatted = as.Date(date.formatted)) %>%
-                complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
-            }
+            # d1 <- difftime(myTime.End, myTime.Start, units="mins")
+            # 
+            # d <- as.Date(raw_data$date.formatted)
+            # date_temp <- seq(min(d,na.rm = TRUE), max(d, na.rm = TRUE), by = 1)
+            # allMissing <- date_temp[!date_temp %in% d]
+            # 
+            # if(length(allMissing) > 0) {
+            #   raw_data <- raw_data %>%
+            #     mutate(date.formatted = as.Date(date.formatted)) %>%
+            #     complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
+            # }
+          timediff <- get_interval(raw_data$date.formatted)
+          timediff <- ifelse(timediff == "min", "15 mins", timediff)
           
-             uploaded_raw_data  <- raw_data %>%
-             select(c(input$parameters_to_process2), "Date" = c(date.formatted)) %>%
-                gather(key = "parameter", value = "value", -Date)
+
+             uploaded_raw_data  <- raw_data %>% 
+               mutate(date.formatted = as.POSIXct(date.formatted)) %>%
+               complete(date.formatted = seq(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by=timediff)) %>%
+               select(c(input$parameters_to_process2), "Date" = c(date.formatted)) %>%
+               gather(key = "parameter", value = "value", -Date)
               
               main_range = calculate_time_range(as.list(uploaded_raw_data))
               mainBreaks = main_range[[1]]
@@ -1549,31 +1556,27 @@ function(input, output, session) {
               for(varName in input$discreteBaseId) {
                 step1 <- base_data %>% select("continuous_value"=all_of(varName),"Date" = c(date.formatted))
                 
-                #step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "discrete_Date" = c(date.formatted))
-                
                 step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "Date" = c(date.formatted))
                 
                 step2 <-  step2 %>% dplyr::left_join(step1,by = "Date") %>% 
                           dplyr::select(discrete_value,"Matching_Continuous_value" = continuous_value, "discrete_Date" = c(Date))
- 
-                d <- as.Date(step1$Date)
-                date_temp <- seq(min(d), max(d), by = 1)
-                allMissing <- date_temp[!date_temp %in% d]
+                
+                timediff <- get_interval(step1$Date)
+                #print(timediff)
+                timediff <- ifelse(timediff == "min", "15 mins", timediff)
 
-                if(length(allMissing) > 0) {
-                  step1 <- step1 %>%
-                    mutate(Date = as.Date(Date)) %>%
-                    complete(Date = seq.Date(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by="day"))
-                }
+                step1 <- step1 %>%
+                    mutate(Date = as.POSIXct(Date)) %>%
+                    complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff))
+                
+                
+                #write.csv(step1,"step1.csv",row.names=FALSE)
                 
                 tempdf <- as.data.frame(qpcR:::cbind.na(step1,step2))
                 mergedData[[varName]] <- tempdf
               }
               combinded_df <- bind_rows(mergedData, .id="df")
-              
-             
-              # combinded_df <-combinded_df[order(combinded_df$Date, combinded_df$discrete_Date),]
-              # print(head(combinded_df))
+
               combinded_df$bothValues <- c(paste("\nContinuous Value: ", combinded_df$Matching_Continuous_value, "\n",
                                                       "Discrete Value: ", combinded_df$discrete_value, "\n"
                                               ))
@@ -1581,19 +1584,11 @@ function(input, output, session) {
               
               # shared x axis so calculate using base data file
               mainMapTitle <- "Discrete and continuous data"
-              main_range = calculate_time_range(as.list(combinded_df))
+              main_range = calculate_time_range_dis(as.list(combinded_df), "discrete_Date")
               mainBreaks = main_range[[1]]
               main_x_date_label = main_range[[2]]
               
-              # d <- as.Date(combinded_df$Date)
-              # date_temp <- seq(min(d), max(d), by = 1)
-              # allMissing <- date_temp[!date_temp %in% d]
-              # 
-              # if(length(allMissing) > 0) {
-              #   combinded_df <- combinded_df %>%
-              #     mutate(Date = as.Date(Date)) %>%
-              #     complete(Date = seq.Date(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by="day"))
-              # }
+
             mainPlot <- prepareDiscretePlot(combinded_df, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
               if(!is.null(mainPlot) & length(input$parameters_to_process2_discrete) > 0){
                 shinyjs::runjs("$('#dateTimeBoxButton_discrete').click()")
@@ -1873,16 +1868,25 @@ function(input, output, session) {
        ##print(formated_raw_data$derivedDF)
        variable_to_plot <- input$dailyStats_ts_variable_name2
        if (!is.null(variable_to_plot) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
-       
-        d <- as.Date(raw_data$date.formatted)
-         date_temp <- seq(min(d), max(d), by = 1) 
-         allMissing <- date_temp[!date_temp %in% d] 
          
-         if(length(allMissing) > 0) {
-           raw_data <- raw_data %>%
-             mutate(date.formatted = as.Date(date.formatted)) %>%
-             complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
-         }
+         
+         timediff <- get_interval(raw_data$date.formatted)
+         #print(timediff)
+         timediff <- ifelse(timediff == "min", "15 mins", timediff)
+         
+         raw_data <- raw_data %>%
+           mutate(date.formatted = as.POSIXct(date.formatted)) %>%
+           complete(date.formatted = seq(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by=timediff))
+       
+        # d <- as.Date(raw_data$date.formatted)
+        #  date_temp <- seq(min(d), max(d), by = 1) 
+        #  allMissing <- date_temp[!date_temp %in% d] 
+        #  
+        #  if(length(allMissing) > 0) {
+        #    raw_data <- raw_data %>%
+        #      mutate(date.formatted = as.Date(date.formatted)) %>%
+        #      complete(date.formatted = seq.Date(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by="day"))
+        #  }
          
          base_data_raw  <- raw_data %>%
            select(any_of(variable_to_plot), Date= c("date.formatted")) %>%
@@ -1917,7 +1921,8 @@ function(input, output, session) {
       
       
       output$display_downloaded_data <- renderPlotly({
-        ggplotly(allCom, height = calulatePlotHeight(totalH*2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+        ggplotly(allCom, height = calulatePlotHeight(totalH*2)) 
+        #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
       }) 
       overridePotlyStyle("display_downloaded_data")
     } else {
@@ -1938,7 +1943,7 @@ function(input, output, session) {
             mainPlot <- draw_uploaded_file_ts()
             if(!is.null(mainPlot) & length(input$dailyStats_ts_variable_name) > 0){
               output$display_time_series <-  renderPlotly({
-                ggplotly(mainPlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4)) 
+                ggplotly(mainPlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4)) 
               })
             }
    
@@ -3380,7 +3385,26 @@ function(input, output, session) {
     }
   }
   
-  getMapTitle <- function(shandingName, userTitle, lowerColumn, upperColumn) {
+  calculate_time_range_dis <- function(baseData, dateColName) {
+    time_range <- difftime(max(as.POSIXct(baseData[[dateColName]],format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),min(as.POSIXct(baseData[[dateColName]],format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),units="days")
+    if (as.numeric(time_range)<365*2){
+      myBreaks = paste0(1," months")
+      x_date_label = "%Y-%m-%d"
+      return(list(myBreaks, x_date_label))
+    }else if(as.numeric(time_range)>=365*2&as.numeric(time_range)<365*5){
+      myBreaks = paste0(2," months")
+      x_date_label = "%Y-%m-%d"
+      return(list(myBreaks, x_date_label))
+    }else{
+      myBreaks = paste0(6," months")
+      x_date_label = "%Y-%m"
+      return(list(myBreaks, x_date_label))
+    }
+  }
+  
+ 
+  
+   getMapTitle <- function(shandingName, userTitle, lowerColumn, upperColumn) {
     shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
     if (shandingName=="quantiles"){
       shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
@@ -3637,18 +3661,17 @@ function(input, output, session) {
  
  prepareDiscretePlot <- function(mergedDataSet, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
    mainPlot <- NULL
-   discrete <- mergedDataSet$df
+   discrete <- mergedDataSet$df 
      mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(name=bothValues, group=df)) +
-     #mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(group=df)) +
-     geom_line(inherit.aes = FALSE, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=continuous_value, colour=df))+
-     geom_point(inherit.aes = TRUE, aes(x=(as.POSIXct(discrete_Date,format="%Y-%m-%d")), y=discrete_value, shape=discrete, colour="black"))+
+     geom_line(inherit.aes = FALSE, aes(x=as.POSIXct(Date), y=continuous_value, colour=df))+
+     geom_point(inherit.aes = TRUE, aes(x=as.POSIXct(discrete_Date), y=discrete_value, shape=discrete, colour="black"))+
      labs(title=mapTitle, x="Date", y="Parameters")+
      scale_x_datetime(date_labels=xDateLabel,date_breaks=xDateBrakes)+
      theme_bw()+
      facet_grid(df ~ ., scales = "free_y")+
      scale_color_discrete(name="continuous")+
      theme(
-       strip.background = element_blank()
+        strip.background = element_blank()
        ,legend.title=element_blank() 
        #,strip.text.y = element_blank()
        ,strip.placement = "outside"
