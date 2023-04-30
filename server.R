@@ -1584,7 +1584,7 @@ function(input, output, session) {
               
               # shared x axis so calculate using base data file
               mainMapTitle <- "Discrete and continuous data"
-              main_range = calculate_time_range_dis(as.list(combinded_df), "discrete_Date")
+              main_range = calculate_time_range_dis(as.list(combinded_df), "Date")
               mainBreaks = main_range[[1]]
               main_x_date_label = main_range[[2]]
               
