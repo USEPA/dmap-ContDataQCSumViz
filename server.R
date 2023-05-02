@@ -295,8 +295,6 @@ function(input, output, session) {
   
   output$displayFC <- renderUI({
     
-    
-    
     data <- uploaded_data() ## datasetlist()
     tagList(
     hr(),
@@ -1584,7 +1582,7 @@ function(input, output, session) {
               
               # shared x axis so calculate using base data file
               mainMapTitle <- "Discrete and continuous data"
-              main_range = calculate_time_range_dis(as.list(combinded_df), "Date")
+              main_range = calculate_time_range(as.list(combinded_df))
               mainBreaks = main_range[[1]]
               main_x_date_label = main_range[[2]]
               
@@ -3385,22 +3383,34 @@ function(input, output, session) {
     }
   }
   
-  calculate_time_range_dis <- function(baseData, dateColName) {
-    time_range <- difftime(max(as.POSIXct(baseData[[dateColName]],format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),min(as.POSIXct(baseData[[dateColName]],format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),units="days")
-    if (as.numeric(time_range)<365*2){
-      myBreaks = paste0(1," months")
-      x_date_label = "%Y-%m-%d"
-      return(list(myBreaks, x_date_label))
-    }else if(as.numeric(time_range)>=365*2&as.numeric(time_range)<365*5){
-      myBreaks = paste0(2," months")
-      x_date_label = "%Y-%m-%d"
-      return(list(myBreaks, x_date_label))
-    }else{
-      myBreaks = paste0(6," months")
-      x_date_label = "%Y-%m"
-      return(list(myBreaks, x_date_label))
-    }
-  }
+  # calculate_time_range_dis <- function(baseData) {
+  #   #modified for continuous and discreate data
+  #   baseMin <- min(as.Date(baseData$Date), na.rm = TRUE)
+  #   baseMax <- max(as.Date(baseData$Date), na.rm = TRUE)
+  # 
+  #   disMin <- min(as.Date(baseData$discrete_Date), na.rm = TRUE)
+  #   disMax <- max(as.Date(baseData$discrete_Date), na.rm = TRUE)
+  # 
+  #   newMin <- max(baseMin, disMin)
+  #   newMax <- max(baseMax, disMax)
+  # 
+  # 
+  #   time_range <- difftime(max(as.POSIXct(newMax,format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),min(as.POSIXct(newMin,format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),units="days")
+  #   time_range <- difftime(max(as.POSIXct(baseData$Date,format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),min(as.POSIXct(baseData$Date,format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),units="days")
+  #   if (as.numeric(time_range)<365*2){
+  #     myBreaks = paste0(1," months")
+  #     x_date_label = "%Y-%m-%d"
+  #     return(list(myBreaks, x_date_label))
+  #   }else if(as.numeric(time_range)>=365*2&as.numeric(time_range)<365*5){
+  #     myBreaks = paste0(2," months")
+  #     x_date_label = "%Y-%m-%d"
+  #     return(list(myBreaks, x_date_label))
+  #   }else{
+  #     myBreaks = paste0(6," months")
+  #     x_date_label = "%Y-%m"
+  #     return(list(myBreaks, x_date_label))
+  #   }
+  # }
   
  
   
