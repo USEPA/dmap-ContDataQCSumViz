@@ -29,68 +29,74 @@ metaDataServer <- function(id, paramToProcess, userData) {
     function(input, output, session) {
       ns <- session$ns
       
-      dailyCheck <- ReportMetaData(
-        fun.myFile = NULL
-        ,fun.myDir.import = NULL
-        ,fun.myParam.Name = paramToProcess
-        ,fun.myDateTime.Name = "date.formatted"
-        ,fun.myDateTime.Format = "%Y-%m-%d"
-        ,fun.myThreshold = 20
-        ,fun.myConfig = ""
-        ,df.input = userData
-      ) 
-      print("passed ReportMetaData")
-      getQuickSummary <- lapply(dailyCheck, fun.getMetaSummary)
-      toReport <- as.data.frame(matrix(nrow = length(dailyCheck), ncol = 5))
-      colnames(toReport) <-
-        c(
-          "Parameters",
-          "Number of days with missing data",
-          "Number of days with data flagged as fail",
-          "Number of days with data flagged as suspect",
-          "Number of days with data flagged not known"
-        )
-        toReport$Parameters <- names(dailyCheck)
-        for (n in 1:length(dailyCheck)) {
-          toReport[n, 2:5] <- getQuickSummary[[n]]
-        }
-        output$metaSummaryTb <- renderTable({
-          toReport
-        },type="html",bordered = TRUE,striped=TRUE,align="c", width="100%")
-        
-        date_column <- userData[, "date.formatted"]
-        max_date <- max(as.POSIXct(date_column, format = "%Y-%m-%d"), na.rm = TRUE)
-        min_date <- min(as.POSIXct(date_column, format = "%Y-%m-%d"), na.rm = TRUE)
-        total_N_days <- as.integer(difftime(max_date, min_date, units = "days"))
-        
-        output$meta_footnote_text <- renderUI({
-          div(class="text-info fs-6",
-              div(class="panel panel-default", style="padding:10px;",
-                  HTML(paste0("<b>Period of record:</b> ",  min_date, "<b> to </b>", max_date)),
-                  br(),
-                  HTML(paste0("<b>Total number of days in this period: </b>", total_N_days, " days"))
+      fillMissingData2=shiny::reactive(input$fillMissingData2)
+      exclude_flagged2=shiny::reactive(input$exclude_flagged2)
+      how_to_save2=shiny::reactive(input$how_to_save2)
+      
+      observeEvent(userData, {
+            dailyCheck <- ReportMetaData(
+              fun.myFile = NULL
+              ,fun.myDir.import = NULL
+              ,fun.myParam.Name = paramToProcess
+              ,fun.myDateTime.Name = "date.formatted"
+              ,fun.myDateTime.Format = "%Y-%m-%d"
+              ,fun.myThreshold = 20
+              ,fun.myConfig = ""
+              ,df.input = userData
+            ) 
+            print("passed ReportMetaData")
+            getQuickSummary <- lapply(dailyCheck, fun.getMetaSummary)
+            toReport <- as.data.frame(matrix(nrow = length(dailyCheck), ncol = 5))
+            colnames(toReport) <-
+              c(
+                "Parameters",
+                "Number of days with missing data",
+                "Number of days with data flagged as fail",
+                "Number of days with data flagged as suspect",
+                "Number of days with data flagged not known"
               )
-          )
-        })
-        
-        check_no_flags <-
-          all(toReport[, 3] == "No flag field found") &
-          all(toReport[, 4] == "No flag field found")
-        
-        if (!check_no_flags) {
-          output$meta_exclude_checks <- renderUI({
-            checkboxGroupInput(
-              ns("exclude_flagged2"),
-              "Select data points to be excluded",
-              choices = c(
-                "fail" = "fail",
-                "suspect" = "suspect",
-                "flag not known" = "flag not known"
-              ),
-              selected = "fail"
-            )
-          }) # renderUI close
-        } # if loop close
+              toReport$Parameters <- names(dailyCheck)
+              for (n in 1:length(dailyCheck)) {
+                toReport[n, 2:5] <- getQuickSummary[[n]]
+              }
+              output$metaSummaryTb <- renderTable({
+                toReport
+              },type="html",bordered = TRUE,striped=TRUE,align="c", width="100%")
+              
+              date_column <- userData[, "date.formatted"]
+              max_date <- max(as.POSIXct(date_column, format = "%Y-%m-%d"), na.rm = TRUE)
+              min_date <- min(as.POSIXct(date_column, format = "%Y-%m-%d"), na.rm = TRUE)
+              total_N_days <- as.integer(difftime(max_date, min_date, units = "days"))
+              
+              output$meta_footnote_text <- renderUI({
+                div(class="text-info fs-6",
+                    div(class="panel panel-default", style="padding:10px;",
+                        HTML(paste0("<b>Period of record:</b> ",  min_date, "<b> to </b>", max_date)),
+                        br(),
+                        HTML(paste0("<b>Total number of days in this period: </b>", total_N_days, " days"))
+                    )
+                )
+              })
+              
+              check_no_flags <-
+                all(toReport[, 3] == "No flag field found") &
+                all(toReport[, 4] == "No flag field found")
+              
+              if (!check_no_flags) {
+                output$meta_exclude_checks <- renderUI({
+                  checkboxGroupInput(
+                    ns("exclude_flagged2"),
+                    "Select data points to be excluded",
+                    choices = c(
+                      "fail" = "fail",
+                      "suspect" = "suspect",
+                      "flag not known" = "flag not known"
+                    ),
+                    selected = "fail"
+                  )
+                }) # renderUI close
+              } # if loop close
+      })
 
         return(
           list(
