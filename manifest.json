@@ -6991,9 +6991,6 @@
     "_moved/install_packages_for_app.R": {
       "checksum": "1402d83f2d12f85f6bb2df757814fba3"
     },
-    "_moved/install_packages_for_app.R.bak": {
-      "checksum": "b3b33363cbdb3601b894d9015d400639"
-    },
     "_moved/myReport.html": {
       "checksum": "0fda7d5c154e04ea4515346fba73b586"
     },
@@ -7204,9 +7201,6 @@
     "global.R": {
       "checksum": "ac0dcb382e28adee8f6750f38e3fd332"
     },
-    "global.R.bak": {
-      "checksum": "f56cf3f7492ee72d28300056bbd1ac82"
-    },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
     },
@@ -7245,12 +7239,6 @@
     },
     "modules/validateDateAndTimeModule.R": {
       "checksum": "0b491fd4e5c302c7f7d3b451947cbd14"
-    },
-    "ngTest6.csv": {
-      "checksum": "295bce92b96ab7c0a6c950bbfb93e028"
-    },
-    "ngTest7.csv": {
-      "checksum": "7c64fd6f1ea3fb1e8b34e1582a572209"
     },
     "Output/reports/myReport.html": {
       "checksum": "409c923b7b56ece270a890064d734b9a"
@@ -7319,15 +7307,15 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "6a8d22ccd1afd01c4510ba49d3dafdf3"
-    },
-    "server.R.bak": {
-      "checksum": "e663fe7f6756e8c693793203e0c2d892"
+      "checksum": "7ae6f7be1bc23b05c648748cd44f455b"
     },
     "StreamThermal.CRBuoy discrete different data and time format.csv.Charles.20230410.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
     },
     "StreamThermal.CRBuoy discrete different data with more points.csv.Charles.20230504.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "StreamThermal.shortTestFile.csv.Ranch493238200015.20230504.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
     },
     "sumVizUtils/fun.calculate.time.breaks.R": {

@@ -554,6 +554,9 @@ function(input, output, session) {
              print("passed fun.ConvertDateFormat")
             
              formated_raw_data$derivedDF <- raw_data
+             dateRange$min <- min(as.Date(raw_data$date.formatted), na.rm = TRUE)
+             dateRange$max <- max(as.Date(raw_data$date.formatted), na.rm = TRUE)
+             
              # now shorten the varname
              raw_data <- formated_raw_data$derivedDF
               metaHomeValues$metaVal <-  metaDataServer("metaDataHome", localHomeDateAndTime$parmToProcess(), formatedUploadedData=raw_data, uploadData=uploaded_data())
@@ -1519,7 +1522,7 @@ function(input, output, session) {
     if (localDiscreteDateAndTime$isTimeValid() & localDiscreteDateAndTime$isDateAndtimeValid()) {
       tryCatch({
         variable_to_plot <- sort(localDiscreteDateAndTime$parmToProcess(), decreasing = FALSE)
-        base_vars_to_plot <- sort(homeDTvalues$homeDateAndTime$parmToProcess(), decreasing = FALSE)
+        base_vars_to_plot <- sort(input$discreteBaseId, decreasing = FALSE)
         if(identical(variable_to_plot,base_vars_to_plot)) {
           discrete_data <- getFormattedRawData(localDiscreteDateAndTime, uploaded_discreteData(), tabName = "", errorDivId = "disDateAndTimeError")
           
@@ -3477,9 +3480,9 @@ function(input, output, session) {
         
 
         dayMetRawData$dayMetData <- rawResult$dayMetData
-        dyametCols <- rawResult$daymetColumns
+        daymetCols <- rawResult$daymetColumns
         dayMetRawData$daymetColumns <- rawResult$daymetColumns
-        updateSelectizeInput(session, 'daymet_params', choices = dyametCols, selected = dyametCols[1])
+        updateSelectizeInput(session, 'daymet_params', choices = daymetCols, selected = daymetCols[1])
         print(dayMetRawData$dayMetData)
         shinyjs::show(id="daymetVarsDiv")
        
