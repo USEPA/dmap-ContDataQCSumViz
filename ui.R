@@ -280,11 +280,7 @@ shinyUI(fluidPage(
                             uiOutput("time_series_input_2"),
                             div(
                               id = "cp_shaded_region",
-                              conditionalPanel(
-                                condition = "(!is.null(input$dailyStats_ts_metrics))&(input$dailyStats_ts_metrics == 'mean'|input$dailyStats_ts_metrics == 'median')",
-                                hr(),
                                 uiOutput("time_series_input_3"),
-                              ), # conditionalPanel end
                             ), # div end
                             shinyjs::hidden(
                               div(

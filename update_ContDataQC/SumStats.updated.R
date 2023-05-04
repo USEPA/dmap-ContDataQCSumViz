@@ -246,9 +246,9 @@ SumStats.updated <- function(fun.myFile
         #print(timediff)
         timediff <- ifelse(timediff == "min", "15 mins", timediff)
         
-        df.param <- df.param %>%
+        df.param <- as.data.frame(df.param %>%
           mutate(Date = as.POSIXct(Date)) %>%
-          complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff))
+          complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff)))
 
           # fullSeq <- seq.Date(min(as.Date(df.param$Date, "%Y-%m-%d"),na.rm = TRUE), to = max(as.Date(df.param$Date,"%Y-%m-%d"),na.rm = TRUE), by = 1)
           # filled_missingData <- df.param %>% complete(Date = fullSeq)

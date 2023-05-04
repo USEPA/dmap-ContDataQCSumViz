@@ -36,6 +36,7 @@ library("tibbletime")
 #library("shinydashboard")
 #library("shinyjs")
 library("shinyBS")
+library("shinyvalidate")
 #library("shinythemes")
 #library("shinyalert")
 library("conflicted") # fails without it
@@ -60,7 +61,7 @@ library("lubridate")
 library("promises")
 library("future")
 library("tinytex")
-# library("purrr")
+library("purrr")
 #library("ggtext")
 library("qpcR")
 library("readr")
@@ -82,7 +83,7 @@ source("update_ContDataQC/build_summary_updated.R")
 source("update_ContDataQC/fun.ConvertDateFormat.R")
 source("sumVizUtils/fun.calculate.time.breaks.R")
 source("sumVizUtils/fun.findVariableToProcess.R")
-#source("sumVizUtils/fun.fillMissingData.R")
+source("sumVizUtils/fun.getMetaSummary.R")
 
 
 source("usgsGage/fun.GageData.R")
@@ -94,8 +95,8 @@ source("dayMet/fun.DayMetData.R")
 source("dayMet/fun.daymet_raw_plot.R")
 source("constants.R")
 
-# list.files("modules") %>%
-#   purrr::map(~ source(paste0("modules/", .)))
+ list.files("modules") %>%
+ purrr::map(~ source(paste0("modules/", .)))
 
 
 

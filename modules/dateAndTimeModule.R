@@ -62,11 +62,12 @@ dateAndTimeUI <- function(id, paramChoices, uploadedCols) {
   
 }
 
-dateAndTimeServer <- function(id) {
+dateAndTimeServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
       ns <- session$ns
+      
       time_iv <- InputValidator$new()
       time_iv$condition(~ input$dateColumnNumsId == 'separate')
       time_iv$add_rule("timeFieldNameId", sv_required(message=""))
@@ -79,6 +80,16 @@ dateAndTimeServer <- function(id) {
       iv$add_rule("dateFormatId", sv_required(message=""))
       iv$enable()
       
+      dateColumnNums=shiny::reactive(input$dateColumnNumsId)
+      parmToProcess=shiny::reactive(input$parmToProcessId)
+      dateFieldName=shiny::reactive(input$dateFieldNameId)
+      dateFormat=shiny::reactive(input$dateFormatId)
+      timeFieldName=shiny::reactive(input$timeFieldNameId)
+      timeFormat=shiny::reactive(input$timeFormatId)
+      timeZone=shiny::reactive(input$timeZoneId)
+      isTimeValid=shiny::reactive(time_iv$is_valid())
+      isDateAndtimeValid=shiny::reactive(iv$is_valid())
+
       observeEvent(input$dateColumnNumsId, ignoreInit = TRUE, {
         if(input$dateColumnNumsId == "separate") {
           shinyjs::show(ns("timeFieldParentId"), asis = TRUE)
@@ -86,6 +97,16 @@ dateAndTimeServer <- function(id) {
           shinyjs::hide(ns("timeFieldParentId"), asis = TRUE)
         }
       })
+      
+     
+      observeEvent(data(), {
+        #updateSelectInput(session, "dateColumnNumsId", selected = "combined")
+        #print("ng tempElementId formed")
+        # shinyjs::runjs("$('#metaDataHome-meta_footnote_text').empty()")
+        # shinyjs::runjs("$('#metaDataHome-metaSummaryTb').empty()")
+
+      })
+   
       
       return(
         list(
