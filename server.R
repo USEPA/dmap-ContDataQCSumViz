@@ -97,6 +97,7 @@ function(input, output, session) {
   formated_raw_data <- reactiveValues(derivedDF = data.frame(),
                                 baseColNames = as.character())
   homeDTvalues <- reactiveValues(
+    
     homeDateAndTime = list(),
     homeDateFormat = as.character()
   )
@@ -140,7 +141,10 @@ function(input, output, session) {
          #goes to left panel
          output$display_runmetasummary <-
            renderUI({
+             tagList(
+             hr(),
              actionButton(inputId="runQS", label="Step 3: Run meta summary",class="btn btn-primary")
+             )
            })
          #goes to right panel
          output$display_raw_ts <- renderUI({
@@ -203,9 +207,6 @@ function(input, output, session) {
   #init server modules
   observeEvent(uploaded_data(), {
     homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data())
-    #shinyjs::runjs("$('#dateAndTimeErrorParent').remove()")
-    #shinyjs::runjs("$('#metaDataHome-meta_footnote_text').empty()")
-    #shinyjs::runjs("$('#metaDataHome-metaSummaryTb').empty()")
   })
   
   getFormattedRawData <- function(dateAndTimeFields, userData, tabName, errorDivId) {
@@ -240,108 +241,6 @@ function(input, output, session) {
     )
     return(userDataL)
   }
-
-
-  ## Copy uploaded files to local folder
-  # observeEvent(input$uploaded_data_file,{
-  #   
-  #   shinyjs::runjs("$('#display_validation_msgs').empty()")
-  #   my_data <- uploaded_data()
-  #   output$display_raw_ts <- renderUI({
-  # 
-  #     if (length(my_data) > 0 ) {
-  #       my_colnames <- colnames(my_data)
-  #       shinyjs::show(id="displayidLeft")
-  #       parmsToProcess <- fun.findVariableToProcess(my_colnames, getDateCols= FALSE)
-  #       shinyjs::runjs("$('#quick_summary_table').empty()")
-  #       shinyjs::runjs("$('#quick_summary_table_footnote').empty()")
-  #       updateWorkFlowState("step1","success")
-  #       shinyjs::show(id="dateTimeBoxButton")
-  #       
-  #       #goes to left panel
-  #       output$display_runmetasummary <-
-  #         renderUI({
-  #             actionButton(inputId="runQS", label="Step 3: Run meta summary",class="btn btn-primary")
-  #         })
-  #       
-  #       div(id="mainBox",
-  #       div(class = "panel panel-default",width = "100%",
-  #           div(class = "panel-heading",
-  #             span("Step 2: Select Date and Time", style="font-weight:bold;"),
-  #             span(
-  #               actionButton(inputId="dateTimeBoxButton", 
-  #                            style="float:right;", class="btn btn-primary btn-xs", 
-  #                            label="Hide Selection", icon= icon("arrow-down"))
-  #               )
-  #           ),
-  #           box(width="100%",class="displayed",id="dateBox",
-  #           dateAndTimeCommonBox(
-  #                                dateColumnNumsId="dtNumOfCols",
-  #                                parmToProcessId="parameters_to_process2",
-  #                                dateFieldNameId="selectedDateFieldName", 
-  #                                dateFormatId="selectedDateFormat", 
-  #                                timeFieldNameId="selectedTimeFieldName", 
-  #                                timeFormatId="selectedTimeFormat",
-  #                                timeZoneId="selectedTimeZone",
-  #                                validationDivId="display_validation_msgs",
-  #                                timeFieldParentId="timeFieldDiv",
-  #                                paramChoices=parmsToProcess,
-  #                                ),
-  #           hr(style="margin:0px;padding:0px;"),
-  #           fluidRow(
-  #             div(width="85%", actionButton(inputId="showrawTS", label="Display time series",class="btn btn-primary"),style="margin:5px 15px 5px 25px;")
-  #           ),
-  #           fluidRow(
-  #             div(uiOutput("contents"), style="overflow-x:auto;margin:0px 15px 0px 15px;")
-  #           ),
-  #           ) # end of box
-  #       ), # end of parent div,
-  # 
-  #           fluidRow(column(width=12,
-  #                   box(width="100%", id="statsBox", 
-  #                    tags$head(tags$style(HTML("#quick_summary_table {
-  #                                                     text-align: center;
-  #                                                     font-size: 16px;
-  #                                                     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  #                                                     }
-  #                                                     "))),
-  #                     fluidRow(column(width=12,uiOutput("display_quick_summary_table")), # column close
-  #                              column(width=12,uiOutput("display_footnote_text"),class="text-info fs-6")
-  #                             ), #fluidRow end
-  #                     fluidRow(column(width=8,style="padding:20px;",
-  #                               uiOutput("display_fill_data"),
-  #                               uiOutput("display_checkBoxes_dailyStats_1"),
-  #                               uiOutput("display_radioButtons_dailyStats_2")
-  #                            ), # column close
-  #                            #column(width=4,style="padding:25px;",uiOutput("display_actionButton_calculateDailyStatistics")
-  #                            #), # column close
-  #                            #column(width=4,div(style="margin-bottom:20px")),
-  #                            #column(width=4,style="padding:30px;",uiOutput("display_actionButton_saveDailyStatistics")
-  #                            #), # column close
-  #                    ) #fluidRow end
-  #                   ) # end of statsBox
-  #               )
-  #           ),
-  #           fluidRow(
-  #             tags$div(id="display_all_raw_ts_div", style="height:100%;width:100%;display:none;", 
-  #                      column(width=12,plotlyOutput("display_all_raw_ts"))
-  #             ) #end of div
-  #           ) #fluidRow end
-  #       ) # end of main div
-  #     }
-  #   })
-  #   
-  #   my_data_continuous <- my_data %>% dplyr::select(where(is.numeric))
-  #   all_continuous_col_names <- colnames(my_data_continuous)
-  #   uploadedCols <- colnames(my_data)
-  # 
-  # 
-  #   updateSelectInput(session,"selectedDateFieldName",choices = c("", uploadedCols),selected="")
-  #   updateSelectInput(session,"selectedTimeFieldName",choices = c("", uploadedCols),selected="")
-  #   updateSelectizeInput(session, 'rawDataToPlot', choices = c("",all_continuous_col_names), server = TRUE)
-  #   #updateSelectizeInput(session, 'parameters_to_process2', choices = c("",all_continuous_col_names), server = TRUE)
-  # 
-  # })  # observeEvent end
   
   observeEvent(input$dateTimeBoxButton,{
     hideShowDateTimeBox("dateTimeBoxButton")
@@ -403,12 +302,11 @@ function(input, output, session) {
   # })
   
   output$displayFC <- renderUI({
-    
     data <- uploaded_data() ## datasetlist()
     tagList(
-    hr(),
-    radioButtons("disp", "Display file information", choices = c(Head = "head",Tail="tail",ColumnNames="Column names"), inline = TRUE,
+    radioButtons("disp", "Display file information", choices = c(Head = "head",Tail="tail",ColumnNames="Column names"),
                  selected = "head"),
+    hr(),
     actionButton(inputId="displayidLeft",label = "Display file contents", class="btn btn-primary")
     )
   })
@@ -432,25 +330,6 @@ function(input, output, session) {
       width = "100%"
     )
   })
-
-  # myQuickSummary <- function(myDf){
-  #   # print(str(myDf$Date))
-  #   # print(class(myDf$Date))
-  #   all.days <- seq.Date(min(myDf$Date,  na.rm = TRUE),max(myDf$Date, na.rm = TRUE),by="day")
-  #   N.missing.days <- (length(all.days)-sum(all.days %in% myDf$Date))+sum(myDf$sumNA>0)
-  #   if (ncol(myDf)>2){
-  #   N.days.flagged.fail <- sum(myDf$sumFail>0)
-  #   N.days.flagged.suspect <- sum(myDf$sumSuspect>0)
-  #   N.days.flagged.noFlagData <- sum(myDf$SumNoFlagData>0)
-  #   }else{
-  #     N.days.flagged.fail <- "No flag field found"
-  #     N.days.flagged.suspect <- "No flag field found"
-  #     N.days.flagged.noFlagData <- "No flag field found"
-  #   }
-  #   mySummary <- c(N.missing.days,N.days.flagged.fail,N.days.flagged.suspect,N.days.flagged.noFlagData)
-  #   return(mySummary)
-  # }
-  
 
   observeEvent(input$showrawTS,{
 
@@ -567,18 +446,24 @@ function(input, output, session) {
           
           output$display_actionButton_calculateDailyStatistics <-
             renderUI({
+              tagList(
+              hr(),
               actionButton(inputId = "calculateDailyStatistics",
                            label = "Step 4: Calculate daily statistics",
                            class="btn btn-primary"
                            )
+              )
             })
           
           ## change the actionButton to downloadButton
           output$display_actionButton_saveDailyStatistics <- renderUI({
+            tagList(
+            hr(),
             downloadButton(outputId = "saveDailyStatistics",
                            label = "Save daily statistics",
                            class="btn btn-primary",
                            style = "padding-left:15px;padding-right:15px;display:none;")
+            )
           })
           
             #click the button to hide the selection box
@@ -809,7 +694,7 @@ function(input, output, session) {
 
     #USGS Gage
     output$gage_panel <- renderUI({
-      div(class="panel panel-default", style="padding:10px;",
+      div(class="panel panel-default", style="padding:10px;margin-top:20px;",
           div(class = "panel-heading", style="padding:10px 5px 10px 10px;",
               span("USGS Gage data", style="font-weight:bold;"),
               a("View Gage Ids", href="https://waterdata.usgs.gov/nwis/rt", target="_blank", style="float:right")
@@ -936,7 +821,7 @@ function(input, output, session) {
     })
 
     output$box_input_3 <- renderUI({
-      div(br(),
+      div(
           radioButtons("box_group", "Group by", choices = c("month"="month"
                                                             ,"month(years side by side)"="month2"
                                                             ,"year"="year"
@@ -968,7 +853,7 @@ function(input, output, session) {
     })
 
     output$CDF_input_2 <- renderUI({
-      div(br(),
+      div(
           radioButtons("CDF_shading", "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
                                                                     "minimum & maximum"="minMax"
                                                                     ),
@@ -1405,7 +1290,6 @@ function(input, output, session) {
           )
       ) # dataTable end
       saveToReport$summaryTable <- myTable
-
       print(myTable)
     })  # renderDT end
 
@@ -1453,7 +1337,7 @@ function(input, output, session) {
     fileContentForDisplay <- head(uploaded_discreteData())
     output$discreteDateAndTimeBox <- renderUI({
       div(id="dt_discrete",
-          div(class = "panel panel-default",width = "100%",
+          div(class = "panel panel-default",width = "100%", 
               div(class = "panel-heading",style="width:100%;",
                   span("Select Date and Time for discrete data", style="font-weight:bold;"),
                   span(
@@ -1470,8 +1354,10 @@ function(input, output, session) {
                   ),
                   hr(style="margin:0px;padding:0px;"),
                   fluidRow(
+                    div(style = "padding:2px;",
                     span(width = "85%", actionButton(inputId = "display_discrete_data", label = "Display", class = "btn btn-primary"), style = "margin:5px 15px 5px 25px;"),
                     span("Note: Red border denotes required fields.", style = "font-weight:bold;color:#b94a48;")
+                    )
                   ),
                   hr(style="margin:0px;padding:0px;"),
                   fluidRow(
@@ -1902,7 +1788,8 @@ function(input, output, session) {
             mainPlot <- draw_uploaded_file_ts()
             if(!is.null(mainPlot) & length(input$dailyStats_ts_variable_name) > 0){
               output$display_time_series <-  renderPlotly({
-                ggplotly(mainPlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4)) 
+                ggplotly(mainPlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name) * 2)) 
+                #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4)) 
               })
             }
    
@@ -1912,14 +1799,16 @@ function(input, output, session) {
                if(!is.null(newMainPlot) & length(newDTvalues$newDateAndTime$parmToProcess()) > 0){
                  shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
                  output$display_time_series_new <-  renderPlotly({
-                   ggplotly(newMainPlot,height=calulatePlotHeight(length(newDTvalues$newDateAndTime$parmToProcess()) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+                   ggplotly(newMainPlot,height=calulatePlotHeight(length(newDTvalues$newDateAndTime$parmToProcess()) * 2)) 
+                   #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
                  })
                }
           } else {
                    basePlot <-  draw_uploaded_file_stats()
                    if(!is.null(basePlot)) {
                      output$display_time_series <-  renderPlotly({
-                       ggplotly(basePlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+                       ggplotly(basePlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name))) 
+                       #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
                      })
                    }
              }          
@@ -3354,36 +3243,7 @@ function(input, output, session) {
     }
   }
   
-  # calculate_time_range_dis <- function(baseData) {
-  #   #modified for continuous and discreate data
-  #   baseMin <- min(as.Date(baseData$Date), na.rm = TRUE)
-  #   baseMax <- max(as.Date(baseData$Date), na.rm = TRUE)
-  # 
-  #   disMin <- min(as.Date(baseData$discrete_Date), na.rm = TRUE)
-  #   disMax <- max(as.Date(baseData$discrete_Date), na.rm = TRUE)
-  # 
-  #   newMin <- max(baseMin, disMin)
-  #   newMax <- max(baseMax, disMax)
-  # 
-  # 
-  #   time_range <- difftime(max(as.POSIXct(newMax,format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),min(as.POSIXct(newMin,format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),units="days")
-  #   time_range <- difftime(max(as.POSIXct(baseData$Date,format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),min(as.POSIXct(baseData$Date,format="%Y-%m-%d %H:%M:%S"),na.rm = TRUE),units="days")
-  #   if (as.numeric(time_range)<365*2){
-  #     myBreaks = paste0(1," months")
-  #     x_date_label = "%Y-%m-%d"
-  #     return(list(myBreaks, x_date_label))
-  #   }else if(as.numeric(time_range)>=365*2&as.numeric(time_range)<365*5){
-  #     myBreaks = paste0(2," months")
-  #     x_date_label = "%Y-%m-%d"
-  #     return(list(myBreaks, x_date_label))
-  #   }else{
-  #     myBreaks = paste0(6," months")
-  #     x_date_label = "%Y-%m"
-  #     return(list(myBreaks, x_date_label))
-  #   }
-  # }
-  
- 
+
   
    getMapTitle <- function(shandingName, userTitle, lowerColumn, upperColumn) {
     shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
@@ -3551,95 +3411,6 @@ function(input, output, session) {
    
  } 
 
- # draw_new_updated_file_stats <- function(renderStatus=FALSE){
- #   mainPlot <- NULL
- # 
- #   if (validateUserInputs(
- #     dateColumnNums="dtNumOfCols1",
- #     parmToProcess="parameters_to_process2_new",
- #     dateFieldNameId="selectedDateFieldName_new",
- #     dateFormatId="selectedDateFormat_new",
- #     timeFieldNameId="selectedTimeFieldName_new",
- #     timeFormatId="selectedTimeFormat_new",
- #     elementId="display_validation_msgs_new"
- #   ) == FALSE){
- #     tryCatch({
- #       
- #       variable_to_plot <- sort(input$parameters_to_process2_new, decreasing = FALSE)
- #       base_vars_to_plot <- sort(input$dailyStats_ts_variable_name, decreasing = FALSE)
- #       if(identical(variable_to_plot,base_vars_to_plot)) {
- #        discrete_data <- fun.ConvertDateFormat(fun.userDateFormat = input$selectedDateFormat_new
- #                                              ,fun.userTimeFormat =input$selectedTimeFormat_new
- #                                              ,fun.userTimeZone = input$selectedTimeZone_new
- #                                              ,fun.userDateFieldName = input$selectedDateFieldName_new
- #                                              ,fun.userTimeFieldName = input$selectedTimeFieldName_new
- #                                              ,fun.rawData = uploaded_newData()
- #                                              ,fun.date.org = input$dtNumOfCols1)
- #     
- #     
- #       if(nrow(discrete_data) != nrow(discrete_data[is.na(discrete_data$date.formatted),])) {
- #         base_data <- formated_raw_data$derivedDF
- #           if (!is.null(base_vars_to_plot) & nrow(base_data) != nrow(base_data[is.na(base_data$date.formatted),])){
- #             
- #               mergedData <- NULL
- #               for(varName in input$dailyStats_ts_variable_name) {
- #                    step1 <- base_data %>% select("continuous_value"=all_of(varName),"Date" = c(date.formatted))
- #                    step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "discrete_Date" = c(date.formatted))
- #                    tempdf <- as.data.frame(qpcR:::cbind.na(step1,step2))
- #                    mergedData[[varName]] <- tempdf
- #               }
- #                combinded_df <- bind_rows(mergedData, .id="df")
- #                print(combinded_df)
- #                print(colnames(combinded_df))
- # 
- #                # shared x axis so calculate using base data file
- #                mainMapTitle <- "Discrete and continuous data"
- #                main_range = calculate_time_range(as.list(combinded_df))
- #                mainBreaks = main_range[[1]]
- #                main_x_date_label = main_range[[2]]
- # 
- #               mainPlot <- prepareDiscretePlot(combinded_df, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
- #               
- #                if(renderStatus == FALSE) {
- #                   return(mainPlot)
- #                 } else {
- #                   if(!is.null(mainPlot) & length(input$parameters_to_process2_new) > 0){
- #                     shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
- #                     output$display_time_series_new <-  renderPlotly({
- #                       ggplotly(mainPlot,height=calulatePlotHeight(length(input$parameters_to_process2_new))) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
- #                     })
- #                   }
- #                }
- #           }
- # 
- #         } 
- #       } else {
- #         shinyAlertUI("common_alert_msg", discreteVarMismatch, "ERROR")
- #         return(mainPlot)
- #       }
- #     },error = function(parsingMsg) {
- #       print(parsingMsg)
- #       output$display_validation_msgs_new <- renderUI({
- #         prepareDateFormatErrorMsg(parsingMsg)
- #       })
- #     }, warning = function(parsingMsg){
- #       print(parsingMsg)
- #       output$display_validation_msgs_new <- renderUI({
- #         prepareDateFormatErrorMsg(parsingMsg)
- #       })
- #     }, message = function(parsingMsg) {
- #       print(parsingMsg)
- #       output$display_validation_msgs_new <- renderUI({
- #         prepareDateFormatErrorMsg(parsingMsg)
- #       })
- #     }, finally = {
- #        return(mainPlot)
- #     })
- #   }
- # }
- # geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=continuous_value, colour=df))+
- #   geom_point(aes(x=(as.POSIXct(discrete_Date,format="%Y-%m-%d")), y=discrete_value, shape=discrete, colour="black"))+
- 
  prepareDiscretePlot <- function(mergedDataSet, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
    mainPlot <- NULL
    discrete <- mergedDataSet$df 
@@ -3752,20 +3523,7 @@ function(input, output, session) {
       return(errorMsg)
     }
   }
-  
-  # validateSiteId <- function(raw_data) {
-  #   my_colnames <- names(raw_data)
-  #   idx_ID_col <- str_detect(my_colnames, regex('site', ignore_case = T))
-  #   total_siteids_found <- sum(idx_ID_col, na.rm=TRUE)
-  #   print(total_siteids_found)
-  # 
-  #   # loaded_data$siteID <- unique(raw_data[idx_ID_col])
-  #   if (total_siteids_found > 1) {
-  #     shinyAlertUI("common_alert_msg", siteIdNotOne, "WARNING")
-  #   } else if (total_siteids_found  == 0) {
-  #     shinyAlertUI("common_alert_msg", noSiteIdFound, "WARNING")
-  #   }
-  # }
+
   
   validateNewLowerAndUpper <- function(elementId){
     missingInputs <- FALSE
@@ -3783,72 +3541,7 @@ function(input, output, session) {
     return(missingInputs)
   }
 
-  
-  validateUserInputs <- function(dateColumnNums,parmToProcess, dateFieldNameId,dateFormatId,timeFieldNameId,timeFormatId,elementId,tab=""){
-    missingInputs <- FALSE
-    # shinyjs::alert(input[[dateColumnNums]])
-    # shinyjs::alert(input[[parmToProcess]])
-    # shinyjs::alert(input[[dateFormatId]])
-    # shinyjs::alert(input[[dateFieldNameId]])
-    # shinyjs::alert(input[[timeFieldName]])
-    
 
-    if (input[[dateColumnNums]] == "combined" &
-        (
-          is.null(input[[parmToProcess]]) |
-          input[[dateFormatId]] == "" |
-          input[[dateFieldNameId]] == ""
-        )) {
-      missingInputs <- TRUE
-      shinyjs::runjs(paste0("$('#",elementId,"').empty()"))
-      output[[elementId]] <- renderUI({
-        shiny::validate(
-          shiny::need(input[[dateFormatId]] != "", 'Please select date format'),
-          shiny::need(
-            input[[dateFieldNameId]] != "",
-            'Please select date field name.'
-          ),
-          shiny::need(
-            !is.null(input[[parmToProcess]]),
-            'Please select parameters to process.'
-          )
-        )
-      })
-    } else if (input[[dateColumnNums]] == 'separate' &
-               (
-                 is.null(input[[parmToProcess]]) |
-                 input[[dateFormatId]] == "" |
-                 input[[dateFieldNameId]] == "" |
-                 input[[timeFieldNameId]] == ""
-               )) {
-      missingInputs <- TRUE
-      shinyjs::runjs(paste0("$('#",elementId,"').empty()"))
-      output[[elementId]] <- renderUI({
-        shiny::validate(
-          shiny::need(input[[dateFormatId]] != "", 'Please select date format'),
-          shiny::need(
-            input[[dateFieldNameId]] != "",
-            'Please select date field name.'
-          ),
-          shiny::need(
-            !is.null(input[[parmToProcess]]),
-            'Please select parameters to process.'
-          ),
-          shiny::need(
-            input[[timeFieldNameId]] != "",
-            'Please select time field name.'
-          )
-        )
-      })
-    }
-    if(missingInputs == FALSE & tab == "homePage" & workflowStatus$finish==FALSE) {
-      updateWorkFlowState("step2", "success")
-    } else if(missingInputs == TRUE & tab == "homePage") {
-      updateWorkFlowState("step2", "error")
-    }
-    return(missingInputs)
-  }
-  
   calulatePlotHeight <- function(varNum) {
     plotHeight <- 400
     if(varNum > 2) {

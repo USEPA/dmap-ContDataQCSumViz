@@ -33,9 +33,9 @@
 #display_fill_data .shiny-input-container .checkbox label span {font-weight: bold;}
 #display_validation_msgs, #display_validation_msgs_new,#display_validation_msgs_new2,#display_validation_msgs_discrete {   color: red; font-weight: bold; }
 
-.action-btn-style {
+/*.action-btn-style {
   color:cornflowerblue;background-color:black;font-weight:bold;
-}
+}*/
 
 #step1, #step2, #step3, #step4, #step5 {
   cursor: not-allowed;
@@ -47,7 +47,6 @@
 #mainTabs {
   margin-bottom:20px;
 }
-
 .radio-inline {
     text-align: center;
     margin-left: 10px;
@@ -59,4 +58,27 @@
 #mainTabs li a[data-value = 'downloadData']
 {
   visibility:hidden;
+}
+
+.headerImgRes {
+  max-height:188px;
+  width:100%;
+}
+.rectangle {
+  position: relative;
+  width: 250px;
+  height: 50px;
+  background: #f5f5f5;
+  padding: 15px 0px 0px 10px;
+}
+.rectangle:after {
+  content: '';
+  position: absolute;
+  right: -49px;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 25px solid transparent;
+  border-left: 50px solid #f5f5f5;
+  border-bottom: 25px solid transparent;
 }

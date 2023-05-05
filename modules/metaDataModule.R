@@ -4,9 +4,15 @@ metaDataUI <- function(id) {
     tagList(
        uiOutput(outputId = ns("metaSummaryTb")),
        uiOutput(outputId = ns("meta_footnote_text")),
-       uiOutput(outputId = ns("fillMissingData")),
-       uiOutput(outputId = ns("saveStats")),
-       uiOutput(outputId = ns("meta_exclude_checks"))
+       fluidRow(
+         column(width = 4,uiOutput(outputId = ns("fillMissingData"))
+         ),
+         column(width = 4,uiOutput(outputId = ns("saveStats")),
+         ),
+         column(width = 4,uiOutput(outputId = ns("meta_exclude_checks"))
+         )
+       )
+
     )# end of tagList
 }
 
@@ -77,7 +83,7 @@ metaDataServer <- function(id, paramToProcess, formatedUploadedData, uploadData)
                 )
               })
               output$fillMissingData <- renderUI({
-                checkboxInput(ns("fillMissingData2"), "Fill missing data with 'NA' values", TRUE)
+                HTML(paste0("<span style='position:relative;top:-10px;'>", checkboxInput(ns('fillMissingData2'), label='Fill missing data with \'NA\' values', TRUE),"</span>"))
               })
               output$saveStats <- renderUI({
                 radioButtons(
@@ -111,7 +117,7 @@ metaDataServer <- function(id, paramToProcess, formatedUploadedData, uploadData)
                     selected = "fail"
                   )
                 }) # renderUI close
-              } # if loop close
+              } # if  close
       })
 
         return(
