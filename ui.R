@@ -50,7 +50,7 @@ shinyUI(fluidPage(
     fluidRow(
       column(
         width = 12,
-        div(img(src="headerImg.png", class="headerImgRes"), style="display: flex;justify-content:center")
+        div(img(src="headerImage.png", class="headerImgRes"), style="display: flex;justify-content:center")
        )
     ),
     fluidRow(
