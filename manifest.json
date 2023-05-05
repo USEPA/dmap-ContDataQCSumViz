@@ -7325,7 +7325,7 @@
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
     },
     "ui.R": {
-      "checksum": "cf7fefb8b803bd54a3f1a629774eae6b"
+      "checksum": "00ba888afd92bf3b6593f7769b704911"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -7381,7 +7381,7 @@
     "www/GDD.R": {
       "checksum": "ed8341d5bbf0eeb3ec8a577287112165"
     },
-    "www/headerImg.png": {
+    "www/headerImage.png": {
       "checksum": "4067a72274e46a747b64e181847d37c3"
     },
     "www/script.js": {
