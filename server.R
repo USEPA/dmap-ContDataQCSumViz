@@ -75,7 +75,7 @@ function(input, output, session) {
   dateRange <- reactiveValues()
   workflowStatus <- reactiveValues(finish=FALSE,
                                    elementId="step1",
-                                   state="error")
+                                   state="init")
 
 
   currentOutPutId <- reactiveValues()
