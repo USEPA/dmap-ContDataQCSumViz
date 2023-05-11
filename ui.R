@@ -62,51 +62,7 @@ shinyUI(fluidPage(
       )
     ),
     fluidRow(
-      column(
-        width = 1,
-        div(class="rectangle",
-            span(circleButton(inputId="step1",icon = icon("upload"),status="primary", size="xs")),
-            span("Step 1: Upload file", style="font-weight:bold; word-wrap: break-word;margin-right:30px;"),
-            # span(HTML('<i id="arrow1" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>'))
-           
-          )
-        ),
-        column(
-        width = 1),
-        column(
-          width = 1,
-          div(class="rectangle",
-                span(circleButton(inputId = "step2",icon = icon("calendar"),status = "primary", size="xs")),
-                span("Step 2: Select date and time",style="font-weight:bold; word-wrap: break-word;margin-right:30px;"),
-                # span(HTML('<i id="arrow2" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>'))
-          )
-        ),# end of column
-        column(width=1),
-        column(
-          width = 1,
-          div(class="rectangle",
-            span(circleButton(inputId = "step3",icon = icon("tasks"),status = "primary", size="xs")),
-            span("Step 3: Run meta summary",style="font-weight:bold; word-wrap: break-word;margin-right:30px;"),
-            # span(HTML('<i id="arrow3" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>'))
-          )
-        ),# end of column
-        column(width=1),
-        column(
-          width = 1,
-          div(class="rectangle", style="width:280px;",
-            span(circleButton(inputId = "step4",icon = icon("calculator"),status = "primary",size="xs")),
-            span("Step 4: Calculate daily statistics",style="font-weight:bold; word-wrap: break-word;margin-right:30px;"),
-            # span(HTML('<i id="arrow4" class="fas fa-arrow-right" role="presentation" aria-label="arrow-right icon"></i>'))
-          )
-        ),# end of column
-      column(width=1),
-      column(
-        width = 1,
-        div(class="rectangle",style="margin-left:30px;",
-          span(circleButton(inputId = "step5",icon = icon("check"),status = "primary", size="xs")),
-          span("Step 5: Visualize data",style="font-weight:bold; word-wrap: break-word;")
-        )
-      )# end of column
+      column(width = 12, progressWorkflowModuleUI("statusWorkflow"))
     ),
     fluidRow(
       p(),

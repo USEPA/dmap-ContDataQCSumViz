@@ -63,11 +63,7 @@
 
 
 function(input, output, session) {
-  
-  #logf <- file.path(".","contDataSumViz.log")
-  #open logfile
-  #logfile <- log_open(logf)
-  #log_print("I do log")
+
   useShinyjs()
   conflict_prefer("box", "shinydashboard")
   conflict_prefer("dataTableOutput", "DT")
@@ -77,7 +73,11 @@ function(input, output, session) {
   loaded_data <- reactiveValues()
   raw_data_columns<-reactiveValues()
   dateRange <- reactiveValues()
-  workflowStatus <- reactiveValues(finish=FALSE)
+  workflowStatus <- reactiveValues(finish=FALSE,
+                                   elementId="step1",
+                                   state="error")
+
+
   currentOutPutId <- reactiveValues()
   gageColNames  <- NULL
   daymetCols <- NULL
@@ -97,7 +97,6 @@ function(input, output, session) {
   formated_raw_data <- reactiveValues(derivedDF = data.frame(),
                                 baseColNames = as.character())
   homeDTvalues <- reactiveValues(
-    
     homeDateAndTime = list(),
     homeDateFormat = as.character()
   )
@@ -114,28 +113,34 @@ function(input, output, session) {
   to_download <- reactiveValues()
   saveToReport <- reactiveValues(metadataTable=data.frame())
   
+  dailyStatusCalculated <- reactiveValues(status='unfinished')
   
+  readyForCalculation <- reactiveValues(status=FALSE)
 
   #  Upload Data##############################
   #EWL
   if (file.exists("_moved/File_Format.rds")) file.remove("_moved/File_Format.rds")
   do.call(file.remove, list(list.files("Selected_Files", full.names = TRUE)))
  
-
-  #Home page file upload
+  #init modules, reactive values will reflect when the buttons are actually clicked
+  progressWorkflowModuleUIServer("statusWorkflow", workflowStatus)
+  calculateDailyStatsModuleServer("calculateDailyStats", formated_raw_data, homeDTvalues, metaHomeValues,loaded_data, dailyStatusCalculated,processed,readyForCalculation)
+ 
+  
+   #Home page file upload
   uploaded_data<-eventReactive(c(input$uploaded_data_file),{
-    
-      
-    
-       my_data <- uploadFile(c(input$uploaded_data_file), stopExecution=TRUE, tab="homePage")
-       # drop all rows where all the columns are empty
-       my_data <- my_data[rowSums(is.na(my_data) | is.null(my_data) | my_data == "") != ncol(my_data),]
-
+        readyForCalculation$status <- FALSE
+        dailyStatusCalculated$status <- "unfinished"
+        my_data <- uploadFile(c(input$uploaded_data_file), stopExecution=FALSE, tab="homePage")
+         # drop all rows where all the columns are empty
        if (length(my_data) > 0 ) {
+         my_data <- my_data[rowSums(is.na(my_data) | is.null(my_data) | my_data == "") != ncol(my_data),]
          my_colnames <- colnames(my_data)
          shinyjs::show(id="displayidLeft")
          parmsToProcess <- fun.findVariableToProcess(my_colnames, getDateCols= FALSE)
-         updateWorkFlowState("step1","success")
+         workflowStatus$elementId="step1"
+         workflowStatus$state="success"
+        
          shinyjs::show(id="dateTimeBoxButton")
          
          #goes to left panel
@@ -158,7 +163,7 @@ function(input, output, session) {
                                       label="Hide Selection", icon= icon("arrow-down"))
                        )
                    ),
-                   div(id="dateAndTimeError", style="padding:2px;"),
+                   div(id="dateAndTimeError"),
                    box(width="100%",class="displayed",id="dateBox",
                        div(
                          style = "margin-left:10px",
@@ -193,8 +198,8 @@ function(input, output, session) {
                )),
                fluidRow(
                  tags$div(
-                   id = "display_all_raw_ts_div", style = "height:100%;width:100%;display:none;",
-                   column(width = 12, plotlyOutput("display_all_raw_ts"))
+                   id = "display_all_raw_ts_div", style = "height:100%;width:100%;display:none",
+                   column(width = 12, rawTSModuleUI("displayRawTS"))
                  ) # end of div
                ) # fluidRow end
            ) # end of mainBox
@@ -224,21 +229,13 @@ function(input, output, session) {
           fun.rawData = userData,
           fun.date.org = dateAndTimeFields$dateColumnNums()
         )
-      },
-      error = function(parsingMsg) {
-        print(parsingMsg)
-      },
-      warning = function(parsingMsg) {
-        #, id=paste0(errorDivId, "innerDiv")
-        processedMsg <- prepareDateFormatErrorMsg(parsingMsg, tab = tabName)
-        shinyjs::runjs(paste0("$('#",errorDivId,"').text('",processedMsg,"')"))
-        shinyjs::addClass(errorDivId, "alert alert-danger")
-
-      },
-      message = function(parsingMsg) {
-        print(parsingMsg)
-      }
-    )
+      },error = function(parsingMsg) {
+        processErrors(parsingMsg, tab = tabName, elementId=errorDivId)
+      }, warning = function(parsingMsg){
+        processErrors(parsingMsg, tab = tabName, elementId=errorDivId)
+      }, message = function(parsingMsg) {
+        processErrors(parsingMsg, tab = tabName, elementId=errorDivId)
+      }) #end of tryCatch
     return(userDataL)
   }
   
@@ -332,109 +329,83 @@ function(input, output, session) {
   })
 
   observeEvent(input$showrawTS,{
-
-    # output$display_all_raw_ts <- renderUI({
-    #   withSpinner(plotlyOutput(outputId="all_raw_ts"))
-    # })
     shinyjs::show(id="display_all_raw_ts_div")
+    shinyjs::removeClass("dateAndTimeError", "alert alert-danger")
     raw_data <- uploaded_data()
     homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data())
     showRawDateAndTime <- homeDTvalues$homeDateAndTime
-    
+  
     #display_validation_msgs dateBox
     if (showRawDateAndTime$isTimeValid() & showRawDateAndTime$isDateAndtimeValid()) {
       tryCatch({
-        my_raw_choices = showRawDateAndTime$parmToProcess()
         # if error had occured then on fix reset the step
-        shinyjs::removeClass("step3", "btn-danger")
-        shinyjs::addClass("step3", "btn-primary")
-        
-        #shinyjs::runjs("$('#display_validation_msgs').empty()")
+        shinyjs::removeClass("statusWorkflow-step3", "btn-danger")
+        shinyjs::addClass("statusWorkflow-step3", "btn-primary")
         formated_raw_data$derivedDF <- getFormattedRawData(showRawDateAndTime, raw_data, tabName = "homePage", errorDivId = "dateAndTimeError")
-        raw_data <- formated_raw_data$derivedDF
-        #print(formated_raw_data$derivedDF)
-    
-        if (!is.null(my_raw_choices) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted),])){
-          timediff <- get_interval(raw_data$date.formatted)
-          timediff <- ifelse(timediff == "min", "15 mins", timediff)
-             uploaded_raw_data  <- raw_data %>% 
-               mutate(date.formatted = as.POSIXct(date.formatted)) %>%
-               complete(date.formatted = seq(min(date.formatted,na.rm = TRUE), max(date.formatted, na.rm = TRUE), by=timediff)) %>%
-               select(c(showRawDateAndTime$parmToProcess()), "Date" = c(date.formatted)) %>%
-               gather(key = "parameter", value = "value", -Date)
-              
-              main_range = calculate_time_range(as.list(uploaded_raw_data))
-              mainBreaks = main_range[[1]]
-              main_x_date_label = main_range[[2]]
-              
-              p <- ggplot(data = uploaded_raw_data, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
-                geom_line(aes(colour=parameter)) +
-                labs(title="Uploaded data", x="Date", y="Parameters")+
-                scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+
-                theme_bw()+
-                theme(
-                  strip.background = element_blank()
-                  ,strip.text.y = element_blank()
-                  ,strip.placement = "outside" 
-                  ,text=element_text(size=10,face = "bold", color="cornflowerblue")
-                  ,plot.title = element_text(hjust=0.5)
-                  ,legend.position="bottom"
-                  ,axis.text.x=element_text(angle=65, hjust=10)
-                 )
-                 p = p + facet_grid(parameter ~ ., scales = "free_y")
-               
-                 output$display_all_raw_ts <- renderPlotly({
-                  ggplotly(p, height = calulatePlotHeight(length(my_raw_choices) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
-                })
-                overridePotlyStyle("display_all_raw_ts")
-                #click the button to hide the selection box
-                shinyjs::runjs("$('#dateTimeBoxButton').click()")
-                shinyjs::runjs("$('html, body').animate({scrollTop: $(document).height()},2000)")
-              } else {
-                shinyAlertUI("common_alert_msg" , invalidDateFormt, "ERROR")
-              }
-       
-    
+        rawTSModuleServer("displayRawTS", showRawDateAndTime, formated_raw_data)
+        workflowStatus$elementId="step2"
+        workflowStatus$state="success"
       },error = function(parsingMsg) {
-        output$display_validation_msgs <- renderUI({
-          prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
-        })
+          processErrors(parsingMsg, tab = "homePage", elementId="dateAndTimeError")
+          workflowStatus$elementId="step2"
+          workflowStatus$state="error"
       }, warning = function(parsingMsg){
-        output$display_validation_msgs <- renderUI({
-          prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
-        })
+          processErrors(parsingMsg, tab = "homePage", elementId="dateAndTimeError")
+          workflowStatus$elementId="step2"
+          workflowStatus$state="error"
       }, message = function(parsingMsg) {
-        output$display_validation_msgs <- renderUI({
-          prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
-        })
+          processErrors(parsingMsg, tab = "homePage", elementId="dateAndTimeError")
+          workflowStatus$elementId="step2"
+          workflowStatus$state="error"
       }) #end of tryCatch
     } #end of validation check
   })  ## observeEvent end
+  
+  
+  processErrors <- function (errorMsg, tabName="", elementId) {
+    processedMsg <- prepareDateFormatErrorMsg(errorMsg, tab = tabName)
+    shinyjs::runjs(paste0("$('#",elementId,"').text('",processedMsg,"')"))
+    shinyjs::addClass(elementId, "alert alert-danger")
+  }
+  
 
+  observe({
+    if(dailyStatusCalculated$status == "finished") {
+      workflowStatus$elementId="step4"
+      workflowStatus$state="success"
+      workflowStatus$elementId="step5"
+      workflowStatus$state="success"
+    } else if(dailyStatusCalculated$status == "error") {
+      workflowStatus$elementId="step4"
+      workflowStatus$state="error"
+    }
+  })
+
+ 
   observeEvent(input$runQS,{
-    
-    #shinyjs::runjs("$('#display_validation_msgs').empty()")
     tryCatch({
-      #shinyjs::runjs("$('#dateAndTimeErrorinnerDiv').remove()")
       raw_data <- uploaded_data()
       homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data())
       localHomeDateAndTime <- homeDTvalues$homeDateAndTime
-      #It does not stop user, just warns them
-      #validateSiteId(raw_data)
       #display_validation_msgs dateBox
       if (localHomeDateAndTime$isTimeValid() & localHomeDateAndTime$isDateAndtimeValid()) {
          # output$display_quick_summary_table <- renderUI({
          #    column(12, align = "center", withSpinner(tableOutput("quick_summary_table")))
          #  })
           # update the reactiveValues
-          raw_data <- getFormattedRawData(localHomeDateAndTime, raw_data, tabName = "homePage", errorDivId = "dateAndTimeError")
+          #All the variables are selected
+          workflowStatus$elementId="step2"
+          workflowStatus$state="success"
+          raw_data <- getFormattedRawData(localHomeDateAndTime, raw_data, tabName="homePage", errorDivId="dateAndTimeError")
           #now shorten the varname
           if ("date.formatted" %in% colnames(raw_data) & !is.null(localHomeDateAndTime$parmToProcess()) & nrow(raw_data) != nrow(raw_data[is.na(raw_data$date.formatted), ])) {
              print("passed fun.ConvertDateFormat")
             
+             #set dateRange for other modules
              formated_raw_data$derivedDF <- raw_data
              dateRange$min <- min(as.Date(raw_data$date.formatted), na.rm = TRUE)
              dateRange$max <- max(as.Date(raw_data$date.formatted), na.rm = TRUE)
+             raw_data_columns$date_column_name = "date.formatted"
              
              # now shorten the varname
              raw_data <- formated_raw_data$derivedDF
@@ -443,57 +414,33 @@ function(input, output, session) {
               output$display_fill_data <- renderUI({
                 metaDataUI("metaDataHome")
               })
-          
-          output$display_actionButton_calculateDailyStatistics <-
-            renderUI({
-              tagList(
-              hr(),
-              actionButton(inputId = "calculateDailyStatistics",
-                           label = "Step 4: Calculate daily statistics",
-                           class="btn btn-primary"
-                           )
-              )
-            })
-          
-          ## change the actionButton to downloadButton
-          output$display_actionButton_saveDailyStatistics <- renderUI({
-            tagList(
-            hr(),
-            downloadButton(outputId = "saveDailyStatistics",
-                           label = "Save daily statistics",
-                           class="btn btn-primary",
-                           style = "padding-left:15px;padding-right:15px;display:none;")
-            )
-          })
-          
-            #click the button to hide the selection box
-            shinyjs::runjs("$('#dateTimeBoxButton').click()")
+
+              shinyjs::runjs("$('#dateTimeBoxButton').click()")
+            
             if(workflowStatus$finish==FALSE) {
-              updateWorkFlowState("step3", "success")
+                workflowStatus$elementId="step3"
+                workflowStatus$state="success"
+                readyForCalculation$status <- TRUE
             }
+              output$display_actionButton_calculateDailyStatistics <-
+                renderUI({calculateDailyStatsModuleUI("calculateDailyStats", readyForCalculation)})
            
           } else {
             #shinyAlertUI("common_alert_msg" , invalidDateFormt, "ERROR")
             print("it should have updated users on the UI")
           }     
         }
-    },error = function(parsingMsg) {
-      output$errorMsg <- renderUI({
-        print(parsingMsg)
-        prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
-      })
-    }, warning = function(parsingMsg){
-      output$errorMsg <- renderUI({
-        print(parsingMsg)
-        prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
-      })
-    }, message = function(parsingMsg) {
-      output$errorMsg <- renderUI({
-        print(parsingMsg)
-        prepareDateFormatErrorMsg(parsingMsg, tab="homePage")
-      })
-    })
-
+      },error = function(parsingMsg) {
+        processErrors(parsingMsg, tab = "homePage", elementId="dateAndTimeError")
+        readyForCalculation$status <- FALSE
+      }, warning = function(parsingMsg){
+        processErrors(parsingMsg, tab = "homePage", elementId="dateAndTimeError")
+        readyForCalculation$status <- FALSE
+      }, message = function(parsingMsg) {
+        processErrors(parsingMsg, tab = "homePage", elementId="dateAndTimeError")
+        readyForCalculation$status <- FALSE
+      }) #end of tryCatch
+ 
   })  ## observeEvent end
 
   ## close the warning messages inside the above oberveEvent
@@ -502,119 +449,7 @@ function(input, output, session) {
     #print(input$alert_no_date)
     shinyjs::runjs("swal.close();")
   })
-  
-  ### when user clicked actionButton "calculateDailyStatistics"
 
-  observeEvent(input$calculateDailyStatistics,{
-    tryCatch({
-    raw_data <- uploaded_data()
-    
-    withProgress(message = paste("Calculating the daily statistics"), value = 0, {
-      incProgress(0, detail = "now... ")
-    raw_data <- formated_raw_data$derivedDF
-    #print(head(raw_data)) 
-    ##print(formated_raw_data$derivedDF)
-    dateRange$min <- min(as.Date(raw_data$date.formatted), na.rm = TRUE)
-    dateRange$max <- max(as.Date(raw_data$date.formatted), na.rm = TRUE)
-    variables_to_calculate <- homeDTvalues$homeDateAndTime$parmToProcess()
-    raw_data_columns$date_column_name = "date.formatted"
-    ## how to handle "fail" or "suspect" measurements
-    print("ng test calculateDaily")
-    print(metaHomeValues$metaVal$fillMissingData2())
-    print(metaHomeValues$metaVal$exclude_flagged2())
-    print(metaHomeValues$metaVal$how_to_save2())
-
-    if (is.null(metaHomeValues$metaVal$fillMissingData2())) {
-      ContData.env$myStats.Fails.Exclude <- FALSE
-      ContData.env$myStats.Suspects.Exclude <- FALSE
-    }
-    if ("fail" %in% metaHomeValues$metaVal$fillMissingData2()) {
-      print(paste0("check the exclude flagged choices are:", metaHomeValues$metaVal$fillMissingData2()))
-      ContData.env$myStats.Fails.Exclude <- TRUE
-    } else {
-      ContData.env$myStats.Fails.Exclude <- FALSE
-    }
-    if ("suspect" %in% metaHomeValues$metaVal$fillMissingData2()) {
-      print(paste0("check the exclude flagged choices are:", metaHomeValues$metaVal$fillMissingData2()))
-      ContData.env$myStats.Suspects.Exclude <- TRUE
-    } else {
-      ContData.env$myStats.Suspects.Exclude <- FALSE
-    }
-    if ("flag not known" %in% metaHomeValues$metaVal$fillMissingData2()) {
-      # do nothing, logic is not there in the sumStts.updated function
-      print("Just for testing")
-    }
-     
-     
-     # Fill missing data
-     ContData.env$myStats.missing.data.fill = metaHomeValues$metaVal$fillMissingData2()
-
-     dailyStats <- SumStats.updated(fun.myFile=NULL
-                                   ,fun.myDir.import=NULL
-                                   ,fun.myParam.Name=variables_to_calculate
-                                   ,fun.myDateTime.Name=raw_data_columns$date_column_name
-                                   ,fun.myDateTime.Format="%Y-%m-%d %H:%M:%S"
-                                   ,fun.myThreshold=20
-                                   ,fun.myConfig=""
-                                   ,df.input=raw_data
-                                   )
-      processed$processed_dailyStats <- dailyStats
-      shinyjs::show(id="saveDailyStatistics")
-      updateWorkFlowState("step4", "success")
-      updateWorkFlowState("step5", "success")
-      incProgress(1/1, detail = "Calculated the daily statistics")
-    })
-    } ,error = function(parsingMsg) {
-      updateWorkFlowState("step4", "error")
-      print(parsingMsg$message)
-    })
-  
-  })
-
-  output$saveDailyStatistics <- downloadHandler(
-    
-    filename = function(){
-      name_in_file <- loaded_data$name
-      if (endsWith(loaded_data$name,".csv")) name_in_file <- sub(".csv$","",loaded_data$name)
-      if (endsWith(loaded_data$name,".xlsx")) name_in_file <- sub(".xlsx$","",loaded_data$name)
-  
-      if (metaHomeValues$metaVal$how_to_save2() == "save2") {
-        paste0("saved_dailyStats_", name_in_file, "_dailyStats.csv")
-      } else if (metaHomeValues$metaVal$how_to_save2() == "save1") {
-        paste0("saved_dailyStats_", name_in_file, ".zip")
-      } else if (metaHomeValues$metaVal$how_to_save2() == "save4") {
-        paste0("saved_dailyStats_wqx_", name_in_file, ".csv")
-      }
-    },
-
-    content = function(file){
-      if (metaHomeValues$metaVal$how_to_save2() == "save2") {
-        combined_data <- Reduce(full_join, processed$processed_dailyStats)
-        write.csv(combined_data, file, row.names = FALSE)
-      } else if (metaHomeValues$metaVal$how_to_save2() == "save4") {
-        wqxData <- Reduce(full_join, processed$processed_dailyStats)
-        wqxData <- wqxData %>%
-          gather(key = "CharacteristicName", value = "Value", -Date)
-        write.csv(wqxData, file, row.names = FALSE)
-      } else if (metaHomeValues$metaVal$how_to_save2() == "save1") {
-        owd <- setwd(tempdir())
-        on.exit(setwd(owd))
-        files <- NULL
-        for (i in 1:length(processed$processed_dailyStats)) {
-          name_i <- names(processed$processed_dailyStats)[i]
-          print(name_i)
-          filename <- paste0("saved_dailyStats_", loaded_data$name, "_", name_i, "_dailyStats.csv")
-          write.csv(processed$processed_dailyStats[[i]], filename, row.names = FALSE)
-          files <- c(filename, files)
-        }
-        zip::zip(file, files)
-      }
-    }
-
-  )
-  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Data Exploration####
-  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   observeEvent(input[["tabset"]], {
     ### DE, ALL, summary table ####
@@ -1346,7 +1181,7 @@ function(input, output, session) {
                                  label="Hide Selection", icon= icon("arrow-down"))
                   )
               ),
-              div(uiOutput("disDateAndTimeError")),
+              div(uiOutput("disDateAndTimeError"), style="padding:4px;"),
               box(width="100%",class="displayed",id="dateBox_discrete",
                   div(
                     style = "margin-left:10px",
@@ -1401,7 +1236,7 @@ function(input, output, session) {
   
  # draw_discrete_stats <- function(renderStatus=FALSE){
   observeEvent(input$display_discrete_data, {
-    shinyjs::runjs("$('#disDateAndTimeErrorinnerDiv').remove()")
+    
     discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData())
     localDiscreteDateAndTime <- discreteDTvalues$disDateAndTime
     mainPlot <- NULL
@@ -1432,7 +1267,6 @@ function(input, output, session) {
                     mutate(Date = as.POSIXct(Date)) %>%
                     complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff))
                 
-                
                 #write.csv(step1,"step1.csv",row.names=FALSE)
                 
                 tempdf <- as.data.frame(qpcR:::cbind.na(step1,step2))
@@ -1443,6 +1277,7 @@ function(input, output, session) {
               combinded_df$bothValues <- c(paste("\nContinuous Value: ", combinded_df$Matching_Continuous_value, "\n",
                                                       "Discrete Value: ", combinded_df$discrete_value, "\n"
                                               ))
+             
 
               
               # shared x axis so calculate using base data file
@@ -1468,22 +1303,12 @@ function(input, output, session) {
           return(mainPlot)
         }
       },error = function(parsingMsg) {
-        print(parsingMsg)
-        output$display_validation_msgs_discrete <- renderUI({
-          print(parsingMsg)
-          prepareDateFormatErrorMsg(parsingMsg)
-        })
+        processErrors(parsingMsg,  elementId="disDateAndTimeError")
       }, warning = function(parsingMsg){
-          print(parsingMsg)
-          output$display_validation_msgs_discrete <- renderUI({
-            prepareDateFormatErrorMsg(parsingMsg)
-          })
+        processErrors(parsingMsg,  elementId="disDateAndTimeError")
       }, message = function(parsingMsg) {
-        print(parsingMsg)
-        output$display_validation_msgs_discrete <- renderUI({
-          prepareDateFormatErrorMsg(parsingMsg)
-        })
-      })
+        processErrors(parsingMsg,  elementId="disDateAndTimeError")
+      }) #end of tryCatch
     }
   })
  
@@ -1584,23 +1409,12 @@ function(input, output, session) {
                   }
                 }
                return(mainPlot)
-            
               },error = function(parsingMsg) {
-                print(parsingMsg)
-                output$display_validation_msgs_new <- renderUI({
-                  print(parsingMsg)
-                  prepareDateFormatErrorMsg(parsingMsg)
-                })
+                processErrors(parsingMsg,elementId="newDateAndTimeError")
               }, warning = function(parsingMsg){
-                print(parsingMsg)
-                output$display_validation_msgs_new <- renderUI({
-                  prepareDateFormatErrorMsg(parsingMsg)
-                })
+                processErrors(parsingMsg,elementId="newDateAndTimeError")
               }, message = function(parsingMsg) {
-                print(parsingMsg)
-                output$display_validation_msgs_new <- renderUI({
-                  prepareDateFormatErrorMsg(parsingMsg)
-                })
+                processErrors(parsingMsg,elementId="newDateAndTimeError")
               }, finally = {
                  return(mainPlot)
               })
@@ -1755,7 +1569,7 @@ function(input, output, session) {
         theme_bw()+
         theme(
           strip.background = element_blank()
-          ,strip.text.y = element_blank()
+          #,strip.text.y = element_blank()
           ,strip.placement = "outside" 
           ,text=element_text(size=10,face = "bold", color="cornflowerblue")
           ,plot.title = element_text(hjust=0.5)
@@ -3416,7 +3230,7 @@ function(input, output, session) {
    discrete <- mergedDataSet$df 
      mainPlot <- ggplot(data=mergedDataSet, dynamicTicks = TRUE, aes(name=bothValues, group=df)) +
      geom_line(inherit.aes = FALSE, aes(x=as.POSIXct(Date), y=continuous_value, colour=df))+
-     geom_point(inherit.aes = TRUE, aes(x=as.POSIXct(discrete_Date), y=discrete_value, shape=discrete, colour="black"))+
+     geom_point(inherit.aes = TRUE, aes(x=as.POSIXct(discrete_Date), y=discrete_value, shape=discrete, colour="discrete"))+
      labs(title=mapTitle, x="Date", y="Parameters")+
      scale_x_datetime(date_labels=xDateLabel,date_breaks=xDateBrakes)+
      theme_bw()+
@@ -3512,9 +3326,12 @@ function(input, output, session) {
 
   prepareDateFormatErrorMsg <- function(errorMsg, tab="") {
     if(tab == "homePage") {
-      updateWorkFlowState("step3", "error")
+      workflowStatus$elementId="step3"
+      workflowStatus$state="error"
+      dailyStatusCalculated$status <- "unfinished"
+      readyForCalculation$status <- FALSE
     }
-    changeButtonState(state="disable", btnList=c("calculateDailyStatistics","saveDailyStatistics"))
+    readyForCalculation$status <- FALSE
     if(grepl("All formats failed to parse. No formats found.",errorMsg[1], fixed = TRUE ) 
        | grepl( "failed to parse", errorMsg[1], fixed = TRUE)) {
        formattedError = "There is a mismatch between uploaded file date format and selected date format, please correct and try again."
@@ -3553,37 +3370,40 @@ function(input, output, session) {
     options(repr.plot.width = width, repr.plot.height = heigth)
   }
   
-  # debug_msg <- function(...) {
-  #   is_local <- Sys.getenv('SHINY_PORT') == ""
-  #   in_shiny <- !is.null(shiny::getDefaultReactiveDomain())
-  #   txt <- toString(list(...))
-  #   if (is_local) message(txt)
-  #   if (in_shiny) shinyjs::runjs(sprintf("console.debug(\"%s\")", txt))
-  # }
-  
+
   uploadFile <- function(uploadedFile, stopExecution=FALSE, tab="") {
     my_data <- NULL
+    otherExtension <- FALSE
     loaded_data$name <- uploadedFile$name
     if(grepl("csv$",uploadedFile$datapath)){
       my_data<-import_raw_data(uploadedFile$datapath,"csv",has_header=TRUE)
     } else if(grepl("xlsx$",uploadedFile$datapath)){
       my_data<-import_raw_data(uploadedFile$datapath,"xlsx",has_header=TRUE)
+    } else {
+      otherExtension <- TRUE
     }
     
     if(!is.null(my_data)) {
       if(tab == "homePage") {
         workflowStatus$finish = FALSE
-        updateWorkFlowState(elementId= "step1", state="success")
+        workflowStatus$elementId="step1"
+        workflowStatus$state="success"
       }
       return(my_data)
+      
     } else {
       if(tab == "homePage") {
          workflowStatus$finish = FALSE
-         updateWorkFlowState(elementId= "step1", state="error")
+         workflowStatus$elementId="step1"
+         workflowStatus$state="error"
       }
-      shinyAlertUI("common_alert_msg", wrongDataFormat, "ERROR")
-      if(stopExecution== TRUE) {
-        stop()
+      if(otherExtension == TRUE) {
+        shinyAlertUI("common_alert_msg", "Uploaded your data in .csv format.", "ERROR")
+      } else {
+        shinyAlertUI("common_alert_msg", wrongDataFormat, "ERROR")
+      }
+      if(stopExecution == TRUE) {
+         stop()
       }
     }
   }
@@ -3591,128 +3411,9 @@ function(input, output, session) {
   observeEvent(input$common_alert_msg,{
     shinyjs::runjs("swal.close();")
   })
+  
   shinyAlertUI <- function(id,msg,type) {
 	  shinyalert(inputId=id,type,msg,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK")
-  }
-  
-
-  updateWorkFlowState <- function(elementId, state) {
- 
-    if(elementId == "step1" & state == "success") {
-      removeCssClasses()
-      addSuccessClass(c("step1"))
-      addPrimaryClass(c("step2","step3","step4","step5"))
-      changeButtonState(state="disable", btnList=c("runQS","display_raw_ts","calculateDailyStatistics","saveDailyStatistics"))
-      changeButtonState(state="enable", btnList=c("display_raw_ts"))
-    } else if(elementId == "step1" & state == "error") {
-      removeCssClasses()
-      shinyjs::addClass("step1", "btn-danger")
-      addPrimaryClass(c("step2","step3","step4","step5"))
-      changeButtonState(state="disable", btnList=c("display_raw_ts","runQS","calculateDailyStatistics","saveDailyStatistics"))
-      workflowStatus$finish=FALSE
-    }
-    
-    else if(elementId == "step2" & state == "success") {
-      removeCssClasses()
-      addPrimaryClass(c("step3","step4","step5"))
-      addSuccessClass(c("step1","step2"))
-      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS","display_raw_ts"))
-    } else if(elementId == "step2" & state == "error") {
-      removeCssClasses()
-      shinyjs::addClass("step2", "btn-danger")
-      addPrimaryClass(c("step3","step4","step5"))
-      addSuccessClass(c("step1"))
-      changeButtonState(state="disable", btnList=c("display_raw_ts","calculateDailyStatistics","saveDailyStatistics"))
-      changeButtonState(state="enable", btnList=c("runQS","display_raw_ts"))
-      workflowStatus$finish=FALSE
-    }
-    
-    else if(elementId == "step3" & state == "success") {
-      removeCssClasses()
-      addSuccessClass(c("step1","step2","step3"))
-      addPrimaryClass(c("step4","step5"))
-      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS"))
-      js$enableTab("downloadData")
-      js$enableTab("discreateDataEx")
-    } else if(elementId == "step3" & state == "error") {
-      removeCssClasses()
-      shinyjs::addClass("step3", "btn-danger")
-      addPrimaryClass(c("step4","step5"))
-      addSuccessClass(c("step1","step2"))
-      changeButtonState(state="disable", btnList=c("calculateDailyStatistics","saveDailyStatistics"))
-      changeButtonState(state="enable", btnList=c("runQS","display_raw_ts"))
-      workflowStatus$finish=FALSE
-    }
-    
-    else if(elementId == "step4" & state == "success") {
-      removeCssClasses()
-      addSuccessClass(c("step1","step2","step3","step4"))
-      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS","calculateDailyStatistics","saveDailyStatistics"))
-      addPrimaryClass(c("step5"))
-    } else if(elementId == "step4" & state == "error") {
-      removeCssClasses()
-      shinyjs::addClass("step4", "btn-danger")
-      addSuccessClass(c("step1","step2","step3"))
-      addPrimaryClass(c("step5"))
-      changeButtonState(state="disable", btnList=c("calculateDailyStatistics","saveDailyStatistics"))
-      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS"))
-      workflowStatus$finish=FALSE
-    }
-    
-    else if(elementId == "step5" & state == "success") {
-      removeCssClasses()
-      addSuccessClass(c("step1","step2","step3","step4","step5"))
-      js$enableTab("DataExploration")
-      # js$enableTab("CreateReport")
-      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS","calculateDailyStatistics","saveDailyStatistics"))
-      workflowStatus$finish = TRUE
-    } else if(elementId == "step4" & state == "error") {
-      removeCssClasses()
-      shinyjs::addClass("step5", "btn-danger")
-      addSuccessClass(c("step1","step2","step3","step4"))
-      changeButtonState(state="disable", btnList=c("calculateDailyStatistics","saveDailyStatistics"))
-      changeButtonState(state="enable", btnList=c("display_raw_ts","runQS","display_raw_ts"))
-      workflowStatus$finish=FALSE
-    }
-    if(elementId %in% c("step1","step2","step3","step4")) {
-        js$disableTab("DataExploration")
-    }
-    if(elementId %in% c("step1","step2")) {
-      js$disableTab("downloadData")
-      js$disableTab("discreateDataEx")
-    }
-    
-  }
-  
-  changeButtonState <- function(state, btnList) {
-    if(state == "enable") {
-      for(b in btnList) {
-        enable(b)
-      }
-    } else if(state =="disable"){
-      for(b in btnList) {
-        disable(b)
-      }
-    }
-  }
-  
-  removeCssClasses <- function(){
-    cssClasses <- c("btn-success","btn-primary","btn-danger")
-    elementIds <- c("step1","step2","step3", "step4","step5")
-    for(e in elementIds) { 
-      for (c in cssClasses) {
-        shinyjs::removeClass(e, c)      }
-    }
-  }
-  addPrimaryClass <- function(elmentIds){
-    for(e in elmentIds) { 
-      shinyjs::addClass(e, "btn-primary")
-    }
-  }
-  addSuccessClass <- function(elmentIds) {
-    for(e in elmentIds) { 
-      shinyjs::addClass(e, "btn-success")
-    }
   }
   
 }

@@ -6980,7 +6980,7 @@
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
     ".RData": {
-      "checksum": "e0765e01ff3750597ef129992fa42634"
+      "checksum": "f739ea86a8247b2fd5eda3e7f72fc9b1"
     },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
@@ -7199,7 +7199,7 @@
       "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
     },
     "global.R": {
-      "checksum": "ac0dcb382e28adee8f6750f38e3fd332"
+      "checksum": "36c5556c8167a7cbe4b3cde9d90edb2e"
     },
     "help_text_files/Hydrology_IHA.txt": {
       "checksum": "221c734e8fc1313660b66acaaae49f61"
@@ -7225,6 +7225,9 @@
     "manyGageTest.csv": {
       "checksum": "09d6f4bb2029f39f076a2172b191c95c"
     },
+    "modules/calculateDailyStatsModule.R": {
+      "checksum": "43c8b0cd20a1906da6887920f53a0f35"
+    },
     "modules/dateAndTimeModule.R": {
       "checksum": "74a9ab71f1dec5846fa91016dbcdb419"
     },
@@ -7237,8 +7240,11 @@
     "modules/metaDataModule.R": {
       "checksum": "e123ecceddd0a718fe0a277ece1f677d"
     },
-    "modules/validateDateAndTimeModule.R": {
-      "checksum": "0b491fd4e5c302c7f7d3b451947cbd14"
+    "modules/progressWorkflowModule.R": {
+      "checksum": "e7eae94dcb8ddd36830be17cdbc163ae"
+    },
+    "modules/rawTSmodule.R": {
+      "checksum": "337903a824da53fa0a8f016d84d008c7"
     },
     "Output/reports/myReport.html": {
       "checksum": "409c923b7b56ece270a890064d734b9a"
@@ -7307,16 +7313,13 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "7e3926afb7c14795333fdbac4dd0f4c5"
+      "checksum": "6b51b8442523f0fb3c9e059088e7cce2"
     },
-    "sumVizUtils/fun.calculate.time.breaks.R": {
-      "checksum": "bbad3d7c1d53dc1a63b2b07007d579a6"
+    "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230510.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
     },
-    "sumVizUtils/fun.fillMissingData.R": {
-      "checksum": "69dae1dbd41d0289bc94275936953f2e"
-    },
-    "sumVizUtils/fun.findVariableToProcess.R": {
-      "checksum": "703f9f5e1872c17701ce31350b4c3010"
+    "sumVizUtils/common.functions.R": {
+      "checksum": "8ca96d962707aa3d55e1f1477f6523f4"
     },
     "sumVizUtils/fun.getMetaSummary.R": {
       "checksum": "26f57bc9af7ed627202338e381754f0c"
@@ -7325,7 +7328,7 @@
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
     },
     "ui.R": {
-      "checksum": "00ba888afd92bf3b6593f7769b704911"
+      "checksum": "dfff5fe5f922c4e6a963c4efa1563931"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
