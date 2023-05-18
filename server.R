@@ -1446,7 +1446,7 @@ function(input, output, session) {
   
   #Download USGS gage data
   observeEvent(input$display_gage_ts, {
-    
+     message("invoking download. Below code statement also has two ampersands")
      if(input$gage_id != "" && length(input$gage_id) > 0) {
       #data <- uploaded_data()
       consoleUSGS$disp <- data.frame(consoleOutputUSGS = character())
@@ -1472,10 +1472,14 @@ function(input, output, session) {
       #print(gageRawData$gagedata)
 
       allVars <- colnames(gageRawData$gagedata)
+      message("printing downloaded data")
+      print(gageRawData$gagedata)
       varsToPlot <- allVars[!(allVars %in% c("SiteID","GageID","Date.Time"))]
+      print("parepared values for the dropdown")
       updateSelectizeInput(session, 'gaze_params', choices = varsToPlot, selected = varsToPlot[1])
+      print("done updating the dynamich dropdown")
       shinyjs::show(id="gageVarsDiv")
-
+      print("done calling shinyjs to show the hidden dropdown")
       #Names the single column of the R console output data.frame
       colnames(consoleUSGS$disp) <- "R console messages for all USGS data retrieval:"
      } else {
@@ -3112,12 +3116,15 @@ function(input, output, session) {
 
   
   observeEvent(input$display_gage_raw, {
+    print("invoked plotting gage raw data")
     if (input$gage_id != "" & length(input$gage_id) > 0 & nrow(gageRawData$gagedata) > 0 & length(input$gaze_params) > 0) {
+       print("checked a gage id is there. Now calling the gageRawPlot function")
        gageRawPlot <- fun.gageRawPlot(fun.gage.data = gageRawData$gagedata,
                              fun.gage.vars.to.process = input$gaze_params,
                              fun.internal = TRUE)
 
       output$display_downloaded_data <- renderPlotly({
+        print("got the plot object in the server.R at line number 3127")
         ggplotly(gageRawPlot, height = calulatePlotHeight(length(input$gaze_params) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
       })
       overridePotlyStyle("display_downloaded_data")
