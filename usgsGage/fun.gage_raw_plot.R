@@ -14,7 +14,7 @@ fun.gageRawPlot <- function(
 
         raw_data_merged <- fun.gage.data
         # covers if user removes GageId from the dropdown
-        if(fun.gage.vars.to.process != "" && length(fun.gage.vars.to.process) > 0) {
+        if(length(fun.gage.vars.to.process) > 0) {
           raw_data_merged  <- raw_data_merged %>%
             select(any_of(fun.gage.vars.to.process), c("GageID", "Date.Time")) %>%
             gather(key = "parameter", value = "value",-GageID, -Date.Time)

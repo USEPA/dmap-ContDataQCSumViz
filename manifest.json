@@ -7183,7 +7183,7 @@
       "checksum": "2c55ac42cd5e8e36753301cb3b55662e"
     },
     "dayMet/fun.daymet_raw_plot.R": {
-      "checksum": "003cf94466f89141c29bdfc053dab75c"
+      "checksum": "258b9615af07f1a56cdfd2a7c782d2a1"
     },
     "dayMet/fun.DayMetData.R": {
       "checksum": "a31cfec905186df96deb64f0991f729a"
@@ -7369,7 +7369,7 @@
       "checksum": "fc07a28f5b5cd5c5ffad617ad3f9cb55"
     },
     "usgsGage/fun.gage_raw_plot.R": {
-      "checksum": "cbc1c42495a5ddf498f8dfa86c69292d"
+      "checksum": "d2860cbe1c05092d1d42972a72503c4f"
     },
     "usgsGage/fun.gage_stats_plot.R": {
       "checksum": "3a33a754782be20ab67ab38705c59a83"
