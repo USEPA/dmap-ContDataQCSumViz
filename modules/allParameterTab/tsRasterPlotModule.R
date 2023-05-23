@@ -37,7 +37,7 @@ TsRasterPlotModuleServer <- function(id, dailyStats, renderRasterPlot) {
             localStats <- dailyStats
             variables_avail$params <- names(localStats$processed_dailyStats)
             localStats$stats <- localStats$processed_dailyStats
-            print(localStats$stats)
+            #print(localStats$stats)
           })
           
           observe({

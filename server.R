@@ -114,17 +114,16 @@ function(input, output, session) {
   saveToReport <- reactiveValues(metadataTable=data.frame())
   
   dailyStatusCalculated <- reactiveValues(status='unfinished')
-  
   readyForCalculation <- reactiveValues(status=FALSE)
-  
   renderDataExp <- reactiveValues(render=FALSE)
-  
   renderSummaryTables <- reactiveValues(render=FALSE)
-  
   renderTSOverlay <- reactiveValues(render=FALSE)
   renderTSBoxPlot <- reactiveValues(render=FALSE)
   renderCDFPlot <- reactiveValues(render=FALSE)
   renderRasterPlot <- reactiveValues(render=FALSE)
+  
+  #Temperature
+  renderThermalStats <- reactiveValues(render=FALSE)
 
   #  Upload Data##############################
   #EWL
@@ -150,6 +149,7 @@ function(input, output, session) {
   TsCDFPlotModuleServer(id="tsCDFPlot", dailyStats=processed, renderCDFPlot)
   #Continuous Data Exploration > All Parameters > Raster graphs tab
   TsRasterPlotModuleServer(id="tsRasterPlot", dailyStats=processed, renderRasterPlot)
+  
   
    #Home page file upload
   uploaded_data<-eventReactive(c(input$uploaded_data_file),{
@@ -234,6 +234,11 @@ function(input, output, session) {
   })
   
   #init server modules
+  #Continuous Data Exploration >  Temperature > Thermal statistics tab
+  ThermalStatsModuleServer("thermalStats", uploaded_data(), formated_raw_data, dailyStats=processed, loaded_data, to_download, renderThermalStats)
+  
+  
+  
   observeEvent(uploaded_data(), {
     homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data())
   })
@@ -548,69 +553,6 @@ function(input, output, session) {
       sliderInput("n", "N", 1, 1000, 500),
       textInput("label", "Label")
     )
-
-    ############  DE, ALL, Thermal Statistics" << Temperature ############
-    output$thermal_input_1 <- renderUI({
-      variables_avail <- names(uploaded_data())
-      site_keys_in_favor_order <- c("Site","SITE","SiteID","SITEID")
-      possible_site_columns <- site_keys_in_favor_order[site_keys_in_favor_order %in% variables_avail]
-      if (length(possible_site_columns)==0){
-        site_to_select <- variables_avail[grep('site',variables_avail,ignore.case=TRUE)][1]
-      }else{
-        site_to_select <- possible_site_columns[1]
-      }
-      selectizeInput("thermal_SiteID_name",label ="Select SiteID Column",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=site_to_select,
-                     options = list(hideSelected = FALSE))
-    })
-
-    # output$thermal_input_2 <- renderUI({
-    #   variables_avail <- names(uploaded_data())
-    #   date_keys_in_favor_order <- c("Date.Time","DATE.TIME","Year","YEAR","Date","DATE","MonthDay")
-    #   possible_date_columns <- date_keys_in_favor_order[date_keys_in_favor_order %in% variables_avail]
-    #   selectizeInput("thermal_Date_name",label ="Select Date Column",
-    #                  choices=variables_avail,
-    #                  multiple = FALSE,
-    #                  selected=possible_date_columns[1],
-    #                  options = list(hideSelected = FALSE))
-    # })
-
-    output$thermal_input_3 <- renderUI({
-      variables_avail <- names(uploaded_data())
-      temp_keys_in_favor_order <- c("Water.Temp.C","WATER.TEMP.C","Water_Temp_C",
-                                    "WATER_TEMP_C","Air.Temp.C","AIR.TEMP.C","Air_Temp_C","AIR_TEMP_C")
-      possible_temp_columns <- temp_keys_in_favor_order[temp_keys_in_favor_order %in% variables_avail]
-      if (length(possible_temp_columns)==0){
-        temp_to_select <- variables_avail[grep('temp',variables_avail,ignore.case=TRUE)][1]
-      }else{
-        temp_to_select <- possible_temp_columns[1]
-      }
-      selectizeInput("thermal_Temp_name",label ="Select Temperature Column",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected= temp_to_select,
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$display_run_thermal_button <- renderUI({
-      actionButton(inputId="display_thermal", label="Display streamThermal",class="btn btn-primary")
-    })
-
-    output$display_save_thermal_button <- renderUI({
-      downloadButton(outputId="save_thermal", label="Save thermal statistics to excel",class="btn btn-primary")
-    })
-
-    output$display_help_text_thermal_statistics <- renderUI({
-      verbatimTextOutput("help_text_thermal_statistics")
-    })
-
-    output$help_text_thermal_statistics <- renderText({
-      filePath <- "help_text_files/Temperature_ThermalStatistics.txt"
-      fileText <- paste(readLines(filePath,encoding="UTF-8"),collapse="\n")
-      fileText
-    })
 
     ############ DE, TEMP, Air vs water" << Temperature ############
 
@@ -1147,7 +1089,6 @@ function(input, output, session) {
 
   #################  4:Boxplots << All parameters #################
 
-
   ## close the alert messages
   observeEvent(input$alert_data_not_avail_for_box,{
     #print(input$alert_no_date)
@@ -1161,290 +1102,6 @@ function(input, output, session) {
     #print(input$alert_no_date)
     shinyjs::runjs("swal.close();")
   })
-
-
-  #################  1: Thermal Statistics << Temperature  #################
-
-  observeEvent(input$display_thermal, {
-    
-      hide("help_text_thermal_statistics")
-      output$display_thermal_table_1 <- renderUI({
-        withSpinner(dataTableOutput("thermal_statistics_table_1"))
-      })
-    
-      output$display_thermal_table_2 <- renderUI({
-        dataTableOutput("thermal_statistics_table_2")
-      })
-    
-      output$display_thermal_table_3 <- renderUI({
-        dataTableOutput("thermal_statistics_table_3")
-      })
-    
-      output$display_thermal_table_4 <- renderUI({
-        dataTableOutput("thermal_statistics_table_4")
-      })
-    
-      output$display_thermal_table_5 <- renderUI({
-        withSpinner(dataTableOutput("thermal_statistics_table_5"))
-      })
-    
-      myData <- uploaded_data()
-      streamThermal_exported <- Export.StreamThermal(formated_raw_data$derivedDF
-                                                     ,fun.col.SiteID = input$thermal_SiteID_name
-                                                     ,fun.col.Date = "date.formatted"
-                                                     ,fun.col.Temp = input$thermal_Temp_name
-      )
-    
-      ##save(streamThermal_exported, file="test_streamThermal_exported.RData")
-      ST.freq <- T_frequency(streamThermal_exported) %>% mutate_if(is.numeric,round,digits=2)
-      ST.mag  <- T_magnitude(streamThermal_exported) %>% mutate_if(is.numeric,round,digits=2)
-      ST.roc  <- T_rateofchange(streamThermal_exported) %>% mutate_if(is.numeric,round,digits=2)
-      ST.tim  <- T_timing(streamThermal_exported) %>% mutate_if(is.numeric,round,digits=2)
-      ST.var  <- T_variability(streamThermal_exported) %>% mutate_if(is.numeric,round,digits=2)
-    
-      processed$ST.freq <- ST.freq
-      processed$ST.mag <- ST.mag
-      # processed$ST.roc <- ST.roc
-      # processed$ST.tim <- ST.tim
-      # processed$ST.var <- ST.var
-    
-      thermal.statistics.table.options <- list(
-        scrollX = TRUE, #allow user to scroll wide tables horizontally
-        stateSave = FALSE,
-        pageLength = 15,
-        dom = 'Bt',
-        buttons = list('copy','print',list(extend = 'collection',buttons = c('csv','excel','pdf'),text='Download')),
-        columnDefs = list(list(className="dt-center",targets="_all"))
-      )
-    
-      output$thermal_statistics_table_1 <- DT::renderDataTable({
-       table.title.1 <- "Frequency"
-        myTable <- DT::datatable(
-          ST.freq,
-          caption = htmltools::tags$caption(table.title.1,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-          extensions ="Buttons",
-          rownames = FALSE,
-          options = thermal.statistics.table.options
-        ) # dataTable end
-        print(myTable)
-      })  # renderDT end
-    
-    
-      output$thermal_statistics_table_2 <- DT::renderDataTable({
-        table.title.2 <- "Magnitude"
-        myTable <- DT::datatable(
-          ST.mag,
-          caption = htmltools::tags$caption(table.title.2,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-          extensions ="Buttons",
-          rownames = FALSE,
-          options = thermal.statistics.table.options
-        ) # dataTable end
-        print(myTable)
-      })  # renderDT end
-    
-      output$thermal_statistics_table_3 <- DT::renderDataTable({
-        table.title.3 <- "Rate of Change"
-        myTable <- DT::datatable(
-          ST.roc,
-          caption = htmltools::tags$caption(table.title.3,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-          extensions ="Buttons",
-          rownames = FALSE,
-          options = thermal.statistics.table.options
-        ) # dataTable end
-        print(myTable)
-      })  # renderDT end
-    
-      output$thermal_statistics_table_4 <- DT::renderDataTable({
-        table.title.4 <- "Timing"
-        myTable <- DT::datatable(
-          ST.tim,
-          caption = htmltools::tags$caption(table.title.4,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-          extensions ="Buttons",
-          rownames = FALSE,
-          options = thermal.statistics.table.options
-        ) # dataTable end
-        print(myTable)
-      })  # renderDT end
-    
-      output$thermal_statistics_table_5 <- DT::renderDataTable({
-        table.title.5 <- "Variability"
-        myTable <- DT::datatable(
-          ST.var,
-          caption = htmltools::tags$caption(table.title.5,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-          extensions ="Buttons",
-          rownames = FALSE,
-          options = thermal.statistics.table.options
-        ) # dataTable end
-        print(myTable)
-      })  # renderDT end
-    
-      require(XLConnect)
-    
-      # Descriptions
-      #
-      Desc.freq <- "Frequency metrics indicate numbers of days in months or seasons
-      that key events exceed user-defined temperatures. "
-      #
-      Desc.mag <- "Magnitude metrics characterize monthly and seasonal averages and
-      the maximum and minimum from daily temperatures as well as 3-, 7-, 14-, 21-,
-      and 30-day moving averages for mean and maximum daily temperatures."
-      #
-      Desc.roc <- "Rate of change metrics include monthly and seasonal rate of
-      change, which indicates the difference in magnitude of maximum and minimum
-      temperatures divided by number of days between these events."
-      #
-      Desc.tim <- "Timing metrics indicate Julian days of key events including
-      mean, maximum, and minimum temperatures; they also indicate Julian days of
-      mean, maximum, and minimum values over moving windows of specified size."
-      #
-      Desc.var <- "Variability metrics summarize monthly and seasonal range in
-      daily mean temperatures as well as monthly coefficient of variation of daily
-      mean, maximum, and minimum temperatures. Variability metrics also include
-      moving averages for daily ranges and moving variability in extreme
-      temperatures, calculated from differences in average high and low
-      temperatures over various time periods"
-      #
-      Group.Desc <- c(Desc.freq, Desc.mag, Desc.roc, Desc.tim, Desc.var)
-      df.Groups <- as.data.frame(cbind(c("freq","mag","roc","tim","var")
-                                       ,Group.Desc))
-      SiteID <- processed$ST.freq[1,1]
-      myDate <- format(Sys.Date(),"%Y%m%d")
-      myTime <- format(Sys.time(),"%H%M%S")
-    
-      Notes.User <- Sys.getenv("USERNAME")
-      Notes.Names <- c("Dataset (SiteID)", "Analysis.Date (YYYYMMDD)"
-                       , "Analysis.Time (HHMMSS)", "Analysis.User")
-      Notes.Data <- c(SiteID, myDate, myTime, Notes.User)
-      df.Notes <- as.data.frame(cbind(Notes.Names, Notes.Data))
-      ## New File Name
-      fileName <- paste("StreamThermal"
-                    , loaded_data$name
-                    , SiteID
-                    , myDate
-                    , "xlsx"
-                    , sep=".")
-      ## Copy over template with Metric Definitions
-      file.copy(file.path(path.package("ContDataQC")
-                          ,"extdata"
-                          ,"StreamThermal_MetricList.xlsx")
-                , fileName)
-      ## load workbook, create if not existing
-      wb <- loadWorkbook(fileName, create = TRUE)
-      # create sheets
-      createSheet(wb, name = "NOTES")
-      createSheet(wb, name = "freq")
-      createSheet(wb, name = "mag")
-      createSheet(wb, name = "roc")
-      createSheet(wb, name = "tim")
-      createSheet(wb, name = "var")
-      # write to worksheet
-      writeWorksheet(wb, df.Notes, sheet = "NOTES", startRow=1)
-      writeWorksheet(wb, df.Groups, sheet="NOTES", startRow=10)
-      writeWorksheet(wb, processed$ST.freq, sheet = "freq")
-      writeWorksheet(wb, processed$ST.mag, sheet = "mag")
-      writeWorksheet(wb, processed$ST.roc, sheet = "roc")
-      writeWorksheet(wb, processed$ST.tim, sheet = "tim")
-      writeWorksheet(wb, processed$ST.var, sheet = "var")
-      # save workbook
-      to_download$wb <- wb
-      to_download$fileName <- fileName
-  
-
-  }) #observeEvent end
-
-  ## when use actionButton to save thermal statistics to excel file
-
-#   observeEvent(input$save_thermal, {
-#     require(XLConnect)
-#
-#     # Descriptions
-#     #
-#     Desc.freq <- "Frequency metrics indicate numbers of days in months or seasons
-# that key events exceed user-defined temperatures. "
-#     #
-#     Desc.mag <- "Magnitude metrics characterize monthly and seasonal averages and
-# the maximum and minimum from daily temperatures as well as 3-, 7-, 14-, 21-,
-# and 30-day moving averages for mean and maximum daily temperatures."
-#     #
-#     Desc.roc <- "Rate of change metrics include monthly and seasonal rate of
-# change, which indicates the difference in magnitude of maximum and minimum
-# temperatures divided by number of days between these events."
-#     #
-#     Desc.tim <- "Timing metrics indicate Julian days of key events including
-# mean, maximum, and minimum temperatures; they also indicate Julian days of
-# mean, maximum, and minimum values over moving windows of specified size."
-#     #
-#     Desc.var <- "Variability metrics summarize monthly and seasonal range in
-# daily mean temperatures as well as monthly coefficient of variation of daily
-# mean, maximum, and minimum temperatures. Variability metrics also include
-# moving averages for daily ranges and moving variability in extreme
-# temperatures, calculated from differences in average high and low
-# temperatures over various time periods"
-#     #
-#     Group.Desc <- c(Desc.freq, Desc.mag, Desc.roc, Desc.tim, Desc.var)
-#     df.Groups <- as.data.frame(cbind(c("freq","mag","roc","tim","var")
-#                                      ,Group.Desc))
-#     SiteID <- processed$ST.freq[1,1]
-#     myDate <- format(Sys.Date(),"%Y%m%d")
-#     myTime <- format(Sys.time(),"%H%M%S")
-#     Notes.User <- Sys.getenv("USERNAME")
-#
-#     Notes.Names <- c("Dataset (SiteID)", "Analysis.Date (YYYYMMDD)"
-#                      , "Analysis.Time (HHMMSS)", "Analysis.User")
-#     Notes.Data <- c(SiteID, myDate, myTime, Notes.User)
-#     df.Notes <- as.data.frame(cbind(Notes.Names, Notes.Data))
-#     ## New File Name
-#     if (!file.exists("Output/saved_streamThermal/")) dir.create(file.path("Output/saved_streamThermal"),showWarnings = FALSE, recursive = TRUE)
-#     name_in_file <- loaded_data$name
-#     myFile.XLSX <- paste("Output/saved_streamThermal/StreamThermal"
-#                          , name_in_file
-#                          , SiteID
-#                          , myDate
-#                          , myTime
-#                          , "xlsx"
-#                          , sep=".")
-#     ## Copy over template with Metric Definitions
-#     file.copy(file.path(path.package("ContDataQC")
-#                         ,"extdata"
-#                         ,"StreamThermal_MetricList.xlsx")
-#               , myFile.XLSX)
-#     ## load workbook, create if not existing
-#     wb <- loadWorkbook(myFile.XLSX, create = TRUE)
-#     # create sheets
-#     createSheet(wb, name = "NOTES")
-#     createSheet(wb, name = "freq")
-#     createSheet(wb, name = "mag")
-#     createSheet(wb, name = "roc")
-#     createSheet(wb, name = "tim")
-#     createSheet(wb, name = "var")
-#     # write to worksheet
-#     writeWorksheet(wb, df.Notes, sheet = "NOTES", startRow=1)
-#     writeWorksheet(wb, df.Groups, sheet="NOTES", startRow=10)
-#     writeWorksheet(wb, processed$ST.freq, sheet = "freq")
-#     writeWorksheet(wb, processed$ST.mag, sheet = "mag")
-#     writeWorksheet(wb, processed$ST.roc, sheet = "roc")
-#     writeWorksheet(wb, processed$ST.tim, sheet = "tim")
-#     writeWorksheet(wb, processed$ST.var, sheet = "var")
-#     # save workbook
-#     saveWorkbook(wb, myFile.XLSX)
-#
-#   }) # observeEvent close
-#
-
-  output$save_thermal <- downloadHandler(
-
-
-    filename = function(){
-      to_download$fileName
-    },
-
-    content = function(file){
-
-    saveWorkbook(to_download$wb,file)
-
-    }
-
-  ) # downloadHandler close
 
 
 
@@ -2360,7 +2017,16 @@ function(input, output, session) {
 	  shinyalert(inputId=id,type,msg,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK")
   }
   
-
+  
+  
+  # temperatue subtabs
+  observe({
+    if(input$temp_subtabs == "sb1") {
+      renderThermalStats$render <- TRUE
+    }
+  })
+  
+# All Parameters subtabs
   observe({ 
     if(input$all_parameters_subtabs == "tab_time_series") {
       renderDataExp$render <- TRUE
@@ -2375,7 +2041,6 @@ function(input, output, session) {
     } else if (input$all_parameters_subtabs == "tab_raster") {
       renderRasterPlot$render <- TRUE
     } 
-    
   })
   
 }

@@ -81,7 +81,6 @@ TsOverlayModuleServer <- function(id, dailyStats, renderTSOverlay) {
     function(input, output, session) {
           ns <- session$ns
           observe({
-            print("ng observing in tsOverlay")
             localStats <- dailyStats
             variables_avail$params <- names(localStats$processed_dailyStats)
             localStats$stats <- localStats$processed_dailyStats

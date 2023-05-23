@@ -35,7 +35,6 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
     function(input, output, session) {
           ns <- session$ns
           observe({
-            print("ng observing in summaryTables")
             localStats <- dailyStats
             variables_avail$params <- names(localStats$processed_dailyStats)
             localStats$stats <- localStats$processed_dailyStats
@@ -43,8 +42,6 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
           })
           
           observe({
-            print("ng Here")
-            print(renderSummaryTables$render)
             if(renderSummaryTables$render == TRUE) {
                 output$summary_table_input_1 <- renderUI({
                   selectizeInput(ns("summarise_variable_name"),

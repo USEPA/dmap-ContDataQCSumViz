@@ -275,39 +275,7 @@ shinyUI(fluidPage(
                     tabPanel("Thermal statistics",
                       value = "sb1", br(),
                       column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            div(class="panel panel-default",style="margin:10px;",
-                                div(class="panel-heading"),
-                                div(class="panel-body",
-                                    uiOutput("thermal_input_1"),
-                                    uiOutput("thermal_input_2"),
-                                    uiOutput("thermal_input_3"),
-                                    uiOutput("display_run_thermal_button"),
-                                    hr(),
-                                    uiOutput("display_save_thermal_button"),
-                                )#end of panel body
-                            ) # end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            column(
-                              width = 12,
-                              uiOutput("display_help_text_thermal_statistics"),
-                              uiOutput("display_thermal_table_1"),
-                              br(),
-                              uiOutput("display_thermal_table_2"),
-                              br(),
-                              uiOutput("display_thermal_table_3"),
-                              br(),
-                              uiOutput("display_thermal_table_4"),
-                              br(),
-                              uiOutput("display_thermal_table_5")
-                            )
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        width = 12,ThermalStatsModuleUI("thermalStats")
                       ), # column close
                     ),
                     ### DE, Temp, Air v Water ----
