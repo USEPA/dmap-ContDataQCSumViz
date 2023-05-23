@@ -186,6 +186,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
                                             complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff)))
                 
               }
+              mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- tempData
               #mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "min", sep="."), upper_col=paste(varName, "max", sep="."), Date=Date))
             }
           }
