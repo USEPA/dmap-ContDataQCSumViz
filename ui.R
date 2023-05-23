@@ -81,7 +81,7 @@ shinyUI(fluidPage(
                         div(class="panel-heading", "Step 1: Upload File", style="font-weight:bold;", icon("info-circle", style = "color:#2fa4e7", id="fileHelp")),
                         div(class="panel-body",
                             tagList(
-                              bsPopover(id="fileHelp", title="Microsoft Excel and .csv files known issues", content = "Microsoft Excel corrupts .csv files when reopened by double clicking its icon or by using the File Open dialog. You can avoid this by using the Text or Data Import Wizard from the Excel Data Tab.", 
+                              bsPopover(id="fileHelp", title=HTML("<b>Helpful Hints</b>"), content = HTML("Files must contain only one mandatory header row containing column names.</br></br>  Microsoft Excel corrupts .csv files when reopened by double clicking its icon or by using the File Open dialog. You can avoid this by using the Text or Data Import Wizard from the Excel Data Tab"), 
                                         placement = "right", trigger = "hover"),
                               fileInput("uploaded_data_file",
                                         label = HTML("<b>Upload your data in .csv format</b>"),
@@ -191,29 +191,7 @@ shinyUI(fluidPage(
                       br(),
                       column(
                         width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            # EWL, Start
-                            div(class = "panel panel-default",width = "100%",style="margin:10px;",
-                                div(class = "panel-heading",
-                                    p("You must have completed step 1 to step 4 to use Summary Tables", style='font-weight:bold;font-family: Helvetica Neue, Helvetica, Arial, sans-serif;')
-                                ),
-                                div(class="panel-body", 
-                                    uiOutput("summary_table_input_1"),
-                                    uiOutput("summary_table_input_2"),
-                                    uiOutput("summary_table_input_3"),
-                                    hr(),
-                                    uiOutput("summary_table_input_4"),
-                                )
-                            ),
-                          ),
-                          mainPanel(
-                            width = 9,
-                            column(width = 9, uiOutput("display_summary_table_1")),
-                            column(width = 9, uiOutput("display_summary_table_2"))
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        SummaryTablesModuleUI("DataExpSummaryTbls")
                       ), # column close
                       br(),
                     ), # tabPanel 1 end
@@ -222,67 +200,9 @@ shinyUI(fluidPage(
                       value = "tab_time_series", br(),
                       column(
                         width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            div(class = "panel panel-default",width = "100%",style="margin:10px;",
-                                div(class = "panel-heading"),
-                                div(class = "panel-body",
-                                  uiOutput("time_series_input_1"),
-                                  uiOutput("time_series_input_2"),
-                                  div(
-                                      id = "cp_shaded_region",
-                                      uiOutput("time_series_input_3"),
-                                  ), # div end
-                                  shinyjs::hidden(
-                                    div(
-                                      id = "cp_new_data",
-                                      conditionalPanel(
-                                        condition = "input$dailyStats_shading == 'newData' ",
-                                        hr(),
-                                        fileInput("uploaded_newData_file",
-                                          label = "Upload your new data", multiple = FALSE,
-                                          accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                                        )
-                                      ) # conditionalPanel end
-                                    ) # div end
-                                  ), # shinyjs:: hidden end
-                                  uiOutput("time_series_input_4"),
-                                  hr(),
-                                  fluidRow(
-                                    column(
-                                      width = 9,
-                                      uiOutput("time_series_input_5")
-                                    ),
-                                    column(
-                                      width = 6, align = "right",
-                                      uiOutput("time_series_input_6")
-                                    )
-                                  ) # fluidRow close
-                                )# end of panel body
-                            ) #end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            fluidRow(column(width = 12, uiOutput("dateAndTimeBox"))),
-                            br(),
-                            fluidRow(column(width = 12, plotlyOutput("display_time_series"))),
-                            br(),
-                            fluidRow(column(width = 12, plotlyOutput("display_time_series_new"))),
-                            br(),
-                            fluidRow(column(width = 12, plotlyOutput("display_time_series_1"))),
-                            br(),
-                            fluidRow(column(width = 12, uiOutput("display_time_series_2"))),
-                            br(),
-                            fluidRow(column(width = 12, plotlyOutput("display_time_series_3")))
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        DataExplorationTSModuleUI(id="dataExpTS")
                       ), # column close
-                      br(),
-                      column(
-                        width = 12,
-                        uiOutput("another_time_series_UI")
-                      )
+                     
                     ), # tabPanel 2 end
 
                     ### DE, All, TS Annual----
@@ -290,73 +210,7 @@ shinyUI(fluidPage(
                       value = "tab_time_series_overlay", br(),
                       column(
                         width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            div(class="panel panel-default",style="margin:10px;",
-                                div(class="panel-heading"),
-                                div(class="panel-body",
-                                    uiOutput("time_series_overlay_input_1"),
-                                    uiOutput("time_series_overlay_input_2"),
-                                    uiOutput("time_series_overlay_input_3"),
-                                    uiOutput("time_series_overlay_input_4"),
-                                    shinyjs::hidden(
-                                      div(
-                                        id = "cp_new_data_overlay",
-                                        conditionalPanel(
-                                          condition = "input$overlay_shading == 'newData' ",
-                                          fileInput("uploaded_overlay_newData_file",
-                                            label = "Upload your new data", multiple = FALSE,
-                                            accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                                          ),
-                                          selectizeInput("overlay_newData_lower_col",
-                                            label = "Select column to be used as lower bound",
-                                            choices = NULL,
-                                            multiple = FALSE,
-                                            selected = NULL,
-                                            options = list(hideSelected = FALSE)
-                                          ),
-                                          selectizeInput("overlay_newData_longterm_col",
-                                            label = "Select column to be used as long-term reference line",
-                                            choices = NULL,
-                                            multiple = FALSE,
-                                            selected = NULL,
-                                            options = list(hideSelected = FALSE)
-                                          ),
-                                          selectizeInput("overlay_newData_upper_col",
-                                            label = "Select column to be used as upper bound",
-                                            choices = NULL,
-                                            multiple = FALSE,
-                                            selected = NULL,
-                                            options = list(hideSelected = FALSE)
-                                          ),
-                                          selectizeInput("overlay_newData_date_col",
-                                            label = "Select month-day column",
-                                            choices = NULL,
-                                            multiple = FALSE,
-                                            selected = NULL,
-                                            options = list(hideSelected = FALSE)
-                                          ),
-                                          textInput("overlay_newData_name",
-                                            label = "New data name",
-                                            value = "USGS"
-                                          )
-                                        ), # conditionalPanel end
-                                      ) # div end
-                                    ), # shinyjs:: hidden end
-                              hr(),
-                              uiOutput("time_series_overlay_input_5"),
-                            ) # end of panel body
-                            ) # end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            fluidRow(column(width = 9, uiOutput("display_time_series_overlay"))),
-                            br(),
-                            fluidRow(column(width = 9, uiOutput("display_time_series_overlay_1"))),
-                            br()
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        TsOverlayModuleUI(id="tsOverlayTab")
                       ), # column close
                     ), # tabPanel 3 end
 
@@ -364,28 +218,7 @@ shinyUI(fluidPage(
                     tabPanel("Box plots",
                       value = "tab_box", br(),
                       column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                           div(class="panel panel-default",style="margin:10px;",
-                               div(class="panel-heading"),
-                               div(class="panel-body",
-                                      uiOutput("box_input_1"),
-                                      uiOutput("box_input_2"),
-                                      uiOutput("box_input_3"),
-                                      uiOutput("box_input_4"),
-                                      uiOutput("box_input_5")
-                               )#end of panel body
-                           )# end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            fluidRow(column(width = 9, uiOutput("display_box_plots"))),
-                            br(),
-                            br(),
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        width = 12, TsBoxPlotModuleUI(id="tsBoxPlot")
                       ), # column close
                     ), # tabPanel 4 end
 
@@ -393,30 +226,7 @@ shinyUI(fluidPage(
                     tabPanel("CDFs",
                       value = "tab_CDF", br(),
                       column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            div(class="panel panel-default",style="margin:10px;",
-                              div(class="panel-heading"),
-                              div(class="panel-body",
-                                uiOutput("CDF_input_1"),
-                                uiOutput("CDF_input_2"),
-                                uiOutput("CDF_input_3"),
-                                uiOutput("CDF_input_4"),
-                                uiOutput("CDF_input_5"),
-                                hr(),
-                                uiOutput("display_CDF_button")
-                              )#end of panel body
-                            )#end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            fluidRow(column(width = 9, uiOutput("display_plot_CDF"))),
-                            br(),
-                            br(),
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        width = 12, TsCDFPlotModuleUI(id="tsCDFPlot")
                       ), # column close
                       br(),
                     ), # tabPanel 5 end
@@ -425,28 +235,7 @@ shinyUI(fluidPage(
                     tabPanel("Raster graphs",
                       value = "tab_raster", br(),
                       column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                           div(class="panel panel-default",style="margin:10px;",
-                                div(class="panel-heading"),
-                                div(class="panel-body",
-                                    uiOutput("raster_input_1"),
-                                    uiOutput("raster_input_2"),
-                                    uiOutput("raster_input_3"),
-                                    uiOutput("raster_input_4"),
-                                    uiOutput("raster_input_5"),
-                                    hr(),
-                                    uiOutput("raster_input_6")
-                               ) # end of panel body
-                           ) #end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            column(width = 9, uiOutput("display_raster_graphs"))
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        width = 12, TsRasterPlotModuleUI(id="tsRasterPlot")
                       ), # column close
                     ), # tabPanel 6 end Raste
 

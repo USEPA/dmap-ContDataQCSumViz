@@ -241,21 +241,23 @@ SumStats.updated <- function(fun.myFile
     # tempCol <- df.param %>% pull(fun.myDateTime.Name)
     # df.param[,myDate.Name] <- as.Date(tempCol, "%Y-%m-%d")
     df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name],fd01)
-    if( ContData.env$myStats.missing.data.fill == TRUE) {
-        timediff <- get_interval(df.param$Date)
-        #print(timediff)
-        timediff <- ifelse(timediff == "min", "15 mins", timediff)
-        
-        df.param <- as.data.frame(df.param %>%
-          mutate(Date = as.POSIXct(Date)) %>%
-          complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff)))
-
-          # fullSeq <- seq.Date(min(as.Date(df.param$Date, "%Y-%m-%d"),na.rm = TRUE), to = max(as.Date(df.param$Date,"%Y-%m-%d"),na.rm = TRUE), by = 1)
-          # filled_missingData <- df.param %>% complete(Date = fullSeq)
-          # df.param <- as.data.frame(filled_missingData)
-      
-      
-    }
+    
+    # moving logic to ts plot as it is not needed for all the graphs.
+    # if( ContData.env$myStats.missing.data.fill == TRUE) {
+    #     timediff <- get_interval(df.param$Date)
+    #     #print(timediff)
+    #     timediff <- ifelse(timediff == "min", "15 mins", timediff)
+    # 
+    #     df.param <- as.data.frame(df.param %>%
+    #       mutate(Date = as.POSIXct(Date)) %>%
+    #       complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff)))
+    # 
+    #       # fullSeq <- seq.Date(min(as.Date(df.param$Date, "%Y-%m-%d"),na.rm = TRUE), to = max(as.Date(df.param$Date,"%Y-%m-%d"),na.rm = TRUE), by = 1)
+    #       # filled_missingData <- df.param %>% complete(Date = fullSeq)
+    #       # df.param <- as.data.frame(filled_missingData)
+    # 
+    # 
+    # }
    
     #fd01
     #df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name],  tryFormats("%Y-%m-%d %H:%M:%S","%Y-%m-%d"))
@@ -278,7 +280,7 @@ SumStats.updated <- function(fun.myFile
                      ,"cv"
                      ,"n"
                      ,paste("q",formatC(100*myQ,width=2,flag="0"),sep=""))
-    #
+   
     myFUN.sumBy <- function(x, ...){##FUN.myFUN.sumBy.START
       c(mean=mean(x,na.rm=TRUE)
         ,median=stats::median(x,na.rm=TRUE)

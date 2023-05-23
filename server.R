@@ -116,6 +116,15 @@ function(input, output, session) {
   dailyStatusCalculated <- reactiveValues(status='unfinished')
   
   readyForCalculation <- reactiveValues(status=FALSE)
+  
+  renderDataExp <- reactiveValues(render=FALSE)
+  
+  renderSummaryTables <- reactiveValues(render=FALSE)
+  
+  renderTSOverlay <- reactiveValues(render=FALSE)
+  renderTSBoxPlot <- reactiveValues(render=FALSE)
+  renderCDFPlot <- reactiveValues(render=FALSE)
+  renderRasterPlot <- reactiveValues(render=FALSE)
 
   #  Upload Data##############################
   #EWL
@@ -123,9 +132,24 @@ function(input, output, session) {
   do.call(file.remove, list(list.files("Selected_Files", full.names = TRUE)))
  
   #init modules, reactive values will reflect when the buttons are actually clicked
+  #shinyAlertModuleServer("common_alert_msg")
   progressWorkflowModuleUIServer("statusWorkflow", workflowStatus)
   calculateDailyStatsModuleServer("calculateDailyStats", formated_raw_data, homeDTvalues, metaHomeValues,loaded_data, dailyStatusCalculated,processed,readyForCalculation)
- 
+  
+  ############ Continuous Data Exploration >>  All parameters ############
+  
+  #Continuous Data Exploration > All Parameters >  Summary tables tab
+  SummaryTablesModuleServer(id="DataExpSummaryTbls", dailyStats=processed, renderSummaryTables)
+  #Continuous Data Exploration > All Parameters >  Time Series plots tab
+  DataExplorationTSModuleServer(id="dataExpTS", dailyStats=processed, renderDataExp)
+  #Continuous Data Exploration > All Parameters >  Time series - Annual overlays tab
+  TsOverlayModuleServer(id="tsOverlayTab", dailyStats=processed, renderTSOverlay)
+  #Continuous Data Exploration > All Parameters > Box plots tab
+  TsBoxPlotModuleServer(id="tsBoxPlot", dailyStats=processed, renderTSBoxPlot)
+  #Continuous Data Exploration > All Parameters > CDFs tab
+  TsCDFPlotModuleServer(id="tsCDFPlot", dailyStats=processed, renderCDFPlot)
+  #Continuous Data Exploration > All Parameters > Raster graphs tab
+  TsRasterPlotModuleServer(id="tsRasterPlot", dailyStats=processed, renderRasterPlot)
   
    #Home page file upload
   uploaded_data<-eventReactive(c(input$uploaded_data_file),{
@@ -454,79 +478,6 @@ function(input, output, session) {
   observeEvent(input[["tabset"]], {
     ### DE, ALL, summary table ####
 
-    output$summary_table_input_1 <- renderUI({
-      variables_avail <- names(processed$processed_dailyStats)
-      selectizeInput("summarise_variable_name",
-                     label ="Select variable name",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=variables_avail[1],
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$summary_table_input_2 <- renderUI({
-      radioButtons("summarise_by", "Summarise by", choices = c("year/month"="year/month"
-                                                               ,"year"="year"
-                                                               ,"year/season"="year/season"
-                                                               ,"season"="season"),
-                   selected = "year/month")
-    })
-
-    output$summary_table_input_3 <- renderUI({
-      selectizeInput("summarise_metrics",label ="Select metrics",
-                     choices=c("mean","median","min", "max","range","sd","var","cv","n"),
-                     multiple = FALSE,
-                     selected="mean",
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$summary_table_input_4 <- renderUI({
-      actionButton(inputId="display_table", label="Summarise",class="btn btn-primary")
-    })
-
-
-    ## DE, ALL, time series plot" << All parameters ####
-
-    output$time_series_input_1 <- renderUI({
-      variables_avail <- names(processed$processed_dailyStats)
-      selectizeInput("dailyStats_ts_variable_name",label ="Select variable name",
-                     choices=variables_avail,
-                     multiple = TRUE,
-                     selected=variables_avail[1],
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$time_series_input_2 <- renderUI({
-      selectizeInput("dailyStats_ts_metrics",label ="Select daily statistics metrics",
-                     choices=c("mean","median","min", "max","range","sd","var","cv","n"),
-                     multiple = FALSE,
-                     selected="mean",
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$time_series_input_3 <- renderUI({
-      div(
-          radioButtons("dailyStats_shading", "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
-                                                                           "Mminimum & Maximum"="minMax"),
-                       selected = "quantiles"))
-
-    })
-
-    output$time_series_input_4 <- renderUI({
-      textInput(inputId="dailyStats_ts_title", label="Plot title",value="")
-    })
-
-    output$time_series_input_5 <- renderUI({
-      tagList(
-      actionButton(inputId="display_ts",label="Display",class="btn btn-primary"),
-     # actionButton(inputId="display_subplot_ts", label="Display Subplots",class="btn btn-primary"),
-      )
-    })
-
-    output$testing2 <- renderUI({
-      div("coming soon")
-    })
-
     #USGS Gage
     output$gage_panel <- renderUI({
       div(class="panel panel-default", style="padding:10px;margin-top:20px;",
@@ -597,176 +548,6 @@ function(input, output, session) {
       sliderInput("n", "N", 1, 1000, 500),
       textInput("label", "Label")
     )
-
-
-    ## DE, ALL, time series - annual overlays" << All parameters ############
-
-    output$time_series_overlay_input_1 <- renderUI({
-      variables_avail <- names(processed$processed_dailyStats)
-      selectizeInput("dailyStats_ts_overlay_variable_name",label ="Select variable name",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=variables_avail[1],
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$time_series_overlay_input_2 <- renderUI({
-
-      selectizeInput("dailyStats_ts_overlay_metrics",label ="Select daily statistics metrics",
-                     choices=c("mean","median","min", "max","range","sd","var","cv","n"),
-                     multiple = FALSE,
-                     selected="mean",
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$time_series_overlay_input_3 <- renderUI({
-      textInput(inputId="dailyStats_ts_overlay_title", label="Plot title",value="")
-    })
-
-    output$time_series_overlay_input_4 <- renderUI({
-          radioButtons("overlay_shading", "Add shading with", choices = c("none"="none"
-                                                                          ,"overall minimum and maximum(all years)"="overall"
-                                                                          ),
-                       selected = "none")
-
-    })
-
-    output$time_series_overlay_input_5 <- renderUI({
-      actionButton(inputId="display_ts_overlay", label="Display",class="btn btn-primary")
-    })
-
-    ############ DE, ALL, box plots" << All parameters ############
-
-    output$box_input_1 <- renderUI({
-      variables_avail <- names(processed$processed_dailyStats)
-      selectizeInput("boxplot_variable_name",label ="Select variable name",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=variables_avail[1],
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$box_input_2 <- renderUI({
-
-      selectizeInput("boxplot_metrics",label ="Select daily statistics metrics",
-                     choices=c("mean","median","min", "max","range","sd","var","cv","n"),
-                     multiple = FALSE,
-                     selected="mean",
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$box_input_3 <- renderUI({
-      div(
-          radioButtons("box_group", "Group by", choices = c("month"="month"
-                                                            ,"month(years side by side)"="month2"
-                                                            ,"year"="year"
-                                                            ,"season"="season"
-                                                            ,"season(years side by side)"="season2"),
-                       selected = "month"))
-
-    })
-
-    output$box_input_4 <- renderUI({
-      textInput(inputId="box_title", label="Plot title",value="")
-    })
-
-
-    output$box_input_5 <- renderUI({
-      actionButton(inputId="display_box", label="Display",class="btn btn-primary")
-    })
-
-
-    ############ DE, ALL, CompSiteCDF" << All parameters ############
-
-    output$CDF_input_1 <- renderUI({
-      variables_avail <- names(processed$processed_dailyStats)
-      selectizeInput("CDF_variable_name",label ="Select variable name",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=variables_avail[1],
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$CDF_input_2 <- renderUI({
-      div(
-          radioButtons("CDF_shading", "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
-                                                                    "minimum & maximum"="minMax"
-                                                                    ),
-                       selected = "minMax"))
-
-    })
-
-    output$CDF_input_3 <- renderUI({
-          myList <- processed$processed_dailyStats
-          variable_to_plot <- input$CDF_variable_name
-          myData.all <- myList[[which(names(myList)==variable_to_plot)]]
-          myData.all[,"year"] <- format(myData.all[,"Date"],"%Y")
-
-          selectizeInput("CDF_select_year",label ="Select year",
-                         choices=c("All", unique(myData.all$year)),
-                         multiple = FALSE,
-                         selected = "All",
-                         options = list(hideSelected = FALSE))
-    })
-
-    output$CDF_input_4 <- renderUI({
-
-      selectizeInput("CDF_select_season",label ="Select season",
-                     choices=c("All","Fall", "Winter", "Spring","Summer" ),
-                     multiple = FALSE,
-                     selected = "All",
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$CDF_input_5 <- renderUI({
-
-      textInput(inputId="CDF_title", label="Plot title",value="")
-
-    })
-
-    output$display_CDF_button <- renderUI({
-      actionButton(inputId="run_CDF", label="Run and display",class="btn btn-primary")
-    })
-
-    ############  DE, ALL, Raster graphs" << All parameters ############
-
-    output$raster_input_1 <- renderUI({
-      variables_avail <- names(processed$processed_dailyStats)
-      selectizeInput("dailyStats_raster_variable_name",label ="Select variable name",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=variables_avail[1],
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$raster_input_2 <- renderUI({
-
-      selectizeInput("dailyStats_raster_metrics",label ="Select daily statistics metrics",
-                     choices=c("mean","median","min", "max","range","sd","var","cv","n"),
-                     multiple = FALSE,
-                     selected="mean",
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$raster_input_3 <- renderUI({
-      textInput(inputId="dailyStats_raster_title", label="Plot title",value="")
-
-    })
-
-    output$raster_input_4 <- renderUI({
-      numericInput(inputId="raster_plot_aspect_ratio", label="Adjust plot aspect ratio",0.5,min=0,max=10,step=0.1)
-
-    })
-
-    output$raster_input_5 <- renderUI({
-      radioButtons(inputId="raster_plot_color",label ="Color palette options",choices=c("hcl","rainbow","heat","terrain","topo"),selected="hcl",inline=FALSE)
-    })
-
-    output$raster_input_6 <- renderUI({
-      actionButton(inputId="run_raster", label="Display",class="btn btn-primary")
-    })
-
-
 
     ############  DE, ALL, Thermal Statistics" << Temperature ############
     output$thermal_input_1 <- renderUI({
@@ -1010,152 +791,12 @@ function(input, output, session) {
 
 
   #################  1:Summary table << All parameters #################
-  reorderSeason <- function(seasonCol=mySeasonCol){
-    seasonNames <- unique(seasonCol)
-    if (length(seasonNames)==4){
-      seasonCol <- factor(seasonCol,levels=c("Spring","Summer","Fall","Winter"))
-    }else if(length(seasonNames)==3 & !('Winter' %in% seasonNames)){
-      seasonCol <- factor(seasonCol,levels=c("Spring","Summer","Fall"))
-    }else if(length(seasonNames)==3 & !('Spring' %in% seasonNames)){
-      seasonCol <- factor(seasonCol,levels=c("Summer","Fall","Winter"))
-    }else if(length(seasonNames)==2 & !('Winter' %in% seasonNames)&!('Spring' %in% seasonNames)){
-      seasonCol <- factor(seasonCol,levels=c("Summer","Fall"))
-    }
-    return(seasonCol)
-  }
 
-  addSeason <- function(df=myDf){
-    #df[,"year"] <- format(df[,"Date"],"%Y")
-    df[,"year"] <- format(as.Date(df$Date, format="%Y-%m-%d %H:%M:%S"),"%Y")
-    #df[,"monthday"] <- format(df[,"Date"],"%m%d")
-    df[,"monthday"] <- format(as.Date(df$Date, format="%Y-%m-%d %H:%M:%S"),"%m%d")
-    df[,"season"] <- NA
-    df[,"season"][as.numeric(df[, "monthday"]) >= as.numeric("0101") & as.numeric(df[
-      ,"monthday"])< as.numeric(ContData.env$myTimeFrame.Season.Spring.Start)] <- "Winter"
-    df[,"season"][as.numeric(df[,"monthday"]) >= as.numeric(ContData.env$myTimeFrame.Season.Spring.Start) &
-                    as.numeric(df[,"monthday"])< as.numeric(ContData.env$myTimeFrame.Season.Summer.Start)] <- "Spring"
-    df[,"season"][as.numeric(df[,"monthday"]) >= as.numeric(ContData.env$myTimeFrame.Season.Summer.Start) &
-                    as.numeric(df[,"monthday"])< as.numeric(ContData.env$myTimeFrame.Season.Fall.Start)] <- "Summer"
-    df[,"season"][as.numeric(df[, "monthday"]) >= as.numeric(ContData.env$myTimeFrame.Season.Fall.Start) &
-                    as.numeric(df[,"monthday"])< as.numeric(ContData.env$myTimeFrame.Season.Winter.Start)] <- "Fall"
-    df[,"season"][as.numeric(df[, "monthday"]) >= as.numeric(ContData.env$myTimeFrame.Season.Winter.Start) &
-                    as.numeric(df[,"monthday"])<= as.numeric("1231")] <- "Winter"
-    df$season <- reorderSeason(seasonCol=df$season)
-    df[,"yearseason"] <- paste(df[,"year"],df[,"season"], sep="")
-    return(df)
-  }
-
-  mySummarisemore <- function(df=myDf, variable=myVariable,metrics=myMetrics,timeframe=myTimeframe){
-       variable_col_name <- paste0(variable,".",metrics)
-       names(df)[match(variable_col_name,names(df))] <- "x"
-    if (timeframe == "year/month"){
-      ## summarise by each year&month first
-      df[,"yearmonth"] <- format(df[,"Date"],"%Y%m")
-      df.summary <- doBy::summaryBy(x~yearmonth,data=df,FUN=mean,na.rm=TRUE,variable.names=variable)
-      df.summary[,"year"] <- substr(df.summary[,"yearmonth"],1,4)
-      df.summary[,"month"] <- substr(df.summary[,"yearmonth"],5,6)
-      df.summary <- df.summary[2:4]
-      df.summary[,"x.mean"] <- formatC(df.summary[,"x.mean"],digits=2,format="f")
-      df.summary.wide <- pivot_wider(df.summary,names_from=year,values_from=x.mean)
-      ## summarise by each month regardless of the year to get overall mean for each month
-      df[,"month"] <- format(df[,"Date"],"%m")
-      df.summary.overall <- doBy::summaryBy(x~month,data=df,FUN=mean,na.rm=TRUE,variable.names=variable)
-      df.summary.overall[,"x.mean"] <- formatC(df.summary.overall[,"x.mean"],digits=2,format="f")
-      names(df.summary.overall)[2] <- "Overall"
-      df.summary.all <- merge(df.summary.wide,df.summary.overall,by="month")
-      return(df.summary.all)
-    }else if(timeframe =="year"){
-      df[,"year"] <- format(df[,"Date"],"%Y")
-      df.summary <- doBy::summaryBy(x~year,data=df,FUN=mean,na.rm=TRUE,variable.names=variable)
-      df.summary[,"x.mean"] <- formatC(df.summary[,"x.mean"],digits=2,format="f")
-      df.summary.wide <- pivot_wider(df.summary,names_from=year,values_from=x.mean)
-      df.summary.wide[,"Overall"] <- formatC(mean(df$x,na.rm=TRUE),digits=2,format="f")
-      return(df.summary.wide)
-    }else if(timeframe == "year/season"){
-      df <- addSeason(df)
-      df.summary <- doBy::summaryBy(x~yearseason,data=df,FUN=mean,na.rm=TRUE,variable.names=variable)
-      df.summary[,"year"] <- substr(df.summary[,"yearseason"],1,4)
-      df.summary[,"season"] <- substr(df.summary[,"yearseason"],5,nchar(df.summary[,"yearseason"]))
-      df.summary <- df.summary[2:4]
-      df.summary[,"x.mean"] <- formatC(df.summary[,"x.mean"],digits=2,format="f")
-      df.summary.wide <- pivot_wider(df.summary,names_from=year,values_from=x.mean)
-      df.summary.overall <- doBy::summaryBy(x~season,data=df,FUN=mean,na.rm=TRUE,variable.names=variable)
-      df.summary.overall[,"x.mean"] <- formatC(df.summary.overall[,"x.mean"],digits=2,format="f")
-      names(df.summary.overall)[2] <- "Overall"
-      df.summary.all <- merge(df.summary.wide,df.summary.overall,by="season")
-      return(df.summary.all)
-
-    }else if(timeframe =="season"){
-      df <- addSeason(df)
-      df.summary <- doBy::summaryBy(x~season,data=df,FUN=mean,na.rm=TRUE,variable.names=variable)
-      df.summary[,"x.mean"] <- formatC(df.summary[,"x.mean"],digits=2,format="f")
-      df.summary.wide <- pivot_wider(df.summary,names_from=season,values_from=x.mean)
-      df.summary.wide[,"Overall"] <- formatC(mean(df$x,na.rm=TRUE),digits=2,format="f")
-      return(df.summary.wide)
-    }else{
-      stop("please specify one of the following summarise timeframes:
-         'year/month','year','year/season','season'")
-    }
-  }
-
-
-  observeEvent(input$display_table, {
-    output$display_summary_table_1 <- renderUI({
-      withSpinner(dataTableOutput("summary_table_1"))
-    })
-    myList <- processed$processed_dailyStats
-    variable_to_summarise <- input$summarise_variable_name
-    myData <- myList[[which(names(myList)==variable_to_summarise)]]
-    summary_df <- mySummarisemore(df=myData,variable=input$summarise_variable_name,metric=input$summarise_metrics,timeframe=input$summarise_by)
-    table_title <- paste0(input$summarise_variable_name," ",input$summarise_metrics)
-    output$summary_table_1 <- DT::renderDataTable({
-      print("inside renderDT now...")
-      myTable <- DT::datatable(
-                 summary_df,
-                 caption = htmltools::tags$caption(table_title,style="color:black;font-size:16px;font-weight:bold;text-align:center;"),
-                 extensions ="Buttons",
-                 rownames = FALSE,
-          options = list(
-          scrollX = TRUE, #allow user to scroll wide tables horizontally
-          stateSave = FALSE,
-          pageLength = 15,
-          dom = 'Bt',
-          buttons = list('copy','print',list(extend = 'collection',buttons = c('csv','excel','pdf'),text='Download')),
-          columnDefs = list(list(className="dt-center",targets="_all"))
-          )
-      ) # dataTable end
-      saveToReport$summaryTable <- myTable
-      print(myTable)
-    })  # renderDT end
-
-  }) # observeEvent end
-
-  ################# 2:Time series plot << All parameters #################
-  uploaded_newData<-eventReactive(c(input$uploaded_newData_file),{
-    my_data <- uploadFile(c(input$uploaded_newData_file), stopExecution = FALSE)
-    my_data <- my_data[rowSums(is.na(my_data) | is.null(my_data) | my_data == "") != ncol(my_data),]
-    return(my_data)
-  })
 
 
 
-  observeEvent(input$dailyStats_ts_metrics,{
-    if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics == 'mean'|input$dailyStats_ts_metrics == 'median')){
-        shinyjs::show("cp_shaded_region")
-    }else{
-      shinyjs::hide("cp_shaded_region")
-    }
-    #click("display_ts")
-    
-  })
+  ################# 2:Time series plot << All parameters #################
 
-  observeEvent(input$dailyStats_shading,{
-    if (input$dailyStats_shading == 'newData' | input$dailyStats_shading == 'discreteData'){
-      shinyjs::show("cp_new_data")
-    }else{
-      shinyjs::hide("cp_new_data")
-    }
-  })
   
   #Discrete Data Exploration
   
@@ -1236,7 +877,6 @@ function(input, output, session) {
   
  # draw_discrete_stats <- function(renderStatus=FALSE){
   observeEvent(input$display_discrete_data, {
-    
     discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData())
     localDiscreteDateAndTime <- discreteDTvalues$disDateAndTime
     mainPlot <- NULL
@@ -1314,112 +954,6 @@ function(input, output, session) {
  
   # End of Discrete data related functions
   
-  
-  
-  # continuous Data Exploration with New File
-  
-  observeEvent(input$uploaded_newData_file,{
-    cols_avail <- colnames(uploaded_newData())
-    fileContentForDisplay <- head(uploaded_newData())
-     output$dateAndTimeBox <- renderUI({
-
-     div(id="dt_new",
-           div(class = "panel panel-default",width = "100%",
-               div(class = "panel-heading",
-                   span("Step 2: Select Date and Time for new data", style="font-weight:bold;"),
-                   span(
-                     actionButton(inputId="dateTimeBoxButton_new", 
-                                  style="float:right;", class="btn btn-primary btn-xs", 
-                                  label="Hide Selection", icon= icon("arrow-down"))
-                   )
-               ),
-               div(uiOutput("newDateAndTimeError"), style = "font-weight:bold;color:#b94a48;margin:5px;"),
-               box(width="100%",class="displayed",id="dateBox_new",
-                   div(
-                     style = "margin-left:10px",
-                     dateAndTimeUI(id = "newDataUpload", paramChoices = cols_avail, uploadedCols = cols_avail)
-                   ),
-              fluidRow(
-              column(width = 4,
-                   div(style="margin-left:15px;",
-                   selectizeInput("newData_lower_col",
-                                  label = "Select column to be used as lower bound",
-                                  choices = c("",cols_avail),
-                                  multiple = FALSE,
-                                  selected = NULL,
-                                  options = list(hideSelected = FALSE))
-                   )),
-              column(width = 4,
-                   selectizeInput("newData_upper_col",
-                                  label = "Select column to be used as upper bound",
-                                  choices = c("",cols_avail),
-                                  multiple = FALSE,
-                                  selected = NULL,
-                                  options = list(hideSelected = FALSE))
-                   )
-          ),
-          # fluidRow(
-          #   column(width=2, actionButton(inputId="display_new_data", label="Display",class="btn btn-primary")),
-          #   column(width=10, div(id="dummy"))
-          # ),
-          hr(style="margin:0px;padding:0px;"),
-          fluidRow(
-            column(width=12, 
-                   tags$div(
-                     renderTable({
-                     fileContentForDisplay
-                   },type="html",bordered = TRUE,striped=TRUE,align="c"),style="overflow-x:auto;")
-           )
-          )
-      )
-      ) # end of box
-     )
-    })
-     newDTvalues$newDateAndTime <- dateAndTimeServer(id = "newDataUpload", )
-  })
-
- display_new_data <- function(renderStatus=FALSE) {
-   shinyjs::runjs("$('#newDateAndTimeErrorinnerDiv').remove()")
-   newDTvalues$newDateAndTime <- dateAndTimeServer(id = "newDataUpload",uploaded_newData())
-   newHomeDateAndTime <- newDTvalues$newDateAndTime
-   mainPlot <- NULL
-   if (newHomeDateAndTime$isTimeValid() & newHomeDateAndTime$isDateAndtimeValid() &
-       validateNewLowerAndUpper("display_validation_msgs_new2") == FALSE) {
-            tryCatch({
-              new_raw_data <- getFormattedRawData(newHomeDateAndTime, uploaded_newData(), tabName = "", errorDivId = "newDateAndTimeError")
-            if(nrow(new_raw_data) != nrow(new_raw_data[is.na(new_raw_data$date.formatted),])) {
-                  variable_to_plot <- newDTvalues$newDateAndTime$parmToProcess()
-                  mainList <- list()
-                  for(varName in variable_to_plot) {
-                    mainList[[varName]] <- as.data.frame(new_raw_data %>% select(value=all_of(varName), lower_col=input$newData_lower_col , upper_col=input$newData_upper_col, Date=date.formatted))
-                  }
-                  plotTitle <- ifelse((input$dailyStats_ts_title == ""), "New Data", input$dailyStats_ts_title) 
-                  mainMapTitle <- getMapTitle("dynamic", plotTitle, lowerColumn = input$newData_lower_col, upperColumn = input$newData_upper_col)
-                  main_range = calculate_time_range(as.list(bind_rows(mainList, .id="df")))
-                  mainBreaks = main_range[[1]]
-                  main_x_date_label = main_range[[2]]
-                  mainPlot <- prepareBasePlot(dataList= mainList, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks)
-                  if(!is.null(mainPlot) & length(newHomeDateAndTime$parmToProcess()) > 0 & renderStatus==FALSE){
-                    return(mainPlot)
-                  }else{
-                    shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
-                    output$display_time_series_new <-  renderPlotly({
-                      ggplotly(mainPlot,height=calulatePlotHeight(length(newHomeDateAndTime$parmToProcess()) * 2)) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
-                    })
-                  }
-                }
-               return(mainPlot)
-              },error = function(parsingMsg) {
-                processErrors(parsingMsg,elementId="newDateAndTimeError")
-              }, warning = function(parsingMsg){
-                processErrors(parsingMsg,elementId="newDateAndTimeError")
-              }, message = function(parsingMsg) {
-                processErrors(parsingMsg,elementId="newDateAndTimeError")
-              }, finally = {
-                 return(mainPlot)
-              })
-          }
-  }
   
   observeEvent(input$dtNumOfCols, {
     if(isolate(input$dtNumOfCols) == "combined")
@@ -1589,52 +1123,6 @@ function(input, output, session) {
     }
   })
 
-
-  observeEvent(input$display_ts, {
-    
-          shinyjs::runjs("$('#display_time_series').empty()")
-          shinyjs::runjs("$('#display_time_series_1').empty()")
-          shinyjs::runjs("$('#display_time_series_3').empty()")
-          
-          if(length(processed$processed_dailyStats) > 0 & length(input$dailyStats_ts_variable_name) > 0) {
-          #Display uploaded file stats
-          if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading != "newData"){
-            mainPlot <- draw_uploaded_file_ts()
-            if(!is.null(mainPlot) & length(input$dailyStats_ts_variable_name) > 0){
-              output$display_time_series <-  renderPlotly({
-                ggplotly(mainPlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name) * 2)) 
-                #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4)) 
-              })
-            }
-   
-         } else if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")&input$dailyStats_shading == "newData"){
-           # this option is removed from the front end for now
-             newMainPlot <- display_new_data(renderStatus=FALSE)
-               if(!is.null(newMainPlot) & length(newDTvalues$newDateAndTime$parmToProcess()) > 0){
-                 shinyjs::runjs("$('#dateTimeBoxButton_new').click()")
-                 output$display_time_series_new <-  renderPlotly({
-                   ggplotly(newMainPlot,height=calulatePlotHeight(length(newDTvalues$newDateAndTime$parmToProcess()) * 2)) 
-                   #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
-                 })
-               }
-          } else {
-                   basePlot <-  draw_uploaded_file_stats()
-                   if(!is.null(basePlot)) {
-                     output$display_time_series <-  renderPlotly({
-                       ggplotly(basePlot,height=calulatePlotHeight(length(input$dailyStats_ts_variable_name))) 
-                       #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
-                     })
-                   }
-             }          
-            overridePotlyStyle("display_time_series")
-            overridePotlyStyle("display_time_series_1")
-            overridePotlyStyle("display_time_series_3")
-            overridePotlyStyle("display_time_series_new")
-            } else {
-             shinyAlertUI("common_alert_msg", calculateDailyStats, "WARNING")
-            }
-
-  })  # observeEvent end
   
   overridePotlyStyle <- function(elementId) {
     shinyjs::removeClass(elementId, "html-fill-item-overflow-hidden")
@@ -1657,323 +1145,8 @@ function(input, output, session) {
     shinyjs::toggle(id="ts_mainPanel")
   })
 
-
-  #################  3:Time series - Annual overlays << All parameters #################
-  uploaded_overlay_newData <- eventReactive(c(input$uploaded_overlay_newData_file),{
-    my_data <- uploadFile(c(input$uploaded_overlay_newData_file), stopExecution = FALSE)
-      return(my_data)
-  })
-
-  observeEvent(input$overlay_shading,{
-    if (input$overlay_shading == 'newData'){
-      shinyjs::show("cp_new_data_overlay")
-    }else{
-      shinyjs::hide("cp_new_data_overlay")
-    }
-  })
-
-  observeEvent(input$uploaded_overlay_newData_file,{
-    cols_avail <- colnames(uploaded_overlay_newData())
-    #print(cols_avail)
-    updateSelectizeInput(session,"overlay_newData_lower_col",label ="Select column to be used as lower bound",
-                         choices=cols_avail,
-                         selected=''
-    )
-
-    updateSelectizeInput(session,"overlay_newData_longterm_col",label ="Select column to be used as long-term reference line",
-                         choices=cols_avail,
-                         selected=''
-    )
-
-    updateSelectizeInput(session,"overlay_newData_upper_col",label ="Select column to be used as upper bound",
-                         choices=cols_avail,
-                         selected='',
-                         options = list(hideSelected = FALSE))
-
-    updateSelectizeInput(session,"overlay_newData_date_col",label ="Select month-day column",
-                         choices=cols_avail,
-                         selected='',
-                         options = list(hideSelected = FALSE))
-  })
-
-
-  # output$display_time_series <- renderPlotly({(NULL)})
-  # output$testSubgraph <- renderPlotly({(NULL)})
-  
-  # display_time_series_Proxy <- plotlyProxy("display_time_series")
-  # gage_proxy <- plotlyProxy("plot_gage_ts")
-  
-  
-
-  observeEvent(input$display_ts_overlay, {
-    
-    #plot_dailyStats_ts
-    output$display_time_series_overlay <- renderUI({
-      withSpinner(plotlyOutput("plot_dailyStats_ts_overlay",height="550px",width="1200px"),type=2)
-    })
-
-    output$display_time_series_overlay_1 <- renderUI({
-      withSpinner(plotOutput("plot_dailyStats_ts_overlay_1",height="550px",width="1200px"),type=2)
-    })
-
-    myList <- processed$processed_dailyStats
-    variable_to_plot <- input$dailyStats_ts_overlay_variable_name
-    myData <- myList[[which(names(myList)==variable_to_plot)]]
-    mean_col <- paste0(input$dailyStats_ts_overlay_variable_name,".",input$dailyStats_ts_overlay_metrics)
-    cols_selected <- c("Date",mean_col)
-    data_to_plot <- myData[cols_selected]
-    
-    #print(format(as.Date(data_to_plot$Date, format="%Y-%m-%d %H:/%M:%S"),"%Y"))
-   
-    data_to_plot[,"year"] <- format(as.Date(data_to_plot$Date, format="%Y-%m-%d %H:%M:%S"),"%Y")
-    ## dynamically change the "date_breaks" based on the width of the time window
-
-    if ((input$dailyStats_ts_overlay_metrics=="mean"|input$dailyStats_ts_overlay_metrics=="median")&input$overlay_shading=="overall"){
-    ## calculate overall(include all years) monthly minimum and maximum values
-      min_col <- paste0(input$dailyStats_ts_overlay_variable_name,".min")
-      max_col <- paste0(input$dailyStats_ts_overlay_variable_name,".max")
-      data_for_overlay <- myData[c("Date",min_col,max_col)]
-      #data_for_overlay[,"MonthDay"] <- format(data_for_overlay[,"Date"],"%m-%d")
-      data_for_overlay[,"MonthDay"] <- format(as.Date(data_for_overlay$Date, format="%Y-%m-%d %H:%M:%S"),"%m-%d")
-    
-      
-      monthDay_min <- aggregate(data_for_overlay[,2],list(data_for_overlay$MonthDay),FUN=mean)
-      monthDay_max <- aggregate(data_for_overlay[,3],list(data_for_overlay$MonthDay),FUN=mean)
-      merged_overlay <- merge(monthDay_min,monthDay_max,by="Group.1")
-      colnames(merged_overlay) <- c("MonthDay","min","max")
-      #save(merged_overlay,file="test_overall_min_max_overlay.RData")
-      output$plot_dailyStats_ts_overlay <- renderPlotly({
-        isolate({
-          p1 <- ggplot(data_to_plot)+
-            geom_line(aes(x=as.Date(yday(Date),"2000-01-01"),y=isolate(!!sym(mean_col)),colour=year),size=0.8)+
-            geom_ribbon(data=merged_overlay,aes(x=as.Date(yday(paste0("2000","-",MonthDay)),"2000-01-01"),
-                                                        ymin=min,ymax=max,
-                                                fill="overall minimum and maximum" ),alpha=0.5)+
-            scale_x_date(date_breaks="1 month",limits=c(as.Date("2000-01-01"),as.Date("2000-12-31")),date_labels = "%m%d")+
-            scale_fill_manual(" ",labels="overall minimum and maximum",values=c("grey80"="grey80"))+
-            labs(title=isolate(input$dailyStats_ts_overlay_title),x = "MonthDay",y =mean_col)+
-            theme_classic()+
-            theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                  ,panel.border = element_rect(colour="black",fill=NA, size=0.5)
-                  ,plot.title = element_text(hjust=0.5)
-                  ,plot.background = element_rect(color="grey20",size=2)
-                  ,legend.position = "right"
-                  ,axis.text.x=element_text(angle=45, hjust=1))
-          ggplotly(p1,dynamicTicks = FALSE)
-          print(p1)
-        })
-      }) # renderPlot close
-
-      output$plot_dailyStats_ts_overlay_1 <- renderPlot({
-        isolate({
-          p1 <- ggplot(data_to_plot)+
-            geom_line(aes(x=as.Date(yday(Date),"2000-01-01"),y=isolate(!!sym(mean_col)),colour=year),size=0.8)+
-            geom_ribbon(data=merged_overlay,aes(x=as.Date(yday(paste0("2000","-",MonthDay)),"2000-01-01"),
-                                                ymin=min,ymax=max,
-                                                fill="overall minimum and maximum" ),alpha=0.5)+
-            scale_x_date(date_breaks="1 month",limits=c(as.Date("2000-01-01"),as.Date("2000-12-31")),date_labels = "%m%d")+
-            scale_fill_manual(" ",labels="overall minimum and maximum",values=c("grey80"="grey80"))+
-            labs(title=isolate(input$dailyStats_ts_overlay_title),x = "MonthDay",y =mean_col)+
-            theme_classic()+
-            theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                  ,panel.border = element_rect(colour="black",fill=NA, size=0.5)
-                  ,plot.title = element_text(hjust=0.5)
-                  ,plot.background = element_rect(color="grey20",size=2)
-                  ,legend.position = "right"
-                  ,axis.text.x=element_text(angle=45, hjust=1))
-          #ggplotly(p1,dynamicTicks = FALSE)
-          print(p1)
-        })
-      }) # renderPlot close
-
-    }else if ((input$dailyStats_ts_overlay_metrics=="mean"|input$dailyStats_ts_overlay_metrics=="median")&input$overlay_shading=="newData") {
-      # This option is removed from the front end for now
-      overlay_data <- uploaded_overlay_newData()
-
-
-     # save(data_to_add_as_overlay,file="test_data_to_add_as_overlay.RData")
-
-      output$plot_dailyStats_ts_overlay <- renderPlotly({
-        isolate({
-
-          p1 <- ggplot(data_to_plot)+
-            geom_line(aes(x=as.Date(yday(Date),"2000-01-01"),y=!!sym(mean_col),colour=year),size=0.8)
-
-          if((input$overlay_newData_lower_col!='')&(input$overlay_newData_upper_col!='')){
-            overlay_cols_selected <- c(input$overlay_newData_date_col,input$overlay_newData_lower_col,input$overlay_newData_upper_col)
-            data_to_add_as_overlay <- overlay_data[overlay_cols_selected]
-             p1<- p1 +
-             geom_ribbon(data=data_to_add_as_overlay,aes(x=as.Date(yday(paste0("2000","-",month_day)),"2000-01-01"),
-                                                      ymin=!!sym(input$overlay_newData_lower_col),ymax=!!sym(input$overlay_newData_upper_col),
-                                                      fill=input$overlay_newData_name),alpha=0.5)+
-             scale_fill_manual(" ",labels=input$overlay_newData_name,values=c("grey80"="grey80"))
-          }
-
-          if(input$overlay_newData_longterm_col!=''){
-          data_to_add_as_longterm <- overlay_data[c(input$overlay_newData_date_col,input$overlay_newData_longterm_col)]
-          print(input$overlay_newData_longterm_col)
-          p1 <- p1 +
-            geom_line(data=data_to_add_as_longterm,aes(x=as.Date(yday(paste0("2000","-",month_day)),"2000-01-01"),y=!!sym(input$overlay_newData_longterm_col),color="USGS long-term"),size=0.8,color="black")
-          }
-
-         p1 <- p1+
-          scale_x_date(date_breaks="1 month",limits=c(as.Date("2000-01-01"),as.Date("2000-12-31")),date_labels = "%m%d")+
-          labs(title=isolate(input$dailyStats_ts_overlay_title),x = "MonthDay",y =mean_col)+
-          theme_classic()+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,panel.border = element_rect(colour="black",fill=NA, size=0.5)
-                ,plot.title = element_text(hjust=0.5)
-                ,plot.background = element_rect(color="grey20",size=2)
-                ,legend.position = "right"
-                ,axis.text.x=element_text(angle=45, hjust=1))
-         p1<- plotly::ggplotly(p1)
-         print(p1)
-
-      })
-      }) # renderPlot close
-
-      output$plot_dailyStats_ts_overlay_1 <- renderPlot({
-        isolate({
-          p1 <- ggplot(data_to_plot)+
-            geom_line(aes(x=as.Date(yday(Date),"2000-01-01"),y=!!sym(mean_col),colour=year),size=0.8)
-            if((input$overlay_newData_lower_col!='')&(input$overlay_newData_upper_col!='')){
-              overlay_cols_selected <- c(input$overlay_newData_date_col,input$overlay_newData_lower_col,input$overlay_newData_upper_col)
-              data_to_add_as_overlay <- overlay_data[overlay_cols_selected]
-              p1 <- p1+
-              geom_ribbon(data=data_to_add_as_overlay,aes(x=as.Date(yday(paste0("2000","-",month_day)),"2000-01-01"),
-                                                          ymin=!!sym(input$overlay_newData_lower_col),ymax=!!sym(input$overlay_newData_upper_col),
-                                                          fill=input$overlay_newData_name),alpha=0.5)+
-              scale_fill_manual(" ",labels=input$overlay_newData_name,values=c("grey80"="grey80"))
-            }
-
-            if(input$overlay_newData_longterm_col!=''){
-            data_to_add_as_longterm <- overlay_data[c(input$overlay_newData_date_col,input$overlay_newData_longterm_col)]
-            p1 <- p1 + geom_line(data=data_to_add_as_longterm,aes(x=as.Date(yday(paste0("2000","-",month_day)),"2000-01-01"),y=!!sym(input$overlay_newData_longterm_col),color="USGS long-term"),size=0.8,color="black")
-            }
-
-          p1 <- p1+
-            scale_x_date(date_breaks="1 month",limits=c(as.Date("2000-01-01"),as.Date("2000-12-31")),date_labels = "%m%d")+
-            labs(title=isolate(input$dailyStats_ts_overlay_title),x = "MonthDay",y =mean_col)+
-            theme_classic()+
-            theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                  ,panel.border = element_rect(colour="black",fill=NA, size=0.5)
-                  ,plot.title = element_text(hjust=0.5)
-                  ,plot.background = element_rect(color="grey20",size=2)
-                  ,legend.position = "right"
-                  ,axis.text.x=element_text(angle=45, hjust=1))
-          #p1<- plotly::ggplotly(p1)
-          print(p1)
-
-        })
-      }) # renderPlot close
-
-    }else{
-      if (!all(is.na(data_to_plot[,mean_col]))){
-
-        output$plot_dailyStats_ts_overlay <- renderPlotly({
-          p1 <- ggplot(data_to_plot,aes(x=as.Date(yday(Date),"2000-01-01"),y=!!sym(mean_col)))+
-            geom_line(aes(colour=year),size=0.8)+
-            scale_x_date(date_breaks="1 month",limits=c(as.Date("2000-01-01"),as.Date("2000-12-31")),date_labels = "%m%d")+
-            labs(title=isolate(input$dailyStats_ts_overlay_title),x = "MonthDay",y =mean_col)+
-            theme_classic()+
-            theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                  ,panel.border = element_rect(colour="black",fill=NA, size=0.5)
-                  ,plot.title = element_text(hjust=0.5)
-                  ,plot.background = element_rect(color="grey20",size=2)
-                  ,legend.position = "right"
-                  ,axis.text.x=element_text(angle=45, hjust=1))
-            ggplotly(p1,dynamicTicks = FALSE) %>% plotly::layout()
-        })  # renderPlot close
-      }else{
-        shinyalert("Warning","No data available to plot for the selected variable!"
-                   ,closeOnClickOutside = TRUE
-                   ,closeOnEsc = TRUE
-                   ,confirmButtonText="OK"
-                   ,inputId = "alert_data_not_avail_for_ts")
-      }##inner if else loop close
-    } ## outer if else loop close
-
-  }) ##observeEvent end
-
   #################  4:Boxplots << All parameters #################
 
-  observeEvent(input$display_box, {
-
-    output$display_box_plots <- renderUI({
-      withSpinner(plotlyOutput("plot_dailyStats_box",height="600px",width="1200px"),type=2)
-    })
-
-    myList <- processed$processed_dailyStats
-    variable_to_plot <- input$boxplot_variable_name
-    myData <- myList[[which(names(myList)==variable_to_plot)]]
-    mean_col <- paste0(input$boxplot_variable_name,".",input$boxplot_metrics)
-    if(input$box_group=="year"){
-      #myData[,input$box_group] <- format(myData[,"Date"],"%Y")
-      myData[,input$box_group] <- format(as.Date(myData$Date, format="%Y-%m-%d %H:%M:%S"),"%Y")
-    cols_selected = c("Date",input$box_group,mean_col)
-    }else if(input$box_group=="month"){
-      #myData[,input$box_group] <- format(myData[,"Date"],"%m")
-      myData[,input$box_group] <- format(as.Date(myData$Date, format="%Y-%m-%d %H:%M:%S"),"%m")
-    cols_selected = c("Date",input$box_group,mean_col)
-    }else if(input$box_group=="season"){
-    myData <- addSeason(myData)
-    cols_selected = c("Date",input$box_group,mean_col)
-    }else if(input$box_group=="month2"){
-    #myData[,"year"] <- format(myData[,"Date"],"%Y")
-    myData[,"year"] <- format(as.Date(myData$Date, format="%Y-%m-%d %H:%M:%S"),"%Y")
-    #myData[,"month"] <- format(myData[,"Date"],"%m")
-    myData[,"month"] <- format(as.Date(myData$Date, format="%Y-%m-%d %H:%M:%S"),"%m")
-    cols_selected = c("Date","year","month",mean_col)
-    }else if(input$box_group=="season2"){
-    myData <- addSeason(myData)
-    cols_selected = c("Date","year","season",mean_col)
-    }
-
-    data_to_plot <- myData[cols_selected]
-    if (!all(is.na(data_to_plot[,mean_col]))&input$box_group!="month2"&input$box_group!="season2"){
-    output$plot_dailyStats_box <- renderPlotly({
-
-      p2 <- ggplot(data=data_to_plot,aes(x=!!sym(isolate(input$box_group)),y=!!sym(isolate(mean_col)))) +
-        geom_boxplot()+
-        labs(title=isolate(input$box_title),x = isolate(input$box_group),y = isolate(input$boxplot_variable_name))+
-        theme_bw()+
-        theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-              ,plot.title = element_text(hjust=0.5)
-              ,axis.text.x = element_text(angle=0, hjust=1))
-      p2 <- ggplotly(p2)
-      print(p2)
-    })
-    } else if(!all(is.na(data_to_plot[,mean_col]))&input$box_group=="month2"){
-      output$plot_dailyStats_box <- renderPlotly({
-
-        p2 <- ggplot(data=data_to_plot,aes(x=month,y=!!sym(isolate(mean_col)),fill=year)) +
-          geom_boxplot(position=position_dodge(width=0.1))+
-          labs(title=isolate(input$box_title),x = "month",y = isolate(input$boxplot_variable_name))+
-          theme_bw()+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,plot.title = element_text(hjust=0.5)
-                ,axis.text.x = element_text(angle=0, hjust=1))
-        ggplotly(p2) %>% plotly::layout(boxmode="group")
-      })
-    } else if(!all(is.na(data_to_plot[,mean_col]))&input$box_group=="season2"){
-      output$plot_dailyStats_box <- renderPlotly({
-
-        data_to_plot$season = reorderSeason(data_to_plot$season)
-        p2 <- ggplot(data=data_to_plot,aes(x=season,y=!!sym(isolate(mean_col)),fill=year)) +
-          geom_boxplot(position=position_dodge(width=0.1))+
-          labs(title=isolate(input$box_title),x = "season",y = isolate(input$boxplot_variable_name))+
-          theme_bw()+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,plot.title = element_text(hjust=0.5)
-                ,axis.text.x = element_text(angle=0, hjust=1))
-        ggplotly(p2) %>% plotly::layout(boxmode="group")
-      })
-    }else{
-      shinyalert("Warning","No data available to plot for the selected variable!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
-                 confirmButtonText="OK",inputId = "alert_data_not_avail_for_box")
-    }
-
-  })  #observeEvent end
 
   ## close the alert messages
   observeEvent(input$alert_data_not_avail_for_box,{
@@ -1982,73 +1155,6 @@ function(input, output, session) {
   })
 
 
-  #################  5:CDF << All parameters  #################
-
-  observeEvent(input$run_CDF, {
-
-    output$display_plot_CDF <- renderUI({
-      withSpinner(plotlyOutput("plot_CDF",height="600px",width="1200px"),type=2)
-    })
-
-
-    myList <- processed$processed_dailyStats
-    variable_to_plot <- input$CDF_variable_name
-    myData.all <- myList[[which(names(myList)==variable_to_plot)]]
-
-    if (input$CDF_select_year=="All"){
-      myData <- myData.all
-    }else{
-      myData.all[,"year"] <- format(myData.all[,"Date"],"%Y")
-      myData <- myData.all[myData.all$year==input$CDF_select_year,]
-    }
-    mean_col <- paste0(input$CDF_variable_name,".mean")
-    if (input$CDF_shading=="quantiles"){
-      upper_col <- paste0(input$CDF_variable_name,".q.75%")
-      lower_col <- paste0(input$CDF_variable_name,".q.25%")
-    }else if (input$CDF_shading=="minMax"){
-      lower_col <- paste0(input$CDF_variable_name,".min")
-      upper_col <- paste0(input$CDF_variable_name,".max")
-    }
-    cols_selected = c("Date",mean_col,lower_col,upper_col)
-    data.plot <- myData[cols_selected]
-
-    if (input$CDF_select_season=="All"){
-      season.choice = NULL
-    }else{
-      season.choice = input$CDF_select_season
-    }
-
-    output$plot_CDF <- renderPlotly({
-
-      # g <- ggplot(data=data.plot,aes(x=!!sym(mean_col)))+
-      #      geom_step(stat="ecdf")
-      # inside <- ggplot_build(g)
-      # matched <- merge(inside$data[[1]],data.frame(x=data.plot[,names(data.plot)==mean_col]
-      #                                              ,data.plot[,names(data.plot)==lower_col]
-      #                                              ,data.plot[,names(data.plot)==upper_col]),by=("x"))
-      # names(matched)[ncol(matched)] <- "data.plot.max"
-      # names(matched)[ncol(matched)-1] <-"data.plot.min"
-      # CDF_plot <- g+geom_ribbon(data=matched,aes(x=x,ymin=ecdf(data.plot.min)(x),ymax=ecdf(data.plot.max)(x)),alpha=0.5,fill="green")
-
-      CDF_plot <- CompSiteCDF.updated(file.input = NULL
-                                     , dir.input = getwd()
-                                     , dir.output = getwd()
-                                     , Param.Name = mean_col
-                                     , Shaded.Names = c(lower_col,upper_col)
-                                     , Plot.title = isolate(input$CDF_title)
-                                     , Plot.season = isolate(season.choice)
-                                     , hist.columnName = NULL
-                                     , df.input = data.plot)
-      CDF_plot <- ggplotly(CDF_plot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
-      if (is.null(CDF_plot)){
-        shinyalert("Warning","No data available to plot for the selected variable/year/season!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
-                   confirmButtonText="OK",inputId = "alert_data_not_avail_for_CDF")
-      }
-      print(CDF_plot)
-    })
-
-
-  }) # observeEvent close
 
   ## close the alert messages
   observeEvent(input$alert_data_not_avail_for_CDF,{
@@ -2056,66 +1162,6 @@ function(input, output, session) {
     shinyjs::runjs("swal.close();")
   })
 
-
-  #################  6:Raster graphs << All parameters #################
-  observeEvent(input$run_raster, {
-    output$display_raster_graphs <- renderUI({
-      withSpinner(plotOutput("plot_dailyStats_raster",height="550px",width="1200px"),type=2)
-    })
-
-    myMonth <- seq(as.Date("2020-01-01"),as.Date("2020-12-31"),by="1 month")
-    month_numeric <- lubridate::yday(myMonth)/365*52+1
-    month_label <- lubridate::month(myMonth,label=TRUE)
-    myList <- processed$processed_dailyStats
-    variable_to_plot <- input$dailyStats_raster_variable_name
-    myData <- myList[[which(names(myList)==variable_to_plot)]]
-    mean_col <- paste0(input$dailyStats_raster_variable_name,".",input$dailyStats_raster_metrics)
-    cols_selected <- c("Date",mean_col)
-    data_to_plot <- myData[cols_selected]
-    data_to_plot[,"year"] <- format(data_to_plot[,"Date"],"%Y")
-    if (input$raster_plot_color=="hcl"){
-      colorV <- hcl.colors(12)
-    }else if(input$raster_plot_color=="rainbow"){
-      colorV <- rainbow(12)
-    }else if(input$raster_plot_color=="terrain"){
-      colorV <- terrain.colors(12)
-    }else if (input$raster_plot_color=="heat"){
-      colorV <- heat.colors(12)
-    }else if (input$raster_plot_color=="topo"){
-      colorV <- topo.colors(12)
-    }
-    #data_to_plot[,"yday"] <- lubridate::yday(as.Date(data_to_plot[,"Date"],format="%Y-%m-%d"))
-    if (!all(is.na(data_to_plot[,mean_col]))){
-    output$plot_dailyStats_raster <- renderPlot({
-         p1 <- ggplot(data_to_plot,aes(x=as.Date(yday(Date),"2000-01-01"),y=year))+
-           geom_raster(aes(fill=!!sym(mean_col)))+
-           coord_equal()+
-           scale_fill_gradientn(name=mean_col,na.value="white",colours=colorV)+
-           scale_x_date(date_breaks="1 month",date_labels = "%b")+
-           scale_colour_manual(values=NA)+
-           labs(title=isolate(input$dailyStats_raster_title), x = "month",y = "year")+
-           guides(color=guide_legend("No data",override.aes = list(fill="white")))+
-           theme_classic()+
-           theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                 ,panel.border = element_rect(colour="black",fill=NA, size=0.5)
-                 ,plot.title = element_text(hjust=0.5)
-                 ,aspect.ratio = isolate(input$raster_plot_aspect_ratio)
-                 ,plot.background = element_rect(color="grey20",size=2)
-                 ,legend.position = "right"
-                 )
-         #ggplotly(p1)
-         print(p1)
-       })  # renderPlot close
-
-  }else{
-    shinyalert("Warning","No data available to plot for the selected variable!"
-               ,closeOnClickOutside = TRUE
-               ,closeOnEsc = TRUE
-               ,confirmButtonText="OK"
-               ,inputId = "alert_data_not_avail_for_ts")
-  }##inner if else loop close
-
-  }) ##observeEvent end
 
   #################  1: Thermal Statistics << Temperature  #################
 
@@ -3031,7 +2077,6 @@ function(input, output, session) {
 
 
   output$downloadReport <- downloadHandler(
-
     filename = function(){
       to_download$fileName_report
     },
@@ -3056,26 +2101,7 @@ function(input, output, session) {
       return(list(myBreaks, x_date_label))
     }
   }
-  
 
-  
-   getMapTitle <- function(shandingName, userTitle, lowerColumn, upperColumn) {
-    shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
-    if (shandingName=="quantiles"){
-      shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
-    } else if (shandingName=="minMax"){
-      shadingText <- " \n <span style='font-size:10px'>(Shading between daily minimum and maximum values)</span>"
-    } else if (shandingName=="dynamic"){
-      shadingText <- paste("\n <span style='font-size:10px'>(Shading between" , lowerColumn, "and", upperColumn, ")</span>", sep=" ")
-    }
-    
-    if(userTitle != "") {
-      shading_text = paste0(userTitle, shadingText)
-    } else {
-      shading_text =  paste0("Uploaded File metrics", shadingText)
-    }
-    return(shading_text)
-  }
   
   changeDateFormat <- function(uploadedDate, uploadedFormat) {
     newFormat = ""
@@ -3189,41 +2215,7 @@ function(input, output, session) {
  }) 
   
 
-  
- draw_uploaded_file_stats <- function() {
-   basePlot <- NULL
-   mainMapTitle <- getMapTitle(input$dailyStats_shading, input$dailyStats_ts_title, lowerColumn = NULL, upperColumn = NULL)
-   variable_to_plot <- input$dailyStats_ts_variable_name 
-   statsCols <- paste(variable_to_plot, input$dailyStats_ts_metrics, sep=".")
-   statsList <- processed$processed_dailyStats
-   mainData <- Reduce(full_join, statsList)
-   myData  <- mainData %>% select(statsCols, "Date") %>%
-     gather(key = "parameter", value = "value", -Date)
-   
-   main_range = calculate_time_range(as.list(myData))
-   mainBreaks = main_range[[1]]
-   main_x_date_label = main_range[[2]]
-   
-   basePlot <- ggplot(data = myData, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y = value)) +
-     geom_line(aes(colour=parameter)) +
-     #scale_x_datetime(date_labels="%Y-%m-%d",date_breaks=paste0(1," month"))+
-     scale_x_datetime(date_labels=main_x_date_label,date_breaks=mainBreaks)+  
-     labs(title=mainMapTitle, x="Date", y="Parameters")+
-     theme_bw()+
-     facet_grid(parameter ~ ., scales = "free_y")+
-     theme(
-       strip.background = element_blank()
-       ,strip.text.y = element_blank()
-       #,strip.text.y = element_text(angle = 35)
-       ,strip.placement = "outside"
-       ,text=element_text(size=10,face = "bold", color="cornflowerblue")
-       ,plot.title = element_text(hjust=0.5)
-       ,legend.position="bottom"
-       ,axis.text.x=element_text(angle=65, hjust=10)
-     )
-   return(basePlot)
-   
- } 
+
 
  prepareDiscretePlot <- function(mergedDataSet, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
    mainPlot <- NULL
@@ -3249,61 +2241,13 @@ function(input, output, session) {
    return(mainPlot)
  }
  
-   draw_uploaded_file_ts <- function(){
-    mainPlot <- NULL
-    mainMapTitle <- getMapTitle(input$dailyStats_shading, input$dailyStats_ts_title,lowerColumn = NULL, upperColumn = NULL)
-    statsList <- processed$processed_dailyStats
-    variable_to_plot <- input$dailyStats_ts_variable_name
-    
-    mainData <- Reduce(full_join, statsList)
-      #shadingText <- paste0(variable_to_plot, " between daily 25th percentiles and 75th percentiles")
-      mainList <- list()
-      for(varName in variable_to_plot) {
-        if(input$dailyStats_shading=="quantiles" | input$dailyStats_shading=="newData") {
-          mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "q.25%", sep="."), upper_col=paste(varName, "q.75%", sep="."), Date=Date))
-        } else if(input$dailyStats_shading=="minMax"){
-          mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "min", sep="."), upper_col=paste(varName, "max", sep="."), Date=Date))
-        } 
-      }
-      main_range = calculate_time_range(as.list(bind_rows(mainList, .id="df")))
-      mainBreaks = main_range[[1]]
-      main_x_date_label = main_range[[2]]
-      
-      mainPlot <- prepareBasePlot(dataList= mainList, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks)
-    return(mainPlot)
-  }
-
-
-  prepareBasePlot <- function(dataList, mapTitle, xDateLabel, xDateBrakes) {
-    mainPlot <- NULL
-    mainPlot <- ggplot(bind_rows(dataList, .id="df"), dynamicTicks = TRUE) +
-      labs(title=mapTitle, x="Date", y="Parameters")+
-      geom_ribbon(na.rm=TRUE, show.legend=TRUE, aes(ymin=lower_col,ymax=upper_col,x=as.POSIXct(Date,format="%Y-%m-%d",fill="df")),alpha=0.3, inherit.aes = FALSE)+
-      geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=df))+
-      scale_x_datetime(date_labels=xDateLabel,date_breaks=xDateBrakes)+
-      theme_bw()+
-      facet_grid(df ~ ., scales = "free_y")+
-      scale_color_discrete(name="")+
-      theme(
-        strip.background = element_blank()
-        ,legend.title=element_blank()
-        ,strip.text.y = element_blank()
-        ,strip.placement = "outside"
-        ,text=element_text(size=10,face = "bold", color="cornflowerblue")
-        ,plot.title = element_text(hjust=0.5)
-        ,legend.position="bottom"
-        ,axis.text.x=element_text(angle=65, hjust=1, vjust=1)
-      ) 
-    return(mainPlot)
-  }
-  
   #Need to test below to remove unknown timezone error
   checkTimeZone <- function (x) 
   {
     tzone <- attr(x, "tzone")[[1]]
     if (is.null(tzone) && !is.POSIXt(x)) 
       return("UTC")
-    if (is.character(tzone) && nzchar(tzone)) 
+    if (is.character(tzone) && nzchar(tzone))
       return(tzone)
     tzone <- attr(as.POSIXlt(x[1]), "tzone")[[1]]
     if (is.null(tzone)) 
@@ -3415,5 +2359,23 @@ function(input, output, session) {
   shinyAlertUI <- function(id,msg,type) {
 	  shinyalert(inputId=id,type,msg,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK")
   }
+  
+
+  observe({ 
+    if(input$all_parameters_subtabs == "tab_time_series") {
+      renderDataExp$render <- TRUE
+    } else if( input$all_parameters_subtabs == "tab_summary_tables") {
+      renderSummaryTables$render <- TRUE
+    } else if (input$all_parameters_subtabs == "tab_time_series_overlay") {
+      renderTSOverlay$render <- TRUE
+    } else if (input$all_parameters_subtabs == "tab_box") {
+      renderTSBoxPlot$render <- TRUE
+    } else if (input$all_parameters_subtabs == "tab_CDF") {
+      renderCDFPlot$render <- TRUE
+    } else if (input$all_parameters_subtabs == "tab_raster") {
+      renderRasterPlot$render <- TRUE
+    } 
+    
+  })
   
 }

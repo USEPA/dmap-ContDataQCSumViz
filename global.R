@@ -66,6 +66,7 @@ library("purrr")
 library("qpcR")
 library("readr")
 library("padr")
+#library("ggh4x")
 plan(multisession)
 #options(scipen=999) 
 
@@ -92,9 +93,8 @@ source("dayMet/fun.DayMetData.R")
 source("dayMet/fun.daymet_raw_plot.R")
 source("constants.R")
 
- list.files("modules") %>%
+ list.files("modules", recursive = TRUE) %>%
  purrr::map(~ source(paste0("modules/", .)))
-
 
 
 # Other ----

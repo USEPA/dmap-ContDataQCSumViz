@@ -64,3 +64,59 @@ fun.findVariableToProcess <- function(fileColNames, getDateCols= FALSE) {
   }
   return(parmsToProcess)
 }
+
+#' @export
+getMapTitle <- function(shandingName, userTitle, lowerColumn, upperColumn) {
+  shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
+  if (shandingName=="quantiles"){
+    shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
+  } else if (shandingName=="minMax"){
+    shadingText <- " \n <span style='font-size:10px'>(Shading between daily minimum and maximum values)</span>"
+  } else if (shandingName=="dynamic"){
+    shadingText <- paste("\n <span style='font-size:10px'>(Shading between" , lowerColumn, "and", upperColumn, ")</span>", sep=" ")
+  }
+  
+  if(userTitle != "") {
+    shading_text = paste0(userTitle, shadingText)
+  } else {
+    shading_text =  paste0("Uploaded File metrics", shadingText)
+  }
+  return(shading_text)
+}
+
+#' @export
+addSeason <- function(df=myDf){
+  #df[,"year"] <- format(df[,"Date"],"%Y")
+  df[,"year"] <- format(as.Date(df$Date, format="%Y-%m-%d %H:%M:%S"),"%Y")
+  #df[,"monthday"] <- format(df[,"Date"],"%m%d")
+  df[,"monthday"] <- format(as.Date(df$Date, format="%Y-%m-%d %H:%M:%S"),"%m%d")
+  df[,"season"] <- NA
+  df[,"season"][as.numeric(df[, "monthday"]) >= as.numeric("0101") & as.numeric(df[
+    ,"monthday"])< as.numeric(ContData.env$myTimeFrame.Season.Spring.Start)] <- "Winter"
+  df[,"season"][as.numeric(df[,"monthday"]) >= as.numeric(ContData.env$myTimeFrame.Season.Spring.Start) &
+                  as.numeric(df[,"monthday"])< as.numeric(ContData.env$myTimeFrame.Season.Summer.Start)] <- "Spring"
+  df[,"season"][as.numeric(df[,"monthday"]) >= as.numeric(ContData.env$myTimeFrame.Season.Summer.Start) &
+                  as.numeric(df[,"monthday"])< as.numeric(ContData.env$myTimeFrame.Season.Fall.Start)] <- "Summer"
+  df[,"season"][as.numeric(df[, "monthday"]) >= as.numeric(ContData.env$myTimeFrame.Season.Fall.Start) &
+                  as.numeric(df[,"monthday"])< as.numeric(ContData.env$myTimeFrame.Season.Winter.Start)] <- "Fall"
+  df[,"season"][as.numeric(df[, "monthday"]) >= as.numeric(ContData.env$myTimeFrame.Season.Winter.Start) &
+                  as.numeric(df[,"monthday"])<= as.numeric("1231")] <- "Winter"
+  df$season <- reorderSeason(seasonCol=df$season)
+  df[,"yearseason"] <- paste(df[,"year"],df[,"season"], sep="")
+  return(df)
+}
+
+#' @export
+reorderSeason <- function(seasonCol=mySeasonCol){
+  seasonNames <- unique(seasonCol)
+  if (length(seasonNames)==4){
+    seasonCol <- factor(seasonCol,levels=c("Spring","Summer","Fall","Winter"))
+  }else if(length(seasonNames)==3 & !('Winter' %in% seasonNames)){
+    seasonCol <- factor(seasonCol,levels=c("Spring","Summer","Fall"))
+  }else if(length(seasonNames)==3 & !('Spring' %in% seasonNames)){
+    seasonCol <- factor(seasonCol,levels=c("Summer","Fall","Winter"))
+  }else if(length(seasonNames)==2 & !('Winter' %in% seasonNames)&!('Spring' %in% seasonNames)){
+    seasonCol <- factor(seasonCol,levels=c("Summer","Fall"))
+  }
+  return(seasonCol)
+}
