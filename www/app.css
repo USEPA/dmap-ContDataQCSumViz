@@ -31,7 +31,10 @@
  }
  
 #display_fill_data .shiny-input-container .checkbox label span {font-weight: bold;}
-#display_validation_msgs, #display_validation_msgs_new,#display_validation_msgs_new2,#display_validation_msgs_discrete {   color: red; font-weight: bold; }
+/*#display_validation_msgs, 
+#display_validation_msgs_new,
+#display_validation_msgs_new2,
+#display_validation_msgs_discrete {   color: red; font-weight: bold; }*/
 
 /*.action-btn-style {
   color:cornflowerblue;background-color:black;font-weight:bold;
@@ -81,4 +84,27 @@
   border-top: 25px solid transparent;
   border-left: 50px solid #f5f5f5;
   border-bottom: 25px solid transparent;
+}
+
+[id$='help_text_air_water'],
+[id$='help_text_thermal_statistics'],
+[id$='display_help_text_growing_degree_days'],
+[id$='help_text_IHA'],
+[id$='help_text_flashiness'] {
+  font-size:16px;
+  color:black;
+  font-style:bold;
+  display:block;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-wrap: normal;
+}
+
+/*.sep {
+    float: right;
+}
+*/
+div.dt-button-collection button {
+    color: #ffffff;
+    background-color: #2fa4e7;
+    border-color: #2fa4e7;
 }

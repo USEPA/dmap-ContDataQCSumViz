@@ -6979,7 +6979,7 @@
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
     ".RData": {
-      "checksum": "46cc97b946b9cff1a9392ecfd9830cb7"
+      "checksum": "f903f1e79e32cfb98b3fcafbd4c82ebd"
     },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
@@ -7000,7 +7000,7 @@
       "checksum": "34a4484a74f12f566189b70ec50719e3"
     },
     "constants.R": {
-      "checksum": "716555ae4c8729b2a71f75958e1adea3"
+      "checksum": "ba63e7b7848da7d7cc7e17a51f4e27e2"
     },
     "ContDataQC_test_data/01104455_Gage_20150303_20201028.csv": {
       "checksum": "9a882d718de77bbe5b43d35fb5752452"
@@ -7225,10 +7225,10 @@
       "checksum": "09d6f4bb2029f39f076a2172b191c95c"
     },
     "modules/allParameterTab/dataExplorationTSModule.R": {
-      "checksum": "b156d22ee80f1a90fb9e99c417283c46"
+      "checksum": "31914a61bda46d3420523cbe7ff35063"
     },
     "modules/allParameterTab/summaryTablesModule.R": {
-      "checksum": "be549d8eb66cce6be08bebc76669dc68"
+      "checksum": "b4130961243e92123e2347b54d0dd544"
     },
     "modules/allParameterTab/tsBoxPlotModule.R": {
       "checksum": "10e4f990f17a3a929b70e600e3f1b43a"
@@ -7254,6 +7254,12 @@
     "modules/fileUploadModule.R": {
       "checksum": "62e948ce71d071b4b6923e515e22dc75"
     },
+    "modules/hydrologyTab/flashinessModule.R": {
+      "checksum": "244cee397f57e07b1e8f2996a4cf5491"
+    },
+    "modules/hydrologyTab/ihaModule.R": {
+      "checksum": "f3de6eb2b5ddf6b33d6f79606c66923e"
+    },
     "modules/metaDataModule.R": {
       "checksum": "e123ecceddd0a718fe0a277ece1f677d"
     },
@@ -7261,13 +7267,22 @@
       "checksum": "e7eae94dcb8ddd36830be17cdbc163ae"
     },
     "modules/rawTSmodule.R": {
-      "checksum": "337903a824da53fa0a8f016d84d008c7"
+      "checksum": "72998fe7704fe9394c606c52b2c333e9"
     },
     "modules/shinyAlertModule.R": {
-      "checksum": "4300f51ed3d0c25c607cab0922cf67e0"
+      "checksum": "27d011384c89eaf1af82d23f03cd7cd3"
+    },
+    "modules/temperatureTab/airVsWaterModule.R": {
+      "checksum": "ee6262d9fd876aa435c661ad033e6a22"
+    },
+    "modules/temperatureTab/growingDegreeModule.R": {
+      "checksum": "ed1876470f6a850152a9509d93b48cfb"
+    },
+    "modules/temperatureTab/thermalClassificationModule.R": {
+      "checksum": "99f5341ddb7ebf10432b07a8320b38d8"
     },
     "modules/temperatureTab/thermalStatsModule.R": {
-      "checksum": "1c9dc36e492b770aab87c9f98c3998e5"
+      "checksum": "b54aaf93b43b802a3139b0d94e1f4cbe"
     },
     "Output/reports/myReport.html": {
       "checksum": "409c923b7b56ece270a890064d734b9a"
@@ -7336,13 +7351,16 @@
       "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
     },
     "server.R": {
-      "checksum": "64d43023ae3ad95028f354c73cb67c78"
+      "checksum": "6c95f832d8d178749fdad89c6f34407f"
     },
     "StreamThermal.GB27_Water_05102022_10252022.csv.GB27.20230523.xlsx": {
       "checksum": "692057c7d33af0f60160746a3af6f572"
     },
+    "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230530.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
     "sumVizUtils/common.functions.R": {
-      "checksum": "8936c26abcee9f7205c4dca7ad420695"
+      "checksum": "3cd9df2e81b12b4563d1ccebf6f51288"
     },
     "sumVizUtils/fun.getMetaSummary.R": {
       "checksum": "26f57bc9af7ed627202338e381754f0c"
@@ -7351,7 +7369,7 @@
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
     },
     "ui.R": {
-      "checksum": "820ce9216271c390fffa21532c862461"
+      "checksum": "dbbcbfd7e30955b89c22dd4766210d88"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -7387,7 +7405,7 @@
       "checksum": "0b29ec94c8c8c810e3e5f37c7701b717"
     },
     "www/app.css": {
-      "checksum": "8ce7009ed6dff494be263d39692dd84c"
+      "checksum": "194620ca027a498b3c58e2a67eac6182"
     },
     "www/ContDataSumViz_banner.png": {
       "checksum": "af6a3abac239c0553226d175af54536d"

@@ -76,8 +76,8 @@ function(input, output, session) {
   workflowStatus <- reactiveValues(finish=FALSE,
                                    elementId="step1",
                                    state="init")
-
-
+  
+  
   currentOutPutId <- reactiveValues()
   gageColNames  <- NULL
   daymetCols <- NULL
@@ -124,6 +124,11 @@ function(input, output, session) {
   
   #Temperature
   renderThermalStats <- reactiveValues(render=FALSE)
+  renderAirVsWater <- reactiveValues(render=FALSE)
+  renderGrowingDegree <- reactiveValues(render=FALSE)
+  renderThermalClassification <- reactiveValues(render=FALSE)
+  renderIHA <- reactiveValues(render=FALSE)
+  renderFlashiness <- reactiveValues(render=FALSE)
 
   #  Upload Data##############################
   #EWL
@@ -131,7 +136,7 @@ function(input, output, session) {
   do.call(file.remove, list(list.files("Selected_Files", full.names = TRUE)))
  
   #init modules, reactive values will reflect when the buttons are actually clicked
-  #shinyAlertModuleServer("common_alert_msg")
+  #shinyAlertModuleServer("de")
   progressWorkflowModuleUIServer("statusWorkflow", workflowStatus)
   calculateDailyStatsModuleServer("calculateDailyStats", formated_raw_data, homeDTvalues, metaHomeValues,loaded_data, dailyStatusCalculated,processed,readyForCalculation)
   
@@ -151,10 +156,12 @@ function(input, output, session) {
   TsRasterPlotModuleServer(id="tsRasterPlot", dailyStats=processed, renderRasterPlot)
   
   
-   #Home page file upload
+  #Home page file upload
   uploaded_data<-eventReactive(c(input$uploaded_data_file),{
         readyForCalculation$status <- FALSE
         dailyStatusCalculated$status <- "unfinished"
+
+        
         my_data <- uploadFile(c(input$uploaded_data_file), stopExecution=FALSE, tab="homePage")
          # drop all rows where all the columns are empty
        if (length(my_data) > 0 ) {
@@ -234,9 +241,14 @@ function(input, output, session) {
   })
   
   #init server modules
+  #uploaded_data is not availabe before this point
   #Continuous Data Exploration >  Temperature > Thermal statistics tab
-  ThermalStatsModuleServer("thermalStats", uploaded_data(), formated_raw_data, dailyStats=processed, loaded_data, to_download, renderThermalStats)
-  
+  ThermalStatsModuleServer("thermalStats", uploaded_data, formated_raw_data, dailyStats=processed, loaded_data, to_download, renderThermalStats)
+  AirVsWaterModuleServer("airVsWater", uploaded_data, dailyStats=processed, renderAirVsWater)
+  GrowingDegreeModuleServer("growingDegree",renderGrowingDegree)
+  ThermalClassificationModuleServer("thermalClassification", dailyStats=processed, uploaded_data, renderThermalClassification)
+  IHAModuleServer("IHATab", dailyStats=processed, loaded_data, uploaded_data, to_download, renderIHA)
+  FlashinessModuleServer("flashinessTab",  renderFlashiness)
   
   
   observeEvent(uploaded_data(), {
@@ -548,203 +560,18 @@ function(input, output, session) {
      ) #end of parent div
     })
     #end of Daymet
-    
     tagList(
       sliderInput("n", "N", 1, 1000, 500),
       textInput("label", "Label")
     )
 
-    ############ DE, TEMP, Air vs water" << Temperature ############
-
-    output$air_vs_water_input_1 <- renderUI({
-      variables_avail <- names(uploaded_data())
-      air_keys_in_favor_order <- c("Air.Temp.C","AIR.TEMP.C","Air_Temp_C","AIR_TEMP_C")
-      possible_air_columns <- air_keys_in_favor_order[air_keys_in_favor_order %in% variables_avail]
-      if (length(possible_air_columns)==0){
-        air_to_select <- variables_avail[grep('air',variables_avail,ignore.case=TRUE)][1]
-      }else{
-        air_to_select <- possible_air_columns[1]
-      }
-      selectizeInput("air_temp_name",label ="Select Air Temperature Column",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=air_to_select,
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$air_vs_water_input_2 <- renderUI({
-      variables_avail <- names(uploaded_data())
-      water_keys_in_favor_order <- c("Water.Temp.C","WATER.TEMP.C","Water_Temp_C","WATER_TEMP_C")
-      possible_water_columns <- water_keys_in_favor_order[water_keys_in_favor_order %in% variables_avail]
-      if (length(possible_water_columns)==0){
-        water_to_select <- variables_avail[grep('water',variables_avail,ignore.case=TRUE)][1]
-      }else{
-        water_to_select <- possible_water_columns[1]
-      }
-      selectizeInput("water_temp_name",label ="Select Water Temperature Column",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=water_to_select,
-                     options = list(hideSelected = FALSE))
-    })
-
-    air_limit_temp_tooltip_text = paste0("limit the data points with air temperature")
-    output$air_vs_water_input_4 <- renderUI({
-      tipify(numericInput("air_limit_temp",label ="air temperature less than this value will be excluded",0,min=-10,max=100,step=1.0),air_limit_temp_tooltip_text,placement="right",trigger="hover")
-    })
-
-    output$display_thermal_sensitivity_button <- renderUI({
-      actionButton(inputId="display_thermal_sensitivity", label="Display thermal sensitivity",class="btn btn-primary")
-    })
-
-    output$display_help_text_air_water <- renderUI({
-      verbatimTextOutput("help_text_air_water")
-    })
-
-    output$help_text_air_water <- renderText({
-      filePath <- "help_text_files/Temperature_AirWater.txt"
-      fileText <- paste(readLines(filePath,encoding="UTF-8"),collapse="\n")
-      fileText
-    })
-
-    ############  DE, TEMP, "growing degree days" << Temperature ###############
-
-    output$growing_degree_days_input_1 <- renderUI({
-      verbatimTextOutput("come_later_text")
-    })
-
-    # output$come_later_text <- renderText({
-    #   myText <- "Coming later"
-    # })
-
-    output$display_help_text_growing_degree_days <- renderUI({
-      verbatimTextOutput("help_text_growing_degree_days")
-    })
-
-    output$help_text_growing_degree_days <- renderText({
-      filePath <- "help_text_files/Temperature_GrowingDegreeDays.txt"
-      fileText <- paste(readLines(filePath,encoding="UTF-8"),collapse="\n")
-      fileText
-    })
-
-
-
-    ############ DE, TEMP, thermal classification" << Temperature ############
-
-    output$water_temp_class_input_1 <- renderUI({
-      variables_avail <- names(uploaded_data())
-      water_keys_in_favor_order <- c("Water.Temp.C","WATER.TEMP.C","Water_Temp_C","WATER_TEMP_C")
-      possible_water_columns <- water_keys_in_favor_order[water_keys_in_favor_order %in% variables_avail]
-      if (length(possible_water_columns)==0){
-        water_to_select <- variables_avail[grep('water',variables_avail,ignore.case=TRUE)][1]
-      }else{
-        water_to_select <- possible_water_columns[1]
-      }
-      selectizeInput("water_temp_name_in_class",label ="Select Water Temperature Column",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=water_to_select,
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$display_water_temp_class_button <- renderUI({
-      actionButton(inputId="display_water_class", label="Display water temperature class",class="btn btn-primary")
-    })
-
-    output$display_help_text_water_temp_class <- renderUI({
-      verbatimTextOutput("help_text_water_temp_class")
-    })
-
-    output$help_text_water_temp_class <- renderText({
-      filePath <- "help_text_files/Temperature_Classification.txt"
-      fileText <- paste(readLines(filePath,encoding="UTF-8"),collapse="\n")
-      fileText
-    })
-
-    ############  DE, HYDRO, IHA" << Hydrology ############
-
-    output$IHA_input_1 <- renderUI({
-      if (length(processed$processed_dailyStats)==0){
-      variables_avail <- names(uploaded_data())
-      date_keys_in_favor_order <- c("Date.Time","DATE.TIME","Year","YEAR","Date","DATE","MonthDay")
-      possible_date_columns <- date_keys_in_favor_order[date_keys_in_favor_order %in% variables_avail]
-      }else{
-        possible_date_columns <- "Date"
-        variables_avail <- possible_date_columns
-      }
-      selectizeInput("IHA_Date_name",label ="Select Date Column",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected=possible_date_columns[1],
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$IHA_input_2 <- renderUI({
-      variables_avail <- names(processed$processed_dailyStats)
-      parameter_to_select <- variables_avail[grep('Discharge',variables_avail,ignore.case=TRUE)][1]
-      selectizeInput("parameter_name",label ="Select Parameter Column",
-                     choices=variables_avail,
-                     multiple = FALSE,
-                     selected= parameter_to_select,
-                     options = list(hideSelected = FALSE))
-    })
-
-    output$display_IHA_button <- renderUI({
-      actionButton(inputId="display_IHA", label="Display IHA tables",class="btn btn-primary")
-    })
-
-
-    output$display_save_IHA_button <- renderUI({
-      downloadButton(outputId="save_IHA", label="Save IHA results to excel",class="btn btn-primary")
-    })
-
-    output$display_help_text_IHA <- renderUI({
-      verbatimTextOutput("help_text_IHA")
-    })
-
-    output$help_text_IHA <- renderText({
-      filePath <- "help_text_files/Hydrology_IHA.txt"
-      fileText <- paste(readLines(filePath,encoding="UTF-8"),collapse="\n")
-      fileText
-    })
-
-    ############  DE, HYDRO, Flashiness" << Hydrology ############
-
-    output$flashiness_input_1 <- renderUI({
-      verbatimTextOutput("come_later_text_1")
-    })
-
-    output$come_later_text_1 <- renderText({
-      myText <- "Coming later"
-    })
-
-    output$display_help_text_flashiness <- renderUI({
-      verbatimTextOutput("help_text_flashiness")
-    })
-
-    output$help_text_flashiness <- renderText({
-      filePath <- "help_text_files/Hydrology_RBI.txt"
-      fileText <- paste(readLines(filePath,encoding="UTF-8"),collapse="\n")
-      fileText
-    })
-
   }) #observe Event end
-
-
-
-  #################  1:Summary table << All parameters #################
-
-
-
-
-  ################# 2:Time series plot << All parameters #################
 
   
   #Discrete Data Exploration
-  
   uploaded_discreteData<-eventReactive(c(input$uploaded_discrete_file),{
     discrete_data <- uploadFile(c(input$uploaded_discrete_file), stopExecution = FALSE)
-    discrete_data <- discrete_data[rowSums(is.na(discrete_data) | is.null(discrete_data) | discrete_data == "") != ncol(discrete_data),]
+        discrete_data <- discrete_data[rowSums(is.na(discrete_data) | is.null(discrete_data) | discrete_data == "") != ncol(discrete_data),]
     return(discrete_data)
   })
   
@@ -1104,643 +931,40 @@ function(input, output, session) {
   })
 
 
-
-  #################  2: Thermal Sensitivity << Temperature  #################
-  observeEvent(input$exclude_data_points,{
-    if (input$exclude_data_points == 'Yes'){
-      shinyjs::show("cp_air_temp")
-    }else{
-      shinyjs::hide("cp_air_temp")
-    }
-  })
-
-
-  observeEvent(input$display_thermal_sensitivity, {
-
-    hide("help_text_air_water")
-
-    output$display_thermal_sensitivity_plot_1 <- renderUI({
-      withSpinner(plotOutput("thermal_sensitivity_plot_1"))
-    })
-
-    myList <- processed$processed_dailyStats
-    ## check if both of "Air.Temp.C" and "Water.Temp.C" are available
-    if(all(names(myList) %in% c(input$air_temp_name,input$water_temp_name))){
-      myData.Air <- myList[[which(names(myList)==input$air_temp_name)]]
-      myData.Water <- myList[[which(names(myList)==input$water_temp_name)]]
-      mean_col_air <- paste0(input$air_temp_name,".mean")
-      mean_col_water <- paste0(input$water_temp_name,".mean")
-      data_air_to_plot <- myData.Air[c("Date",mean_col_air)]
-      data_water_to_plot <- myData.Water[c("Date",mean_col_water)]
-      data_to_plot <- merge(data_air_to_plot,data_water_to_plot,by="Date")
-      if (input$exclude_data_points=="Yes"){
-        data_to_plot <- data_to_plot[data_to_plot$Air.Temp.C.mean>input$air_limit_temp,]
-      }
-      data_to_model <- data_to_plot
-      names(data_to_model)[match(mean_col_water,names(data_to_model))] <- "y"
-      names(data_to_model)[match(mean_col_air,names(data_to_model))] <- "x"
-      myModel <- lm(y ~ x,data_to_model,na.action=na.exclude)
-      myEquation <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2,
-                               list(a = format(unname(coef(myModel)[1]), digits = 2),
-                                    b = format(unname(coef(myModel)[2]), digits = 2),
-                                    r2 = format(summary(myModel)$r.squared, digits = 3)))
-
-      output$thermal_sensitivity_plot_1 <- renderPlot({
-        p1 <- ggplot(data_to_plot,aes(x=!!sym(mean_col_air),y=!!sym(mean_col_water)))+
-          geom_point(alpha=0.5,size=1.5)+
-          geom_smooth(method="loess",se=FALSE,color="black")+
-          geom_smooth(method="lm",se=FALSE,color="cornflowerblue",linetype="dashed",size=2)+
-          geom_text(x=(min(data_to_plot[,mean_col_air],na.rm=TRUE)+5)
-                    ,y=(max(data_to_plot[,mean_col_water],na.rm=TRUE)-1.5)
-                    ,label=as.character(as.expression(myEquation))
-                    ,color="cornflowerblue"
-                    ,size=8
-                    ,parse= TRUE)+
-          labs(x = "Air Temperature",y = "Water Temperature")+
-          theme_minimal()+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue"),
-                plot.background = element_rect(color="grey20",size=2),
-                legend.position = "right",
-          )
-        #ggplotly(p1)
-        print(p1)
-      })  # renderPlot close
-
-    }else{
-      shinyalert("Warning","We need both of air temperature and water temperature data to run thermal sensitivity. Please check."
-                 ,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK",inputId = "alert_data_not_val_for_thermal")
-    } ## outer if else loop close
-
-  }) ## observeEvent end
-
-  observeEvent(input$alert_data_not_val_for_thermal,{
-    shinyjs::runjs("swal.close();")
-  })
-
-
-  #################  4: Thermal classification << Temperature  #################
-  observeEvent(input$display_water_class, {
-    hide("help_text_water_temp_class")
-
-    output$display_water_temp_class_table <- renderUI({
-      withSpinner(dataTableOutput("water_temp_class_table"))
-    })
-    myList <- processed$processed_dailyStats
-    myData.Water <- myList[[which(names(myList)==input$water_temp_name_in_class)]]
-    mean_col_water <- paste0(input$water_temp_name_in_class,".mean")
-    data_water_to_calculate <- myData.Water[c("Date",mean_col_water)]
-    #save(data_water_to_calculate,file="test_data_water_class.RData")
-    ## calculate the July/August mean for each year
-    all.years <- unique(format(data_water_to_calculate$Date,format="%Y"))
-    #print(all.years)
-    calculated.mean <- data.frame(matrix(ncol=3,nrow=0))
-
-    for (i in 1:length(all.years)){
-      year.now = all.years[i]
-      to.select <- data_water_to_calculate$Date >= as.Date(paste0(year.now,"-07-01")) & data_water_to_calculate$Date <= as.Date(paste0(year.now,"-08-31"))
-      mean.this.year <- mean(data_water_to_calculate[to.select,2],na.rm=TRUE)
-      if(is.nan(mean.this.year)){
-        class.this.year <- "NaN"
-      }else if (mean.this.year<10){
-        class.this.year <- "Very cold"
-      }else if(mean.this.year>=10&mean.this.year<15){
-        class.this.year <- "Cold"
-      }else if(mean.this.year>=15&mean.this.year<18){
-        class.this.year <- "Cold-cool"
-      }else if(mean.this.year>=18&mean.this.year<21){
-          class.this.year <- "Cool"
-      }else if(mean.this.year>=21&mean.this.year<=24){
-        class.this.year <- "Cool-warm"
-      }else if(mean.this.year>24){
-        class.this.year <- "Warm"
-      }
-      calculated.mean[i,] <- c(year.now,round(mean.this.year,digits=1),class.this.year)
-    } # for loop end
-    second_col_name <- paste0("Mean July/Aug water temperature(C)")
-    colnames(calculated.mean) <- c("Year",second_col_name,"Class")
-
-    output$water_temp_class_table <- DT::renderDataTable({
-      myTable <- DT::datatable(
-        calculated.mean,
-        extensions ="Buttons",
-        rownames = FALSE,
-        options = list(
-          scrollX = FALSE, #allow user to scroll wide tables horizontally
-          stateSave = FALSE,
-          pageLength = 15,
-          dom = 'Bt',
-          buttons = list('copy','print',list(extend = 'collection',buttons = c('csv','excel','pdf'),text='Download')),
-          columnDefs = list(list(className="dt-center",targets="_all"))
-        )
-      ) # dataTable end
-      print(myTable)
-    })  ## renderDataTable ebd
-
-  })  ##observeEvent end
-
-
-  #################  1: IHA << Hydrology  ####
-  observeEvent(input$display_IHA, {
-
-    hide("help_text_IHA")
-
-    output$display_IHA_table_1 <- renderUI({
-      withSpinner(dataTableOutput("IHA_table_1"))
-    })
-
-    output$display_IHA_plot_button_1 <-renderUI({
-      fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_1", label="Show/hide plot",class="btn btn-primary")
-      )) # column and fluidRow close
-    })
-
-    output$display_IHA_table_2 <- renderUI({
-      dataTableOutput("IHA_table_2")
-    })
-
-    output$display_IHA_plot_button_2 <-renderUI({
-      fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_2", label="Show/hide plot",class="btn btn-primary")
-      )) # column and fluidRow close
-    })
-
-    output$display_IHA_table_3 <- renderUI({
-      dataTableOutput("IHA_table_3")
-    })
-
-    output$display_IHA_plot_button_3 <-renderUI({
-      fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_3", label="Show/hide plot",class="btn btn-primary")
-      )) # column and fluidRow close
-    })
-
-    output$display_IHA_table_4 <- renderUI({
-      dataTableOutput("IHA_table_4")
-    })
-
-    output$display_IHA_plot_button_4 <-renderUI({
-      fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_4", label="Show/hide plot",class="btn btn-primary")
-      )) # column and fluidRow close
-    })
-
-    output$display_IHA_table_5 <- renderUI({
-      dataTableOutput("IHA_table_5")
-    })
-
-    output$display_IHA_plot_button_5 <-renderUI({
-      fluidRow(column(width=12,align="right",
-                      actionButton(inputId="display_IHA_plot_5", label="Show/hide plot",class="btn btn-primary")
-      )) # column and fluidRow close
-    })
-
-    myList <- processed$processed_dailyStats
-
-    if (length(myList)>0){
-    variable_to_IHA <- input$parameter_name
-    myData <- myList[[which(names(myList)==variable_to_IHA)]]
-    mean_col <- paste0(input$parameter_name,".mean")
-    myData <- myData[c('Date',mean_col)]
-    myData.IHA<- read.zoo(myData,format="%Y-%m-%d")
-    processed$myData.IHA <- myData.IHA
-    }else{
-    myData <- uploaded_data()
-    print(paste0("the file name is:",loaded_data$name))
-    }
-
-    IHA.table.options <- list(
-      scrollX = TRUE, #allow user to scroll wide tables horizontally
-      stateSave = FALSE,
-      pageLength = 15,
-      dom = 'Bt',
-      buttons = list('copy','print',list(extend = 'collection',buttons = c('csv','excel','pdf'),text='Download')),
-      columnDefs = list(list(className="dt-center",targets="_all"))
-    )
-
-    myYr <- "calendar"
-    ## IHA parameters group 1; Magnitude of monthly water conditions
-    Analysis.Group.1 <- group1(myData.IHA, year=myYr)
-    #save(Analysis.Group.1,file="IHA_group_1.RData")
-    Analysis.Group.1 <- as.data.frame(Analysis.Group.1) %>% mutate_if(is.numeric,round,digits=2)
-    processed$IHA.group.1 <- Analysis.Group.1
-
-    output$IHA_table_1 <- DT::renderDataTable({
-      table.title.1 <- "Group 1: Magnitude of monthly water conditions"
-      myTable <- DT::datatable(
-        Analysis.Group.1,
-        caption = htmltools::tags$caption(table.title.1,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-        extensions ="Buttons",
-        rownames = TRUE,
-        options = IHA.table.options
-      ) # dataTable end
-      print(myTable)
-    })  # renderDT end
-
-
-   ## IHA parameters group 2: Magnitude of monthly water condition and include 12 parameters
-    Analysis.Group.2 <- group2(myData.IHA, year=myYr)
-    #save(Analysis.Group.2,file="IHA_group_2.RData")
-    Analysis.Group.2 <- as.data.frame(Analysis.Group.2) %>% mutate_if(is.numeric,round,digits=2)
-    processed$IHA.group.2 <- Analysis.Group.2
-    output$IHA_table_2 <- DT::renderDataTable({
-      table.title.1 <- "Group 2: Magnitude of monthly water condition and include 12 parameters"
-      myTable <- DT::datatable(
-        Analysis.Group.2,
-        caption = htmltools::tags$caption(table.title.1,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-        extensions ="Buttons",
-        rownames = FALSE,
-        options = IHA.table.options
-      ) # dataTable end
-      print(myTable)
-    })  # renderDT end
-
-    ## IHA parameters group 3:Timing of annual extreme water conditions
-    Analysis.Group.3 <- group3(myData.IHA, year=myYr)
-    #save(Analysis.Group.3,file="IHA_group_3.RData")
-    processed$IHA.group.3 <- Analysis.Group.3
-    output$IHA_table_3 <- DT::renderDataTable({
-      table.title.3 <- "Group 3: Timing of annual extreme water conditions"
-      myTable <- DT::datatable(
-        Analysis.Group.3,
-        caption = htmltools::tags$caption(table.title.3,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-        extensions ="Buttons",
-        rownames = TRUE,
-        options = IHA.table.options
-      ) # dataTable end
-      print(myTable)
-    })  # renderDT end
-
-    ## IHA parameters group 4; Frequency and duration of high and low pulses
-    # defaults to 25th and 75th percentiles
-    Analysis.Group.4 <- group4(myData.IHA, year=myYr)
-    #save(Analysis.Group.4,file="IHA_group_4.RData")
-    processed$IHA.group.4 <- Analysis.Group.4
-    output$IHA_table_4 <- DT::renderDataTable({
-      table.title.4 <- "Group 4: Frequency and duration of high and low pulses"
-      myTable <- DT::datatable(
-        Analysis.Group.4,
-        caption = htmltools::tags$caption(table.title.4,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-        extensions ="Buttons",
-        rownames = TRUE,
-        options = IHA.table.options
-      ) # dataTable end
-      print(myTable)
-    })  # renderDT end
-
-
-    ## IHA parameters group 5; Rate and frequency of water condition changes
-    Analysis.Group.5 <- group5(myData.IHA, year=myYr)
-    #save(Analysis.Group.5,file="IHA_group_5.RData")
-    processed$IHA.group.5 <- Analysis.Group.5
-    Analysis.Group.5 <- as.data.frame(Analysis.Group.5) %>% mutate_if(is.numeric,round,digits=2)
-    output$IHA_table_5 <- DT::renderDataTable({
-      table.title.5 <- "Group 5: Rate and frequency of water condition changes"
-      myTable <- DT::datatable(
-        Analysis.Group.5,
-        caption = htmltools::tags$caption(table.title.5,style="color:black;font-size:16px;font-weight:bold;text-align:left;"),
-        extensions ="Buttons",
-        rownames = TRUE,
-        options = IHA.table.options
-      ) # dataTable end
-      print(myTable)
-    })  # renderDT end
-
-    ## create Excel Workbook
-    require(XLConnect)
-    Group.Desc <- c("Magnitude of monthly water conditions"
-                    ,"Magnitude of monthly water condition and include 12 parameters"
-                    ,"Timing of annual extreme water conditions"
-                    ,"Frequency and duration of high and low pulses"
-                    ,"Rate and frequency of water condition changes")
-    df.Groups <- as.data.frame(cbind(paste0("Group",1:5),Group.Desc))
-    myDate <- format(Sys.Date(),"%Y%m%d")
-    Notes.User <- Sys.getenv("USERNAME")
-    myYr <- "calendar"
-    Notes.Names <- c("Dataset (SiteID)","IHA.Year","Analysis.Date (YYYYMMDD)"
-                     ,"Analysis.Time (HHMMSS)","Analysis.User")
-    Notes.Data <- c(loaded_data$name, myYr, myDate, Notes.User)
-    df.Notes <- as.data.frame(cbind(Notes.Names,Notes.Data))
-    # Open/Create file
-    myFile.XLSX <- paste("IHA",loaded_data$name, myYr, myDate, "xlsx", sep=".")
-    Notes.Summary <- summary(processed$myData.IHA)
-    wb <- loadWorkbook(myFile.XLSX, create = TRUE) # load workbook, create if not existing
-    # create sheets
-    createSheet(wb, name = "NOTES")
-    createSheet(wb, name = "Group1")
-    createSheet(wb, name = "Group2")
-    createSheet(wb, name = "Group3")
-    createSheet(wb, name = "Group4")
-    createSheet(wb, name = "Group5")
-    # write to worksheet
-    writeWorksheet(wb, df.Notes, sheet = "NOTES", startRow=1)
-    writeWorksheet(wb, Notes.Summary, sheet = "NOTES", startRow=10)
-    writeWorksheet(wb, df.Groups, sheet="NOTES", startRow=25)
-    writeWorksheet(wb, processed$IHA.group.1, sheet = "Group1",rownames=c("year",rownames(processed$IHA.group.1)))
-    writeWorksheet(wb, processed$IHA.group.2, sheet = "Group2")
-    writeWorksheet(wb, processed$IHA.group.3, sheet = "Group3",rownames=c("year",rownames(processed$IHA.group.3)))
-    writeWorksheet(wb, processed$IHA.group.4, sheet = "Group4",rownames=c("year",rownames(processed$IHA.group.4)))
-    writeWorksheet(wb, processed$IHA.group.5, sheet = "Group5",rownames=c("year",rownames(processed$IHA.group.5)))
-    to_download$wb_IHA <- wb
-    to_download$fileName_IHA <- myFile.XLSX
-
-  }) #observeEvent end
-
-
-  ### changed the actionButton "save_IHA" to downloadButton
-
-  # observeEvent(input$save_IHA, {
-  #   require(XLConnect)
-  #   if (!file.exists("Output/saved_IHA/")) dir.create(file.path("Output/saved_IHA"),showWarnings = FALSE, recursive = TRUE)
-  #
-  #   Group.Desc <- c("Magnitude of monthly water conditions"
-  #                   ,"Magnitude of monthly water condition and include 12 parameters"
-  #                   ,"Timing of annual extreme water conditions"
-  #                   ,"Frequency and duration of high and low pulses"
-  #                   ,"Rate and frequency of water condition changes")
-  #   df.Groups <- as.data.frame(cbind(paste0("Group",1:5),Group.Desc))
-  #   myDate <- format(Sys.Date(),"%Y%m%d")
-  #   myTime <- format(Sys.time(),"%H%M%S")
-  #   Notes.User <- Sys.getenv("USERNAME")
-  #   myYr <- "calendar"
-  #   Notes.Names <- c("Dataset (SiteID)","IHA.Year","Analysis.Date (YYYYMMDD)"
-  #                    ,"Analysis.Time (HHMMSS)","Analysis.User")
-  #   Notes.Data <- c(loaded_data$name, myYr, myDate, myTime, Notes.User)
-  #   df.Notes <- as.data.frame(cbind(Notes.Names,Notes.Data))
-  #   # Open/Create file
-  #   myFile.XLSX <- paste("Output/saved_IHA/IHA",loaded_data$name, myYr, myDate, myTime, "xlsx", sep=".")
-  #   Notes.Summary <- summary(processed$myData.IHA)
-  #   wb <- loadWorkbook(myFile.XLSX, create = TRUE) # load workbook, create if not existing
-  #   # create sheets
-  #   createSheet(wb, name = "NOTES")
-  #   createSheet(wb, name = "Group1")
-  #   createSheet(wb, name = "Group2")
-  #   createSheet(wb, name = "Group3")
-  #   createSheet(wb, name = "Group4")
-  #   createSheet(wb, name = "Group5")
-  #   # write to worksheet
-  #   writeWorksheet(wb, df.Notes, sheet = "NOTES", startRow=1)
-  #   writeWorksheet(wb, Notes.Summary, sheet = "NOTES", startRow=10)
-  #   writeWorksheet(wb, df.Groups, sheet="NOTES", startRow=25)
-  #   writeWorksheet(wb, processed$IHA.group.1, sheet = "Group1",rownames=c("year",rownames(processed$IHA.group.1)))
-  #   writeWorksheet(wb, processed$IHA.group.2, sheet = "Group2")
-  #   writeWorksheet(wb, processed$IHA.group.3, sheet = "Group3",rownames=c("year",rownames(processed$IHA.group.3)))
-  #   writeWorksheet(wb, processed$IHA.group.4, sheet = "Group4",rownames=c("year",rownames(processed$IHA.group.4)))
-  #   writeWorksheet(wb, processed$IHA.group.5, sheet = "Group5",rownames=c("year",rownames(processed$IHA.group.5)))
-  #   # save workbook
-  #   saveWorkbook(wb, myFile.XLSX)
-  # })# observeEvent end
-
-  output$save_IHA <- downloadHandler(
-
-    filename = function(){
-      to_download$fileName_IHA
-    },
-
-    content = function(file){
-      saveWorkbook(to_download$wb_IHA,file)
-    }
-
-  )
-
-  observeEvent(input$display_IHA_plot_1, {
-    output$IHA_plot_1 <- renderUI({
-      plotOutput("IHA_plot_1_to_show")
-    })
-
-    if(input$display_IHA_plot_1 %% 2 !=0){
-
-       shinyjs::show("IHA_plot_1_panel")
-       data_to_plot <- cbind(rownames(processed$IHA.group.1),data.frame(processed$IHA.group.1,row.names = NULL))
-       colnames(data_to_plot)[1]<-'Year'
-       data_for_plot_1 <- data_to_plot %>% gather(key,value,-Year) ## convert into long format
-       data_for_plot_1$Year <- as.numeric(as.character(data_for_plot_1$Year))
-       data_for_plot_1$key <- factor(data_for_plot_1$key, levels = c("January","February","March","April","May",
-                                                                   "June","July","August","September","October","November","December"))
-       output$IHA_plot_1_to_show <- renderPlot({
-       p1 <- ggplot(data_for_plot_1)+
-             geom_line(aes(x=Year,y=value,colour=key),size=0.8,linetype="dashed")+
-             labs(x = "Year",y = paste0("Magnitude of monthly water conditions"),color="Month")+
-             theme_minimal()+
-             scale_x_continuous(breaks=unique(data_for_plot_1$Year),labels = unique(data_for_plot_1$Year))+
-             theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                   ,plot.background = element_rect(color="grey20",size=2)
-                   ,legend.position = "right"
-                   )
-       print(p1)
-
-      }) # renderPlot end
-    }else{
-      shinyjs::hide("IHA_plot_1_panel")
-    } # if else loop end
-  }) #observeEvent to display IHA plot 1 end
-
-  observeEvent(input$display_IHA_plot_2, {
-    output$IHA_plot_2a <- renderUI({
-      plotOutput("IHA_plot_2a_to_show")
-    })
-
-    output$IHA_plot_2b <- renderUI({
-      plotOutput("IHA_plot_2b_to_show")
-    })
-
-    if(input$display_IHA_plot_2 %% 2 !=0){
-
-      shinyjs::show("IHA_plot_2_panel")
-      data_to_plot <- processed$IHA.group.2[,1:11]
-      column_names <- colnames(data_to_plot)
-      min_cols_to_select <- c("year",column_names[str_detect(column_names,"Min")])
-      max_cols_to_select <- c("year",column_names[str_detect(column_names,"Max")])
-      data_to_plot_min <- data_to_plot[min_cols_to_select]
-      data_to_plot_max <- data_to_plot[max_cols_to_select]
-      data_for_plot_2a <- data_to_plot_min %>% gather(key,value,-year) ## convert into long format
-      data_for_plot_2b <- data_to_plot_max %>% gather(key,value,-year) ## convert into long format
-      output$IHA_plot_2a_to_show <- renderPlot({
-        p1 <- ggplot(data_for_plot_2a,aes(x=year,y=value,fill=key))+
-              geom_bar(stat="identity",position="dodge")+
-              labs(x = "Year",y = paste0("Magnitude of water condition"),fill="parameters")+
-          theme_minimal()+
-          scale_x_continuous(breaks=unique(data_for_plot_2a$year),labels = unique(data_for_plot_2a$year))+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,plot.background = element_rect(color="grey20",size=2)
-                ,legend.position = "right"
-          )
-        print(p1)
-
-      }) # renderPlot end
-
-      output$IHA_plot_2b_to_show <- renderPlot({
-        p2 <- ggplot(data_for_plot_2b,aes(x=year,y=value,fill=key))+
-          geom_bar(stat="identity",position="dodge")+
-          labs(x = "Year",y = paste0("Magnitude of water condition"),fill="parameters")+
-          theme_minimal()+
-          scale_x_continuous(breaks=unique(data_for_plot_2b$year),labels = unique(data_for_plot_2b$year))+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,plot.background = element_rect(color="grey20",size=2)
-                ,legend.position = "right"
-          )
-        print(p2)
-
-      }) # renderPlot end
-    }else{
-      shinyjs::hide("IHA_plot_2_panel")
-    } # if else loop end
-  }) #observeEvent to display IHA plot 2 end
-
-
-  observeEvent(input$display_IHA_plot_3, {
-    output$IHA_plot_3 <- renderUI({
-      plotOutput("IHA_plot_3_to_show")
-    })
-
-    if(input$display_IHA_plot_3 %% 2 !=0){
-
-      shinyjs::show("IHA_plot_3_panel")
-      data_to_plot <- cbind(rownames(processed$IHA.group.3),data.frame(processed$IHA.group.3,row.names = NULL))
-      colnames(data_to_plot)[1]<-'year'
-      data_for_plot_3 <- data_to_plot %>% gather(key,value,-year) ## convert into long format
-      data_for_plot_3$year <- as.numeric(as.character(data_for_plot_3$year))
-      output$IHA_plot_3_to_show <- renderPlot({
-        p1 <- ggplot(data_for_plot_3,aes(x=year,y=value,fill=key))+
-          geom_bar(stat="identity",position="dodge")+
-          labs(x = "Year",y = paste0("Julian days"),fill="parameters")+
-          theme_minimal()+
-          scale_x_continuous(breaks=unique(data_for_plot_3$year),labels = unique(data_for_plot_3$year))+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,plot.background = element_rect(color="grey20",size=2)
-                ,legend.position = "right"
-          )
-        print(p1)
-
-      }) # renderPlot end
-    }else{
-      shinyjs::hide("IHA_plot_3_panel")
-    } # if else loop end
-  }) #observeEvent to display IHA plot 3 end
-
-
-  observeEvent(input$display_IHA_plot_4, {
-    output$IHA_plot_4a <- renderUI({
-      plotOutput("IHA_plot_4a_to_show")
-    })
-
-    output$IHA_plot_4b <- renderUI({
-      plotOutput("IHA_plot_4b_to_show")
-    })
-
-    if(input$display_IHA_plot_4 %% 2 !=0){
-
-      shinyjs::show("IHA_plot_4_panel")
-      data_to_plot <- cbind(rownames(processed$IHA.group.4),data.frame(processed$IHA.group.4,row.names = NULL))
-      colnames(data_to_plot)[1]<-'year'
-      column_names <- colnames(data_to_plot)
-      number_cols_to_select <- c("year",column_names[str_detect(column_names,"number")])
-      length_cols_to_select <- c("year",column_names[str_detect(column_names,"length")])
-      data_to_plot_number <- data_to_plot[number_cols_to_select]
-      data_to_plot_length <- data_to_plot[length_cols_to_select]
-      data_for_plot_4a <- data_to_plot_number %>% gather(key,value,-year) ## convert into long format
-      data_for_plot_4b <- data_to_plot_length %>% gather(key,value,-year) ## convert into long format
-      data_for_plot_4a$year <- as.numeric(as.character(data_for_plot_4a$year))
-      data_for_plot_4b$year <- as.numeric(as.character(data_for_plot_4b$year))
-
-      output$IHA_plot_4a_to_show <- renderPlot({
-        p1 <- ggplot(data_for_plot_4a,aes(x=year,y=value,fill=key))+
-          geom_bar(stat="identity",position="dodge")+
-          labs(x = "Year",y = paste0("Frequency"),fill="parameters")+
-          theme_minimal()+
-          scale_x_continuous(breaks=unique(data_for_plot_4a$year),labels = unique(data_for_plot_4a$year))+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,plot.background = element_rect(color="grey20",size=2)
-                ,legend.position = "right"
-          )
-        print(p1)
-
-      }) # renderPlot end
-
-      output$IHA_plot_4b_to_show <- renderPlot({
-        p2 <- ggplot(data_for_plot_4b,aes(x=year,y=value,fill=key))+
-          geom_bar(stat="identity",position="dodge")+
-          labs(x = "Year",y = paste0("Duration"),fill="parameters")+
-          theme_minimal()+
-          scale_x_continuous(breaks=unique(data_for_plot_4b$year),labels = unique(data_for_plot_4b$year))+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,plot.background = element_rect(color="grey20",size=2)
-                ,legend.position = "right"
-          )
-        print(p2)
-
-      }) # renderPlot end
-    }else{
-      shinyjs::hide("IHA_plot_4_panel")
-    } # if else loop end
-  }) #observeEvent to display IHA plot 4 end
-
-  observeEvent(input$display_IHA_plot_5, {
-    output$IHA_plot_5 <- renderUI({
-      plotOutput("IHA_plot_5_to_show")
-    })
-
-    if(input$display_IHA_plot_5 %% 2 !=0){
-
-      shinyjs::show("IHA_plot_5_panel")
-      data_to_plot <- cbind(rownames(processed$IHA.group.5),data.frame(processed$IHA.group.5,row.names = NULL))
-      colnames(data_to_plot)[1]<-'Year'
-      data_to_plot <- data_to_plot[,1:3]
-      data_for_plot_1 <- data_to_plot %>% gather(key,value,-Year) ## convert into long format
-      data_for_plot_1$Year <- as.numeric(as.character(data_for_plot_1$Year))
-
-      output$IHA_plot_5_to_show <- renderPlot({
-        p1 <- ggplot(data_for_plot_1)+
-          geom_line(aes(x=Year,y=value,colour=key),size=0.8,linetype="dashed")+
-          labs(x = "Year",y = paste0("Rate"),color="Month")+
-          theme_minimal()+
-          scale_x_continuous(breaks=unique(data_for_plot_1$Year),labels = unique(data_for_plot_1$Year))+
-          theme(text=element_text(size=16,face = "bold", color="cornflowerblue")
-                ,plot.background = element_rect(color="grey20",size=2)
-                ,legend.position = "right"
-          )
-        print(p1)
-
-      }) # renderPlot end
-    }else{
-      shinyjs::hide("IHA_plot_5_panel")
-    } # if else loop end
-  }) #observeEvent to display IHA plot 5 end
-
-
   ################### "Create report"####
-
-  observeEvent(input$createReport,{
-
-    showModal(modalDialog("Creating the report now...",footer=NULL))
-
-    #if (!file.exists("Output/reports")) dir.create(file.path("Output/reports"),showWarnings = FALSE, recursive = TRUE)
-    ## copy template file to a temporary directory so that the output file will be saved there
-    ## in case user do not have written permission to the app directory when deployed
-    tempRMD <- file.path(tempdir(),"SiteSummary.Rmd")
-    file.copy("_moved/SiteSummary.Rmd",tempRMD,overwrite= TRUE)
-    build_summary_updated(dir_data="Output/to_report/"
-                  ,file_main="_Captions_SiteX.xlsx"
-                  ,sheet_main="metadata"
-                  ,file_prefix_sep="_"
-                  ,rmd_template=tempRMD
-                  ,output_format=input$report_format
-                  ,output_file=paste0(input$report_name,".",input$report_format))
-
-    to_download$fileName_report <- paste0(tempdir(),"/",input$report_name,".",input$report_format)
-    print(to_download$fileName_report)
-    removeModal()
-
-  })
-
-
-  output$downloadReport <- downloadHandler(
-    filename = function(){
-      to_download$fileName_report
-    },
-    content = function(file){
-      file.copy(to_download$fileName_report,file)
-    }
-  )
+  #Not used, for the future
+  # observeEvent(input$createReport,{
+  # 
+  #   showModal(modalDialog("Creating the report now...",footer=NULL))
+  # 
+  #   #if (!file.exists("Output/reports")) dir.create(file.path("Output/reports"),showWarnings = FALSE, recursive = TRUE)
+  #   ## copy template file to a temporary directory so that the output file will be saved there
+  #   ## in case user do not have written permission to the app directory when deployed
+  #   tempRMD <- file.path(tempdir(),"SiteSummary.Rmd")
+  #   file.copy("_moved/SiteSummary.Rmd",tempRMD,overwrite= TRUE)
+  #   build_summary_updated(dir_data="Output/to_report/"
+  #                 ,file_main="_Captions_SiteX.xlsx"
+  #                 ,sheet_main="metadata"
+  #                 ,file_prefix_sep="_"
+  #                 ,rmd_template=tempRMD
+  #                 ,output_format=input$report_format
+  #                 ,output_file=paste0(input$report_name,".",input$report_format))
+  # 
+  #   to_download$fileName_report <- paste0(tempdir(),"/",input$report_name,".",input$report_format)
+  #   print(to_download$fileName_report)
+  #   removeModal()
+  # 
+  # })
+  # 
+  # 
+  # output$downloadReport <- downloadHandler(
+  #   filename = function(){
+  #     to_download$fileName_report
+  #   },
+  #   content = function(file){
+  #     file.copy(to_download$fileName_report,file)
+  #   }
+  # )
 
   calculate_time_range <- function(baseData) {
     time_range <- difftime(max(as.POSIXct(baseData$Date,format="%Y-%m-%d"),na.rm = TRUE),min(as.POSIXct(baseData$Date,format="%Y-%m-%d"),na.rm = TRUE),units="days")
@@ -2018,11 +1242,26 @@ function(input, output, session) {
   }
   
   
+  #hydrology subtabs
+  observe({
+      if(input$hydro_subtabs == "IHA_tab") {
+        renderIHA$render <- TRUE
+      } else if( input$hydro_subtabs == "Flashiness_tab") {
+        renderFlashiness$render <- TRUE
+      }
+  })
   
-  # temperatue subtabs
+  
+  # temperature subtabs
   observe({
     if(input$temp_subtabs == "sb1") {
       renderThermalStats$render <- TRUE
+    } else if (input$temp_subtabs == "sb2") {
+      renderAirVsWater$render <- TRUE
+    } else if( input$temp_subtabs == "sb3") {
+      renderGrowingDegree$render <- TRUE
+    } else if (input$temp_subtabs == "sb4") {
+      renderThermalClassification$render <- TRUE
     }
   })
   

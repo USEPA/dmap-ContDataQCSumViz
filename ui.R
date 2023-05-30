@@ -269,8 +269,6 @@ shinyUI(fluidPage(
                   value = "temp_tab",
                   tabsetPanel(
                     id = "temp_subtabs",
-                    tags$head(tags$style("#help_text_air_water,#help_text_water_temp_class,#help_text_thermal_statistics,#help_text_growing_degree_days
-                                                                                          {font-size:16px;color:black;font-style:bold;display:block; }")),
                     ### DE, Temp, Thermal Stats----
                     tabPanel("Thermal statistics",
                       value = "sb1", br(),
@@ -282,111 +280,21 @@ shinyUI(fluidPage(
                     tabPanel("Air vs Water",
                       value = "sb2", br(),
                       column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            div(class="panel panel-default",style="margin:10px;",
-                                div(class="panel-heading"),
-                                div(class="panel-body",
-                                      uiOutput("air_vs_water_input_1"),
-                                      uiOutput("air_vs_water_input_2"),
-                                      radioButtons("exclude_data_points",
-                                        "Limit the data points with air temperature",
-                                        choices = c("No" = "No", "Yes" = "Yes"),
-                                        selected = "No"
-                                      ),
-                                      shinyjs::hidden(
-                                        div(
-                                          id = "cp_air_temp",
-                                          conditionalPanel(
-                                            condition = "input$exclude_data_points == 'Yes' ",
-                                            uiOutput("air_vs_water_input_4"),
-                                          ), # conditionalPanel end
-                                        ) # div end
-                                      ), # shinyjs:: hidden end
-                                      hr(),
-                                      uiOutput("display_thermal_sensitivity_button")
-                                )#end of panel body
-                            ) #end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            column(
-                              width = 12,
-                              uiOutput("display_help_text_air_water"),
-                              uiOutput("display_thermal_sensitivity_plot_1"),
-                              br(),
-                              uiOutput("display_thermal_sensitivity_plot_2")
-                            )
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        width = 12, AirVsWaterModuleUI("airVsWater")
                       ) # column close
                     ), # AW end
 
                     ### DE, Temp, GDD ----
                     tabPanel("Growing degree days",
                       value = "sb3", br(),
-                      br(),
-                      #column(
-                        #width = 12,
-                            # sidebarLayout(
-                            #   sidebarPanel(
-                            # width = 3,
-                            # hr(),
-                            # uiOutput("growing_degree_days_input_1"),
-                            # hr(),
-                            # uiOutput("display_growing_degree_days_button"),
-                          #),
-                          #mainPanel(
-                           # width = 11,
-                            column(
-                              width = 12,
-                              uiOutput("display_help_text_growing_degree_days"),
-                              div(
-                                id = "hyper_link_panel",
-                                conditionalPanel(
-                                  condition = "0==0",
-                                  a("Download R script", href = "GDD.R")
-                                ), # conditionalPanel end
-                              ) # div end
-                            ),
-                            column(
-                              width = 12,
-                              uiOutput("display_growing_degree_days_table")
-                            )
-                          #) # mainPanel end
-                        #) # sidebarLayout end
-                      #) # column close
+                       GrowingDegreeModuleUI("growingDegree")
                     ), # GDD, end
-
                     ### DE, Temp, Therm Class ----
                     tabPanel("Thermal classification",
                       value = "sb4", br(),
                       br(),
                       column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            div(class = "panel panel-default",style="margin:10px;",
-                                div(class="panel-heading"),
-                                div(class="panel-body",
-                                    uiOutput("water_temp_class_input_1"),
-                                    hr(),
-                                    uiOutput("display_water_temp_class_button")
-                            )#endo of panel body
-                            )#end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            column(
-                              width = 12,
-                              uiOutput("display_help_text_water_temp_class"),
-                              uiOutput("display_water_temp_class_table")
-                            )
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        width = 12,ThermalClassificationModuleUI(id="thermalClassification")
                       ) # column close
                     ) # Termal class, end
                   )
@@ -397,106 +305,104 @@ shinyUI(fluidPage(
                   value = "hydro_tab",
                   tabsetPanel(
                     id = "hydro_subtabs",
-                    tags$head(tags$style("#help_text_IHA,#help_text_flashiness
-                              {font-size:16px;color:black;font-style:bold;display:block; }")),
                     ### DE, Hydro, IHA----
                     tabPanel("IHA",
                       value = "IHA_tab", br(),
                       column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            div(class="panel panel-default",style="margin:10px;",
-                                div(class="panel-heading"),
-                                div(class="panel-body",
-                                    uiOutput("IHA_input_1"),
-                                    uiOutput("IHA_input_2"),
-                                    uiOutput("IHA_input_3"),
-                                    uiOutput("IHA_input_4"),
-                                    uiOutput("display_IHA_button"),
-                                    hr(),
-                                    uiOutput("display_save_IHA_button")
-                                ) # end of panel body
-                            ) # end of panel
-                          ),
-                          mainPanel(
-                            width = 9,
-                            column(
-                              width = 12,
-                              uiOutput("display_help_text_IHA"),
-                              uiOutput("display_IHA_table_1"),
-                              uiOutput("display_IHA_plot_button_1"),
-                              shinyjs::hidden(
-                                div(
-                                  id = "IHA_plot_1_panel",
-                                  conditionalPanel(
-                                    condition = "input$display_IHA_plot_1 %%2 !=0",
-                                    hr(),
-                                    uiOutput("IHA_plot_1"),
-                                  ), # conditionalPanel end
-                                ) # div end
-                              ) # shinyjs:: hidden end
-                              , br(),
-                              uiOutput("display_IHA_table_2"),
-                              uiOutput("display_IHA_plot_button_2"),
-                              shinyjs::hidden(
-                                div(
-                                  id = "IHA_plot_2_panel",
-                                  conditionalPanel(
-                                    condition = "input$display_IHA_plot_2 %%2 !=0",
-                                    hr(),
-                                    uiOutput("IHA_plot_2a"),
-                                    br(),
-                                    uiOutput("IHA_plot_2b")
-                                  ), # conditionalPanel end
-                                ) # div end
-                              ) # shinyjs:: hidden end
-                              , br(),
-                              uiOutput("display_IHA_table_3"),
-                              uiOutput("display_IHA_plot_button_3"),
-                              shinyjs::hidden(
-                                div(
-                                  id = "IHA_plot_3_panel",
-                                  conditionalPanel(
-                                    condition = "input$display_IHA_plot_3 %%2 !=0",
-                                    hr(),
-                                    uiOutput("IHA_plot_3")
-                                  ), # conditionalPanel end
-                                ) # div end
-                              ) # shinyjs:: hidden end
-                              , br(),
-                              uiOutput("display_IHA_table_4"),
-                              uiOutput("display_IHA_plot_button_4"),
-                              shinyjs::hidden(
-                                div(
-                                  id = "IHA_plot_4_panel",
-                                  conditionalPanel(
-                                    condition = "input$display_IHA_plot_4 %%2 !=0",
-                                    hr(),
-                                    uiOutput("IHA_plot_4a"),
-                                    br(),
-                                    uiOutput("IHA_plot_4b")
-                                  ), # conditionalPanel end
-                                ) # div end
-                              ) # shinyjs:: hidden end
-                              , br(),
-                              uiOutput("display_IHA_table_5"),
-                              uiOutput("display_IHA_plot_button_5"),
-                              shinyjs::hidden(
-                                div(
-                                  id = "IHA_plot_5_panel",
-                                  conditionalPanel(
-                                    condition = "input$display_IHA_plot_5 %%2 !=0",
-                                    hr(),
-                                    uiOutput("IHA_plot_5"),
-                                    br()
-                                  ), # conditionalPanel end
-                                ) # div end
-                              ) # shinyjs:: hidden end
-                            )
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        width = 12, IHAModuleUI("IHATab")
+                        # sidebarLayout(
+                        #   sidebarPanel(
+                        #     width = 3,
+                        #     div(class="panel panel-default",style="margin:10px;",
+                        #         div(class="panel-heading"),
+                        #         div(class="panel-body",
+                        #             uiOutput("IHA_input_1"),
+                        #             uiOutput("IHA_input_2"),
+                        #             uiOutput("IHA_input_3"),
+                        #             uiOutput("IHA_input_4"),
+                        #             uiOutput("display_IHA_button"),
+                        #             hr(),
+                        #             uiOutput("display_save_IHA_button")
+                        #         ) # end of panel body
+                        #     ) # end of panel
+                        #   ),
+                        #   mainPanel(
+                        #     width = 9,
+                        #     column(
+                        #       width = 12,
+                        #       uiOutput("display_help_text_IHA"),
+                        #       uiOutput("display_IHA_table_1"),
+                        #       uiOutput("display_IHA_plot_button_1"),
+                        #       shinyjs::hidden(
+                        #         div(
+                        #           id = "IHA_plot_1_panel",
+                        #           conditionalPanel(
+                        #             condition = "input$display_IHA_plot_1 %%2 !=0",
+                        #             hr(),
+                        #             uiOutput("IHA_plot_1"),
+                        #           ), # conditionalPanel end
+                        #         ) # div end
+                        #       ) # shinyjs:: hidden end
+                        #       , br(),
+                        #       uiOutput("display_IHA_table_2"),
+                        #       uiOutput("display_IHA_plot_button_2"),
+                        #       shinyjs::hidden(
+                        #         div(
+                        #           id = "IHA_plot_2_panel",
+                        #           conditionalPanel(
+                        #             condition = "input$display_IHA_plot_2 %%2 !=0",
+                        #             hr(),
+                        #             uiOutput("IHA_plot_2a"),
+                        #             br(),
+                        #             uiOutput("IHA_plot_2b")
+                        #           ), # conditionalPanel end
+                        #         ) # div end
+                        #       ) # shinyjs:: hidden end
+                        #       , br(),
+                        #       uiOutput("display_IHA_table_3"),
+                        #       uiOutput("display_IHA_plot_button_3"),
+                        #       shinyjs::hidden(
+                        #         div(
+                        #           id = "IHA_plot_3_panel",
+                        #           conditionalPanel(
+                        #             condition = "input$display_IHA_plot_3 %%2 !=0",
+                        #             hr(),
+                        #             uiOutput("IHA_plot_3")
+                        #           ), # conditionalPanel end
+                        #         ) # div end
+                        #       ) # shinyjs:: hidden end
+                        #       , br(),
+                        #       uiOutput("display_IHA_table_4"),
+                        #       uiOutput("display_IHA_plot_button_4"),
+                        #       shinyjs::hidden(
+                        #         div(
+                        #           id = "IHA_plot_4_panel",
+                        #           conditionalPanel(
+                        #             condition = "input$display_IHA_plot_4 %%2 !=0",
+                        #             hr(),
+                        #             uiOutput("IHA_plot_4a"),
+                        #             br(),
+                        #             uiOutput("IHA_plot_4b")
+                        #           ), # conditionalPanel end
+                        #         ) # div end
+                        #       ) # shinyjs:: hidden end
+                        #       , br(),
+                        #       uiOutput("display_IHA_table_5"),
+                        #       uiOutput("display_IHA_plot_button_5"),
+                        #       shinyjs::hidden(
+                        #         div(
+                        #           id = "IHA_plot_5_panel",
+                        #           conditionalPanel(
+                        #             condition = "input$display_IHA_plot_5 %%2 !=0",
+                        #             hr(),
+                        #             uiOutput("IHA_plot_5"),
+                        #             br()
+                        #           ), # conditionalPanel end
+                        #         ) # div end
+                        #       ) # shinyjs:: hidden end
+                        #     )
+                        #   ) # mainPanel end
+                        # ) # sidebarLayout end
                       ) # column close
                     ), # tabpanel, end, IHA
 
@@ -505,24 +411,24 @@ shinyUI(fluidPage(
                       value = "Flashiness_tab", br(),
                       br(),
                       column(
-                        width = 12,
-                        sidebarLayout(
-                          sidebarPanel(
-                            width = 3,
-                            hr(),
-                            uiOutput("flashiness_input_1"),
-                            hr(),
-                            uiOutput("display_flashiness_button"),
-                          ),
-                          mainPanel(
-                            width = 9,
-                            column(
-                              width = 12,
-                              uiOutput("display_help_text_flashiness"),
-                              uiOutput("display_flashiness_table")
-                            )
-                          ) # mainPanel end
-                        ) # sidebarLayout end
+                        width = 12, FlashinessModuleUI("flashinessTab")
+                        # sidebarLayout(
+                        #   sidebarPanel(
+                        #     width = 3,
+                        #     hr(),
+                        #     uiOutput("flashiness_input_1"),
+                        #     hr(),
+                        #     uiOutput("display_flashiness_button"),
+                        #   ),
+                        #   mainPanel(
+                        #     width = 9,
+                        #     column(
+                        #       width = 12,
+                        #       uiOutput("display_help_text_flashiness"),
+                        #       uiOutput("display_flashiness_table")
+                        #     )
+                        #   ) # mainPanel end
+                        # ) # sidebarLayout end
                       ) # column close
                     ) # tab panel Hydro flash end
                   )

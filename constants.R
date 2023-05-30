@@ -3,7 +3,7 @@ invalidDateFormt <- "Selected date format is not matching with the uploaded file
 invalidNewDateFormt <- "New date format is not matching with the first uploaded file date format. New date format should in "
 noGageIdFound <- "Enter a gage id"
 noGagaDataDownloaded <- "No USGS gage data has been downladed yet!"
-calculateDailyStats <- "Please calculate the daily statistics first on the 'Upload Data' tab and select required parameters"
+calculateDailyStatsMsg <- "Please calculate the daily statistics first on the 'Upload Data' tab and select required parameters"
 noDaymetDataDownloaded <- "Enter Site Latitude and Longitude values to download dayMet data."
 downlaodDaymetData <- "Please download daymet data first."
 selectDaymetVars <- "Please select daymet variables to plot"

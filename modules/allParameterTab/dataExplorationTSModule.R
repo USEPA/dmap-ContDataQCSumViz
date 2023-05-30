@@ -131,20 +131,14 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
             }
 
           } else {
-            #shinyAlertModuleUI("common_alert_msg", calculateDailyStats, "WARNING")
-            shinyAlertUI("common_alert_msg", calculateDailyStats, "WARNING")
+            shinyalert("Warning",calculateDailyStatsMsg,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK",inputId="tsParamMissing")
           }
 
         })  # observeEvent end
-        
-        
-        shinyAlertUI <- function(id,msg,type) {
-          shinyalert(inputId=id,type,msg,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK")
-        }
 
-        observeEvent(input$common_alert_msg,{
-          shinyjs::runjs("swal.close();")
-        })
+          observeEvent(input$tsParamMissing,{
+            shinyjs::runjs("swal.close();")
+          })
 
 
         draw_uploaded_file_ts <- function(){

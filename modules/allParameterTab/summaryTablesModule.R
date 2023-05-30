@@ -86,7 +86,7 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
             myData <- myList[[which(names(myList)==variable_to_summarise)]]
             summary_df <- mySummarisemore(df=myData,variable=input$summarise_variable_name,metric=input$summarise_metrics,timeframe=input$summarise_by)
             table_title <- paste0(input$summarise_variable_name," ",input$summarise_metrics)
-            print("DT::renderDataTable not working")
+           
    
             output$display_summary_table_1 <- DT::renderDataTable({
               print("inside renderDT now...")
@@ -100,8 +100,17 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
                   stateSave = FALSE,
                   pageLength = 15,
                   dom = 'Bt',
-                  buttons = list('copy','print',list(extend = 'collection',buttons = c('csv','excel','pdf'),text='Download')),
-                  columnDefs = list(list(className="dt-center",targets="_all"))
+                  buttons = list(
+                    list(extend='copy', text='Copy', className="btn btn-primary"),
+                    list(extend='print', text='Print', className="btn btn-primary"),
+                    list(extend='collection', buttons = c('csv','excel','pdf'), text='Download', className="btn btn-primary")
+                  ),
+                  columnDefs = list(list(className="dt-center",targets="_all")),
+                  initComplete = JS(
+                    "function(settings, json) {",
+                    "$(this.api().table().header()).css({'background-color': '#e3e3e3', 'color': '#000'});",
+                    "$('.dt-buttons button').removeClass('dt-button');",
+                    "}")
                 )
               ) # dataTable end
               #saveToReport$summaryTable <- myTable

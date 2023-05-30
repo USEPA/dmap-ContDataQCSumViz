@@ -50,9 +50,15 @@ rawTSModuleServer <- function(id, userSelectedValues, formated_raw_data) {
         # #click the button to hide the selection box
         shinyjs::runjs("$('#dateTimeBoxButton').click()")
       } else {
-        shinyAlertUI("common_alert_msg" , invalidDateFormt, "ERROR")
+        #just to make sure
+        shinyalert("Warning",invalidDateFormt,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK",inputId = "rawTsError")
       }
+      observeEvent(input$rawTsError,{
+        shinyjs::runjs("swal.close();")
+      })
     })
+  
+
   
 
 }
