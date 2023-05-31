@@ -116,19 +116,19 @@ shinyUI(fluidPage(
           fluidPage(
             fluidRow(
               column(
-                width = 12,
-                sidebarLayout(
-                    sidebarPanel(
-                      width = 3,
-                        uiOutput("gage_panel"),
-                        uiOutput("daymet_panel"),
-                        uiOutput("base_gage_daymet_panel")
-                    ),
-                    mainPanel(
-                      width = 9,
-                      column(width = 12, plotlyOutput("display_downloaded_data"))
-                    ) # mainPanel end
-                  ) # sidebarLayout end
+                width = 12,GageAndDaymetModuleUI("gageDaymetAndBase")
+                # sidebarLayout(
+                #     sidebarPanel(
+                #       width = 3,
+                #         uiOutput("gage_panel"),
+                #         uiOutput("daymet_panel"),
+                #         uiOutput("base_gage_daymet_panel")
+                #     ),
+                #     mainPanel(
+                #       width = 9,
+                #       column(width = 12, plotlyOutput("display_downloaded_data"))
+                #     ) # mainPanel end
+                #   ) # sidebarLayout end
                 )# column close
             ) # raw
           ) # page

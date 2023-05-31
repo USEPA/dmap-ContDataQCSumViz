@@ -24,12 +24,12 @@ TsCDFPlotModuleUI <- function(id) {
 }
 
 TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
- 
+
   localStats <- reactiveValues(stats=list())
   variables_avail <- reactiveValues(params=list())
   variable_to_plot <- reactiveVal()
- 
-  
+
+
   moduleServer(
     id,
     function(input, output, session) {
@@ -38,16 +38,16 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
             localStats <- dailyStats
             variables_avail$params <- names(localStats$processed_dailyStats)
             localStats$stats <- localStats$processed_dailyStats
-            print(localStats$stats)
+            #print(localStats$stats)
           })
-          
+
           observe({
-           
+
             localStats <- dailyStats
             myList <- localStats$processed_dailyStats
             variables_avail$params <- names(localStats$processed_dailyStats)
 
-           
+
             if(renderCDFPlot$render == TRUE) {
               output$CDF_input_1 <- renderUI({
                 selectizeInput(ns("CDF_variable_name"),label ="Select variable name",
@@ -56,17 +56,17 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
                                selected=variables_avail$params[1],
                                options = list(hideSelected = FALSE))
               })
-              
-              
+
+
               output$CDF_input_2 <- renderUI({
                 div(
                   radioButtons(ns("CDF_shading"), "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
                                                                               "minimum & maximum"="minMax"
                   ),
                   selected = "minMax"))
-                
+
               })
-  
+
               output$CDF_input_3 <- renderUI({
                 variable_to_plot <- ifelse(is.null(input$CDF_variable_name), variables_avail$params[1], input$CDF_variable_name)
                 myData.all <- myList[[which(names(myList)==variable_to_plot)]]
@@ -77,7 +77,7 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
                                selected = "All",
                                options = list(hideSelected = FALSE))
               })
-              
+
               output$CDF_input_4 <- renderUI({
                 selectizeInput(ns("CDF_select_season"),label ="Select season",
                                choices=c("All","Fall", "Winter", "Spring","Summer" ),
@@ -85,20 +85,20 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
                                selected = "All",
                                options = list(hideSelected = FALSE))
               })
-              
+
               output$CDF_input_5 <- renderUI({
-                
+
                 textInput(inputId=ns("CDF_title"), label="Plot title",value="")
-                
+
               })
-              
+
               output$display_CDF_button <- renderUI({
                 actionButton(inputId=ns("run_CDF"), label="Run and display",class="btn btn-primary")
               })
 
             }
           })
-          
+
           observeEvent(input$run_CDF, {
             localStats <- dailyStats
             # output$display_plot_CDF <- renderUI({
@@ -107,7 +107,7 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
             myList <- localStats$processed_dailyStats
             variable_to_plot <- input$CDF_variable_name
             myData.all <- myList[[which(names(myList)==variable_to_plot)]]
-            
+
             if (input$CDF_select_year=="All"){
               myData <- myData.all
             }else{
@@ -124,13 +124,13 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
             }
             cols_selected = c("Date",mean_col,lower_col,upper_col)
             data.plot <- myData[cols_selected]
-            
+
             if (input$CDF_select_season=="All"){
               season.choice = NULL
             }else{
               season.choice = input$CDF_select_season
             }
-            
+
             output$display_plot_CDF <- renderPlotly({
               CDF_plot <- CompSiteCDF.updated(file.input = NULL
                                               , dir.input = getwd()
@@ -141,7 +141,7 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
                                               , Plot.season = isolate(season.choice)
                                               , hist.columnName = NULL
                                               , df.input = data.plot)
-              
+
               if (is.null(CDF_plot)){
                 shinyalert("Warning","No data available to plot for the selected variable/year/season!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
                            confirmButtonText="OK",inputId="alert_data_not_avail_for_CDF")
@@ -151,7 +151,7 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
               print(CDF_plot)
             })
           }) # observeEvent close
-          
+
           observeEvent(input$alert_data_not_avail_for_CDF,{
             #print(input$alert_no_date)
             shinyjs::runjs("swal.close();")

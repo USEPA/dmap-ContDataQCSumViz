@@ -118,6 +118,7 @@ fun.GageData <- function(fun.myData.SiteID
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Loop through sites
   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  tryCatch({
   while (intCounter < intCounter.Stop) {##WHILE.START
     intCounter <- intCounter+1
     strGage <- fun.myData.SiteID[intCounter]
@@ -147,6 +148,7 @@ fun.GageData <- function(fun.myData.SiteID
     # column headers are "X_myCode_myStat"
     # can put in multipe and it only runs on those present
     # https://nwis.waterdata.usgs.gov/usa/nwis/pmcodes
+   
     data.myGage <- dataRetrieval::renameNWISColumns(data.myGage
                       ,p00060 = ContData.env$myName.Discharge
                       ,p00065 = ContData.env$myName.WaterLevel
@@ -234,6 +236,10 @@ fun.GageData <- function(fun.myData.SiteID
   #remove all columns ending with _cd, cannot be used
   data.myGage <- data.myGage %>% select(-ends_with("_cd")) 
   return(data.myGage)
+  }, error = function(error){
+     print("error while downloading from https://nwis.waterdata.usgs.gov/usa/nwis/pmcodes")
+     print(error$message)
+  })
 
 }##FUN.fun.GageData.END
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

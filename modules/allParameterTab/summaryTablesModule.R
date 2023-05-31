@@ -9,7 +9,7 @@ SummaryTablesModuleUI <- function(id) {
               div(class = "panel-heading",
                   p("You must have completed step 1 to step 4 to use Summary Tables", style='font-weight:bold;font-family: Helvetica Neue, Helvetica, Arial, sans-serif;')
               ),
-              div(class="panel-body", 
+              div(class="panel-body",
                   uiOutput(ns("summary_table_input_1")),
                   uiOutput(ns("summary_table_input_2")),
                   uiOutput(ns("summary_table_input_3")),
@@ -26,10 +26,10 @@ SummaryTablesModuleUI <- function(id) {
 }
 
 SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
- 
+
   localStats <- reactiveValues(stats=list())
   variables_avail <- reactiveValues(params=list())
-  
+
   moduleServer(
     id,
     function(input, output, session) {
@@ -40,7 +40,7 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
             localStats$stats <- localStats$processed_dailyStats
             #print(localStats$stats)
           })
-          
+
           observe({
             if(renderSummaryTables$render == TRUE) {
                 output$summary_table_input_1 <- renderUI({
@@ -51,7 +51,7 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
                                  selected=variables_avail$params[1],
                                  options = list(hideSelected = FALSE))
                 })
-                
+
                 output$summary_table_input_2 <- renderUI({
                   radioButtons(ns("summarise_by"), "Summarise by", choices = c("year/month"="year/month"
                                                                            ,"year"="year"
@@ -59,7 +59,7 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
                                                                            ,"season"="season"),
                                selected = "year/month")
                 })
-                
+
                 output$summary_table_input_3 <- renderUI({
                   selectizeInput(ns("summarise_metrics"),label ="Select metrics",
                                  choices=c("mean","median","min", "max","range","sd","var","cv","n"),
@@ -67,13 +67,13 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
                                  selected="mean",
                                  options = list(hideSelected = FALSE))
                 })
-                
+
                 output$summary_table_input_4 <- renderUI({
                   actionButton(inputId=ns("display_table"), label="Summarise",class="btn btn-primary")
                 })
               }
           })
-          
+
           observeEvent(input$display_table, {
             localStats <- dailyStats
             variables_avail$params <- names(localStats$processed_dailyStats)
@@ -86,10 +86,10 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
             myData <- myList[[which(names(myList)==variable_to_summarise)]]
             summary_df <- mySummarisemore(df=myData,variable=input$summarise_variable_name,metric=input$summarise_metrics,timeframe=input$summarise_by)
             table_title <- paste0(input$summarise_variable_name," ",input$summarise_metrics)
-           
-   
+
+
             output$display_summary_table_1 <- DT::renderDataTable({
-              print("inside renderDT now...")
+              #print("inside renderDT now...")
               myTable <- DT::datatable(
                 summary_df,
                 caption = htmltools::tags$caption(table_title,style="color:black;font-size:16px;font-weight:bold;text-align:center;"),
@@ -116,10 +116,10 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
               #saveToReport$summaryTable <- myTable
               print(myTable)
             })  # renderDT end
-            
-          }) # observeEvent end 
-          
-          
+
+          }) # observeEvent end
+
+
           mySummarisemore <- function(df=myDf, variable=myVariable,metrics=myMetrics,timeframe=myTimeframe){
             variable_col_name <- paste0(variable,".",metrics)
             names(df)[match(variable_col_name,names(df))] <- "x"
@@ -159,7 +159,7 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
               names(df.summary.overall)[2] <- "Overall"
               df.summary.all <- merge(df.summary.wide,df.summary.overall,by="season")
               return(df.summary.all)
-              
+
             }else if(timeframe =="season"){
               df <- addSeason(df)
               df.summary <- doBy::summaryBy(x~season,data=df,FUN=mean,na.rm=TRUE,variable.names=variable)
@@ -172,6 +172,6 @@ SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
                      'year/month','year','year/season','season'")
             }
           }
-        
+
     }) # end of module server
 }

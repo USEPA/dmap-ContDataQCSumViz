@@ -71,6 +71,7 @@ plan(multisession)
 #options(scipen=999) 
 
 
+
 # fails without dplyr and stringr from tidyverse
 
 # Functions ----
@@ -81,20 +82,12 @@ source("update_ContDataQC/SumStats.updated.R")
 source("update_ContDataQC/ReportMetaData.R")
 source("update_ContDataQC/build_summary_updated.R")
 
+
 source("update_ContDataQC/fun.ConvertDateFormat.R")
-source("sumVizUtils/common.functions.R")
-
-source("usgsGage/fun.GageData.R")
-source("usgsGage/fun.gage_raw_plot.R")
-source("usgsGage/fun.gage_stats_plot.R")
-source("usgsGage/download_usgs_gage_data.R")
-
-source("dayMet/fun.DayMetData.R")
-source("dayMet/fun.daymet_raw_plot.R")
 source("constants.R")
 
- list.files("modules", recursive = TRUE) %>%
- purrr::map(~ source(paste0("modules/", .)))
+list.files("modules", recursive = TRUE) %>%
+purrr::map(~ source(paste0("modules/", .)))
 
 
 # Other ----

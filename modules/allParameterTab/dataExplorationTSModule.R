@@ -35,7 +35,7 @@ DataExplorationTSModuleUI <- function(id) {
                           uiOutput(ns("time_series_input_5"))
                         )
                       ) # fluidRow close,
-                      
+
                   )# end of panel body
               ) #end of panel
             ),
@@ -47,10 +47,10 @@ DataExplorationTSModuleUI <- function(id) {
 }
 
 DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
- 
+
   localStats <- reactiveValues(stats=list())
   variables_avail <- reactiveValues(params=list())
-  
+
   moduleServer(
     id,
     function(input, output, session) {
@@ -61,8 +61,8 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         localStats$stats <- localStats$processed_dailyStats
         #print(localStats$stats)
       })
-      
-        
+
+
       observe({
              if(renderDataExp$render == TRUE) {
                 output$time_series_input_1 <- renderUI({
@@ -85,12 +85,12 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
                     radioButtons(ns("dailyStats_shading"), "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
                                                                                        "Mminimum & Maximum"="minMax"),
                                  selected = "quantiles"))
-                  
+
                 })
                 output$time_series_input_4 <- renderUI({
                   textInput(inputId=ns("dailyStats_ts_title"), label="Plot title",value="")
                 })
-                
+
                 output$time_series_input_5 <- renderUI({
                   tagList(
                     actionButton(inputId=ns("display_ts"),label="Display",class="btn btn-primary")
@@ -146,8 +146,6 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
           mainMapTitle <- getMapTitle(input$dailyStats_shading, input$dailyStats_ts_title,lowerColumn = NULL, upperColumn = NULL)
           localStats <- dailyStats
           statsList <- localStats$stats
-          print("ng statsList")
-          print(statsList)
           variable_to_plot <- input$dailyStats_ts_variable_name
 
           mainData <- Reduce(full_join, statsList)
@@ -160,7 +158,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
                 timediff <- get_interval(tempData$Date)
                 #print(timediff)
                 timediff <- ifelse(timediff == "min", "15 mins", timediff)
-                
+
                 tempData <- as.data.frame(tempData %>%
                                             mutate(Date = as.POSIXct(Date)) %>%
                                             complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff)))
@@ -168,9 +166,9 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
               mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- tempData
               #mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "q.25%", sep="."), upper_col=paste(varName, "q.75%", sep="."), Date=Date))
             } else if(input$dailyStats_shading=="minMax"){
-              
+
               tempData <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "min", sep="."), upper_col=paste(varName, "max", sep="."), Date=Date))
-              
+
               if( ContData.env$myStats.missing.data.fill == TRUE) {
                 timediff <- get_interval(tempData$Date)
                 #print(timediff)
@@ -178,7 +176,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
                 tempData <- as.data.frame(tempData %>%
                                             mutate(Date = as.POSIXct(Date)) %>%
                                             complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff)))
-                
+
               }
               mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- tempData
               #mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "min", sep="."), upper_col=paste(varName, "max", sep="."), Date=Date))
@@ -187,7 +185,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
           main_range = calculate_time_range(as.list(bind_rows(mainList, .id="df")))
           mainBreaks = main_range[[1]]
           main_x_date_label = main_range[[2]]
-          
+
 
           mainPlot <- prepareBasePlot(dataList= mainList, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks)
           return(mainPlot)
@@ -222,19 +220,19 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
             )
           return(mainPlot)
         }
-        
-        
+
+
         draw_uploaded_file_stats <- function() {
           basePlot <- NULL
             localStats <- dailyStats
-            
+
           statsList <- localStats$stats
-    
+
           mainMapTitle <- getMapTitle(input$dailyStats_shading, input$dailyStats_ts_title, lowerColumn = NULL, upperColumn = NULL)
           variable_to_plot <- input$dailyStats_ts_variable_name
           statsCols <- paste(variable_to_plot, input$dailyStats_ts_metrics, sep=".")
           #shinyjs::alert(statsCols)
-        
+
           mainData <- Reduce(full_join, statsList)
           myData  <- mainData %>% select(statsCols, "Date") %>%
             gather(key = "parameter", value = "value", -Date)
@@ -263,11 +261,11 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
           return(basePlot)
 
         }
-        
+
         #NEW data feature is removed for now but saving the code here as it was part of this tab
-        #This part will need to be converted to shiny modules. If needed Discrete data upload 
+        #This part will need to be converted to shiny modules. If needed Discrete data upload
         #can be used as an example to convert below part to a shiny module
-      
+
         # observeEvent(input$dailyStats_shading,{
         #   if (input$dailyStats_shading == 'newData' | input$dailyStats_shading == 'discreteData'){
         #     shinyjs::show("cp_new_data")
@@ -275,26 +273,26 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         #     shinyjs::hide("cp_new_data")
         #   }
         # })
-        
+
         # uploaded_newData<-eventReactive(c(input$uploaded_newData_file),{
         #   my_data <- uploadFile(c(input$uploaded_newData_file), stopExecution = FALSE)
         #   my_data <- my_data[rowSums(is.na(my_data) | is.null(my_data) | my_data == "") != ncol(my_data),]
         #   return(my_data)
         # })
         # continuous Data Exploration with New File
-        
+
         # observeEvent(input$uploaded_newData_file,{
         #   cols_avail <- colnames(uploaded_newData())
         #   fileContentForDisplay <- head(uploaded_newData())
         #   output$dateAndTimeBox <- renderUI({
-        #     
+        #
         #     div(id="dt_new",
         #         div(class = "panel panel-default",width = "100%",
         #             div(class = "panel-heading",
         #                 span("Step 2: Select Date and Time for new data", style="font-weight:bold;"),
         #                 span(
-        #                   actionButton(inputId="dateTimeBoxButton_new", 
-        #                                style="float:right;", class="btn btn-primary btn-xs", 
+        #                   actionButton(inputId="dateTimeBoxButton_new",
+        #                                style="float:right;", class="btn btn-primary btn-xs",
         #                                label="Hide Selection", icon= icon("arrow-down"))
         #                 )
         #             ),
@@ -329,7 +327,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         #                 # ),
         #                 hr(style="margin:0px;padding:0px;"),
         #                 fluidRow(
-        #                   column(width=12, 
+        #                   column(width=12,
         #                          tags$div(
         #                            renderTable({
         #                              fileContentForDisplay
@@ -342,7 +340,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         #   })
         #   newDTvalues$newDateAndTime <- dateAndTimeServer(id = "newDataUpload", )
         # })
-        # 
+        #
         # display_new_data <- function(renderStatus=FALSE) {
         #   shinyjs::runjs("$('#newDateAndTimeErrorinnerDiv').remove()")
         #   newDTvalues$newDateAndTime <- dateAndTimeServer(id = "newDataUpload",uploaded_newData())
@@ -358,7 +356,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         #         for(varName in variable_to_plot) {
         #           mainList[[varName]] <- as.data.frame(new_raw_data %>% select(value=all_of(varName), lower_col=input$newData_lower_col , upper_col=input$newData_upper_col, Date=date.formatted))
         #         }
-        #         plotTitle <- ifelse((input$dailyStats_ts_title == ""), "New Data", input$dailyStats_ts_title) 
+        #         plotTitle <- ifelse((input$dailyStats_ts_title == ""), "New Data", input$dailyStats_ts_title)
         #         mainMapTitle <- getMapTitle("dynamic", plotTitle, lowerColumn = input$newData_lower_col, upperColumn = input$newData_upper_col)
         #         main_range = calculate_time_range(as.list(bind_rows(mainList, .id="df")))
         #         mainBreaks = main_range[[1]]
@@ -385,9 +383,9 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         #     })
         #   }
         # }
-        
-        
-        
-        
+
+
+
+
     }) # end of module server
 }

@@ -43,12 +43,12 @@ progressWorkflowModuleUI <- function(id) {
       )
     )# end of column
   )
-  
+
 
 
 }
 
-progressWorkflowModuleUIServer <- function(id, workflowStatus) {
+progressWorkflowModuleServer <- function(id, workflowStatus) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -58,16 +58,16 @@ progressWorkflowModuleUIServer <- function(id, workflowStatus) {
         # print(paste("workflowStatus$elementId",workflowStatus$elementId))
         # print(paste("workflowStatus$elementId",workflowStatus$state))
         # print(paste("workflowStatus$elementId",workflowStatus$finish))
-     
+
         if(workflowStatus$elementId == "step1" & workflowStatus$state == "success" & workflowStatus$finish == FALSE) {
-            print("int the step1 success")
+            #print("int the step1 success")
             removeCssClasses()
             addSuccessClass(c("step1"))
             addPrimaryClass(c("step2","step3","step4","step5"))
             changeButtonState(state="disable", btnList=c("runQS","display_raw_ts"))
             changeButtonState(state="enable", btnList=c("display_raw_ts"))
         } else if(workflowStatus$elementId == "step1" & workflowStatus$state == "error") {
-            print("int the step1 error")
+            #print("int the step1 error")
             removeCssClasses()
             shinyjs::addClass("step1", "btn-danger")
             addPrimaryClass(c("step2","step3","step4","step5"))
@@ -75,7 +75,7 @@ progressWorkflowModuleUIServer <- function(id, workflowStatus) {
             workflowStatus$finish=FALSE
         }
         else if(workflowStatus$elementId == "step2" & workflowStatus$state == "success" & workflowStatus$finish == FALSE) {
-          print("in the step2")
+          #print("in the step2")
           removeCssClasses()
           addPrimaryClass(c("step3","step4","step5"))
           addSuccessClass(c("step1","step2"))
@@ -88,7 +88,7 @@ progressWorkflowModuleUIServer <- function(id, workflowStatus) {
           changeButtonState(state="enable", btnList=c("runQS","display_raw_ts"))
           workflowStatus$finish=FALSE
         }
-        
+
         else if(workflowStatus$elementId == "step3" & workflowStatus$state == "success" & workflowStatus$finish == FALSE) {
           removeCssClasses()
           addSuccessClass(c("step1","step2","step3"))
@@ -106,7 +106,7 @@ progressWorkflowModuleUIServer <- function(id, workflowStatus) {
           js$disableTab("discreateDataEx")
           workflowStatus$finish=FALSE
         }
-        
+
         else if(workflowStatus$elementId == "step4" & workflowStatus$state == "success" & workflowStatus$finish == FALSE) {
           removeCssClasses()
           addSuccessClass(c("step1","step2","step3","step4"))
@@ -120,7 +120,7 @@ progressWorkflowModuleUIServer <- function(id, workflowStatus) {
           changeButtonState(state="enable", btnList=c("display_raw_ts","runQS"))
           workflowStatus$finish=FALSE
         }
-        
+
         else if(workflowStatus$elementId == "step5" & workflowStatus$state == "success" & workflowStatus$finish == FALSE) {
           removeCssClasses()
           addSuccessClass(c("step1","step2","step3","step4","step5"))
@@ -142,9 +142,9 @@ progressWorkflowModuleUIServer <- function(id, workflowStatus) {
           js$disableTab("downloadData")
           js$disableTab("discreateDataEx")
         }
-        
+
       })
-      
+
       changeButtonState <- function(state, btnList) {
         if(state == "enable") {
           for(b in btnList) {
@@ -158,22 +158,22 @@ progressWorkflowModuleUIServer <- function(id, workflowStatus) {
           }
         }
       }
-      
+
       removeCssClasses <- function(){
         cssClasses <- c("btn-success","btn-primary","btn-danger")
         elementIds <- c("step1","step2","step3", "step4","step5")
-        for(e in elementIds) { 
+        for(e in elementIds) {
           for (c in cssClasses) {
             shinyjs::removeClass(e, c)      }
         }
       }
       addPrimaryClass <- function(elmentIds){
-        for(e in elmentIds) { 
+        for(e in elmentIds) {
           shinyjs::addClass(e, "btn-primary")
         }
       }
       addSuccessClass <- function(elmentIds) {
-        for(e in elmentIds) { 
+        for(e in elmentIds) {
           shinyjs::addClass(e, "btn-success")
         }
       }

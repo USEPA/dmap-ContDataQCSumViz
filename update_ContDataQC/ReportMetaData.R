@@ -103,14 +103,14 @@ ReportMetaData <- function(fun.myFile
     source(file.path(getwd(), "R", "config.R"), local = TRUE)
     # might have to load manually
   }##IF.boo_DEBUG.END
-  
+
   # 0a.0. Load environment
   # config file load, 20170517
   if (fun.myConfig != "") {
     ##IF.fun.myConfig.START
     config.load(fun.myConfig)
   }##IF.fun.myConfig.START
-  
+
   # change the default settings in Environment if needed
   # ContData.env$myName.Flag        <- "Flag" # flag prefix
   # ContData.env$myStats.Fails.Exclude <- TRUE  #FALSE #TRUE
@@ -120,10 +120,10 @@ ReportMetaData <- function(fun.myFile
     ##IF.fun.myConfig.START
     fun.myDateTime.Format <- ContData.env$myFormat.DateTime
   }
-  
+
   # remove the time part if exist for display do not need time
   #userDateFormat <- removeTimeFormat(fun.myDateTime.Format)
-  
+
   # 2.0. Load File
   # load data (data.frame or from CSV)
   # if no data frame then import file.
@@ -149,7 +149,7 @@ ReportMetaData <- function(fun.myFile
       stop(myMsg)
       #
     }##IF.file.END
-    
+
     df.load <-
       utils::read.csv(
         file.path(fun.myDir.import, fun.myFile)
@@ -158,7 +158,7 @@ ReportMetaData <- function(fun.myFile
         na.strings = c("", "NA")
       )
   }##IF.END
-  
+
   # 2.3. Error Checking, data field names
   param.len <- length(fun.myParam.Name)
   myNames2Match <- c(fun.myParam.Name, fun.myDateTime.Name)
@@ -182,11 +182,11 @@ ReportMetaData <- function(fun.myFile
   }##IF.match.END
   # 2.4.  Error Checking, DateTime format
   #df.load[,fun.myDateTime.Name] <- as.Date()
-  
+
   # 2.5.  Number of Parameters
   # Check for 1 vs. 2 parameters
   param.len <- length(fun.myParam.Name)
-  
+
   # Loop, Stats ####
   if (boo_DEBUG == TRUE) {
     ##IF.boo_DEBUG.START
@@ -201,27 +201,27 @@ ReportMetaData <- function(fun.myFile
     #print(paste0("WORKING on parameter (", i.num, "/", param.len, "); ", i))
     utils::flush.console()
     myCol <- c(fun.myDateTime.Name, i)
-    
-    
+
+
     # check NA for each parameter
     # Subset Fields
     df.param <- df.load[, myCol]
-    
+
     # 3.2. Add "Date" field
     #fd01 <- ContData.env$myFormat.Date
     myDate.Name <- "Date"
-    print("passed 212")
-  
+    #print("passed 212")
+
     #df.param[,myDate.Name] <- as.Date(df.param[,fun.myDateTime.Name], fd01)
     #df.param[, myDate.Name] <-  as.Date(df.param[, fun.myDateTime.Name], userDateFormat)
-    
-    #df.param[, myDate.Name] <-  
+
+    #df.param[, myDate.Name] <-
     #lubridate::ymd(df.param[, fun.myDateTime.Name], tz=fun.userTimeZone)
-    
+
     df.param[, myDate.Name] <-  date(df.param[, fun.myDateTime.Name])
-    
-    print("passed 217")
-    
+
+    #print("passed 217")
+
     # 3.3. Data column to numeric
     df.param[, i] <- suppressWarnings(as.numeric(df.param[, i]))
     df.toCheck <- df.param[, c(myDate.Name, i)]
@@ -233,7 +233,7 @@ ReportMetaData <- function(fun.myFile
     # ContData.env$myFlagVal.Fail    <- "F"
     # ContData.env$myFlagVal.Suspect <- "S"
     # ContData.env$myName.Flag       <- "Flag" # flag prefix
-    
+
     ## If flag parameter names is different from config then it won't be found
     myParam.Name.Flag <- paste(ContData.env$myName.Flag, i, sep = ".")
     # Modify columns to keep based on presence of "flag" field
@@ -245,7 +245,7 @@ ReportMetaData <- function(fun.myFile
       #df.param.flag[,myDate.Name] <- as.Date(df.param.flag[,fun.myDateTime.Name], fd01)
       #df.param[, myDate.Name] <-  date(df.param[, fun.myDateTime.Name])
       df.param.flag[, myDate.Name] <- date(df.param[, fun.myDateTime.Name])
-      
+
       df.toCheck.flag <-
         df.param.flag[, c(myDate.Name, myParam.Name.Flag)]
       # summarise the fail and suspect data points
@@ -279,7 +279,7 @@ ReportMetaData <- function(fun.myFile
     df.list <- c(df.list, new.list)
   }##FOR.i.END
   return(df.list)
-  
+
 }##FUNCTION.END
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

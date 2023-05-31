@@ -122,13 +122,6 @@ AirVsWaterModuleServer <- function(id, uploaded_data, dailyStats, renderAirVsWat
           })
            
            
-           
-           
-           
-           
-           
-           
-           
            observeEvent(input$display_thermal_sensitivity, {
              localStats <- dailyStats
              shinyjs::hide(id=ns("display_help_text_air_water"), asis=TRUE)

@@ -14,7 +14,7 @@ discreteVarMismatch <- "Continuous 'parameters to process' and Discrete 'paramet
 csvFileAndExcelissue <- "Warning: Microsoft Excel corrupts .csv file when	 re-imported into Excel.  If you re-open the file by double-clicking its icon or by using the:
 File > Open dialog, Excel tries to 'help' you by changing the formats.  You can avoid this by using the Text or Data Import Wizard from the Data Tab.
 You can tell the Wizard that the files are Text"
-selectBaseVars <- "Please select variables to plot."
+selectBaseVars <- "Please select base variables to plot."
 selectGageVars <- "Please select USGS gage variables to plot."
 
 Desc.freq <- "Frequency metrics indicate numbers of days in months or seasons
