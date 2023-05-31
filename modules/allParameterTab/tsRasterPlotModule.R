@@ -18,7 +18,9 @@ TsRasterPlotModuleUI <- function(id) {
     ),
     mainPanel(
       width = 9,
-      column(width = 12, plotOutput(ns("display_raster_graphs"),height="550px",width="100%"))
+      column(width = 12, 
+             div(style="width:100%", uiOutput(ns("rasterError"))),
+             plotOutput(ns("display_raster_graphs"),height="550px",width="100%"))
     ) # mainPanel end
   ) # sidebarLayout end
 }
@@ -86,12 +88,8 @@ TsRasterPlotModuleServer <- function(id, dailyStats, renderRasterPlot) {
           })
           
           observeEvent(input$run_raster, {
-            # output$display_raster_graphs <- renderUI({
-            #   withSpinner(plotOutput("plot_dailyStats_raster",height="550px",width="1200px"),type=2)
-            # })
+            clearContents()
             localStats <- dailyStats
-
-            
             myMonth <- seq(as.Date("2020-01-01"),as.Date("2020-12-31"),by="1 month")
             month_numeric <- lubridate::yday(myMonth)/365*52+1
             month_label <- lubridate::month(myMonth,label=TRUE)
@@ -137,14 +135,28 @@ TsRasterPlotModuleServer <- function(id, dailyStats, renderRasterPlot) {
               })  # renderPlot close
               
             }else{
-              shinyalert("Warning","No data available to plot for the selected variable!"
-                         ,closeOnClickOutside = TRUE
-                         ,closeOnEsc = TRUE
-                         ,confirmButtonText="OK"
-                         ,inputId = "alert_data_not_avail_for_ts")
+              renderErrorMsg(noRasterData)
+              clearPlot()
+              
             }##inner if else loop close
             
           }) ##observeEvent end
+          
+          #common
+          renderErrorMsg <- function(msg) {
+            output$rasterError <- renderUI({
+              div(class="alert alert-danger" , msg) 
+            })
+          }
+          clearContents <- function(){
+            output$rasterError <- renderUI({})
+          }
+          
+          clearPlot <- function(){
+            output$display_raster_graphs <- renderPlotly({
+              plotly_empty()
+            })
+          }
 
 
     })# end of server module

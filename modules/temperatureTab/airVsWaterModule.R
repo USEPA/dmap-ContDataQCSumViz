@@ -46,7 +46,7 @@ AirVsWaterModuleUI <- function(id) {
                              a('https://doi.org/doi:10.1016/s0022-1694(99)00034-7', href='https://doi.org/doi:10.1016/s0022-1694(99)00034-7', target='_blank'))
 
         ), # end of box
-        
+        div(style="width:100%", uiOutput(ns("airVsWaterError"))),
         plotOutput(ns("display_thermal_sensitivity_plot_1"))
       )
     ) # mainPanel end
@@ -124,11 +124,8 @@ AirVsWaterModuleServer <- function(id, uploaded_data, dailyStats, renderAirVsWat
            
            observeEvent(input$display_thermal_sensitivity, {
              localStats <- dailyStats
+             clearContents()
              shinyjs::hide(id=ns("display_help_text_air_water"), asis=TRUE)
-             
-             # output$display_thermal_sensitivity_plot_1 <- renderUI({
-             #   withSpinner(plotOutput("thermal_sensitivity_plot_1"))
-             # })
              
              myList <- localStats$processed_dailyStats
 
@@ -175,15 +172,12 @@ AirVsWaterModuleServer <- function(id, uploaded_data, dailyStats, renderAirVsWat
                })  # renderPlot close
                
              }else{
-               shinyalert("Warning","We need both of air temperature and water temperature data to run thermal sensitivity. Please check."
-                          ,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK",inputId = "alert_data_not_val_for_thermal")
+               renderErrorMsg(airvswaterMsg)
+               clearPlot()
              } ## outer if else loop close
              
            }) ## observeEvent end
 
-           observeEvent(input$alert_data_not_val_for_thermal,{
-             shinyjs::runjs("swal.close();")
-           })
            
            observeEvent(input$exclude_data_points,{
              if (input$exclude_data_points == 'Yes'){
@@ -196,6 +190,23 @@ AirVsWaterModuleServer <- function(id, uploaded_data, dailyStats, renderAirVsWat
                shinyjs::hide("cp_air_temp")
              }
            })
+           
+           #common
+           renderErrorMsg <- function(msg) {
+             output$airVsWaterError <- renderUI({
+               div(class="alert alert-danger" , msg) 
+             })
+           }
+           
+           clearContents <- function(){
+             output$airVsWaterError <- renderUI({})
+           }
+           
+           clearPlot <- function(){
+             output$display_thermal_sensitivity_plot_1 <- renderPlotly({
+               plotly_empty()
+             })
+           }
           
     }) # end of module server
 }

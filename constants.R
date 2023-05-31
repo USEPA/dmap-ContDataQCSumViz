@@ -16,6 +16,11 @@ File > Open dialog, Excel tries to 'help' you by changing the formats.  You can 
 You can tell the Wizard that the files are Text"
 selectBaseVars <- "Please select base variables to plot."
 selectGageVars <- "Please select USGS gage variables to plot."
+noBoxPlotDataFound <- "No data available to plot for the selected variable."
+noCDFDataFound <- "No data available to plot for the selected variable/year/season."
+noAnnualOverlayData <- "No data available to plot for the selected variable."
+noRasterData <- "No data available to plot for the selected variable."
+airvswaterMsg <- "We need both of air temperature and water temperature data to run thermal sensitivity. Please check."
 
 Desc.freq <- "Frequency metrics indicate numbers of days in months or seasons
               that key events exceed user-defined temperatures. "

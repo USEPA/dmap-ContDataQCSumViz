@@ -18,7 +18,9 @@ TsCDFPlotModuleUI <- function(id) {
     ),
     mainPanel(
       width = 9,
-      fluidRow(column(width = 12, plotlyOutput(ns("display_plot_CDF"))))
+      fluidRow(column(width = 12, 
+                div(style="width:100%", uiOutput(ns("cdfError"))),
+                plotlyOutput(ns("display_plot_CDF"))))
     ) # mainPanel end
   ) # sidebarLayout end
 }
@@ -101,9 +103,9 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
 
           observeEvent(input$run_CDF, {
             localStats <- dailyStats
-            # output$display_plot_CDF <- renderUI({
-            #   withSpinner(plotlyOutput("plot_CDF",height="600px",width="1200px"),type=2)
-            # })
+            clearContents()
+            clearPlot()
+
             myList <- localStats$processed_dailyStats
             variable_to_plot <- input$CDF_variable_name
             myData.all <- myList[[which(names(myList)==variable_to_plot)]]
@@ -143,8 +145,12 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
                                               , df.input = data.plot)
 
               if (is.null(CDF_plot)){
-                shinyalert("Warning","No data available to plot for the selected variable/year/season!",closeOnClickOutside = TRUE,closeOnEsc = TRUE,
-                           confirmButtonText="OK",inputId="alert_data_not_avail_for_CDF")
+                renderErrorMsg(noCDFDataFound)
+                clearPlot()
+              } else if (is.character(CDF_plot)) {
+                #function returns error message in this case
+                renderErrorMsg(paste("Process failed due to invalid data, error: " , CDF_plot))
+                clearPlot()
               } else {
                 CDF_plot <- ggplotly(CDF_plot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
               }
@@ -152,10 +158,22 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
             })
           }) # observeEvent close
 
-          observeEvent(input$alert_data_not_avail_for_CDF,{
-            #print(input$alert_no_date)
-            shinyjs::runjs("swal.close();")
-          })
+         
+          #common
+          renderErrorMsg <- function(msg) {
+            output$cdfError <- renderUI({
+              div(class="alert alert-danger" , msg) 
+            })
+          }
+          clearContents <- function(){
+            output$cdfError <- renderUI({})
+          }
+          
+          clearPlot <- function(){
+            output$display_plot_CDF <- renderPlotly({
+              plotly_empty()
+            })
+          }
 
     })# end of server module
 }

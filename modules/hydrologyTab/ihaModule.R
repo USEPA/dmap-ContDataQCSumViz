@@ -64,11 +64,8 @@ IHAModuleUI <- function(id) {
         shinyjs::hidden(
           div(
             id = ns("IHA_plot_1_panel"),
-            conditionalPanel(
-              condition = "input$display_IHA_plot_1 %%2 !=0",
               hr(),
-              plotOutput(ns("IHA_plot_1")),
-            ), # conditionalPanel end
+              plotOutput(ns("IHA_plot_1"))
           ) # div end
         ), # shinyjs:: hidden end
         br(),
@@ -77,13 +74,10 @@ IHAModuleUI <- function(id) {
         shinyjs::hidden(
           div(
             id = ns("IHA_plot_2_panel"),
-            conditionalPanel(
-              condition = "input$display_IHA_plot_2 %%2 !=0",
               hr(),
               plotOutput(ns("IHA_plot_2a")),
               br(),
               plotOutput(ns("IHA_plot_2b"))
-            ), # conditionalPanel end
           ) # div end
         ) # shinyjs:: hidden end
         , br(),br(),
@@ -91,11 +85,8 @@ IHAModuleUI <- function(id) {
         shinyjs::hidden(
           div(
             id = ns("IHA_plot_3_panel"),
-            conditionalPanel(
-              condition = "input$display_IHA_plot_3 %%2 !=0",
               hr(),
               plotOutput(ns("IHA_plot_3"))
-            ), # conditionalPanel end
           ) # div end
         ) # shinyjs:: hidden end
         , br(),br(),
@@ -103,13 +94,10 @@ IHAModuleUI <- function(id) {
         shinyjs::hidden(
           div(
             id = ns("IHA_plot_4_panel"),
-            conditionalPanel(
-              condition = "input$display_IHA_plot_4 %%2 !=0",
               hr(),
               plotOutput(ns("IHA_plot_4a")),
               br(),
               plotOutput(ns("IHA_plot_4b"))
-            ), # conditionalPanel end
           ) # div end
         ) # shinyjs:: hidden end
         , br(),br(),
@@ -117,12 +105,9 @@ IHAModuleUI <- function(id) {
         shinyjs::hidden(
           div(
             id = ns("IHA_plot_5_panel"),
-            conditionalPanel(
-              condition = "input$display_IHA_plot_5 %%2 !=0",
               hr(),
               plotOutput(ns("IHA_plot_5")),
               br()
-            ), # conditionalPanel end
           ) # div end
         ) # shinyjs:: hidden end
       )

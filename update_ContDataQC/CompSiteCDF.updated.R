@@ -20,6 +20,8 @@ CompSiteCDF.updated <- function(file.input = NULL
   
   # load data (data.frame or from CSV)
   # if no data frame then import file.
+  
+  tryCatch({
   if (!is.null(df.input)) {##IF.START
     data.import <- df.input
   } else {
@@ -149,8 +151,12 @@ CompSiteCDF.updated <- function(file.input = NULL
     }
                 
   }
-  
- return(my_plot);
+ return(my_plot)
+ }, error=function(error){
+    print("error in CompSiteCDF.updated function")
+    print(error$message)
+    return(error$message)
+ })
   
 }
   

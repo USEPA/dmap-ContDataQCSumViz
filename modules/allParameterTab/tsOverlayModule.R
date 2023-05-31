@@ -63,9 +63,14 @@ TsOverlayModuleUI <- function(id) {
     ),
     mainPanel(
       width = 9,
-      # fluidRow(column(width = 12, plotlyOutput(ns("display_time_series_overlay_2")))),
-      fluidRow(column(width = 12, plotlyOutput(ns("display_time_series_overlay")))),
-      fluidRow(column(width = 12, plotOutput(ns("display_time_series_overlay_1"))))
+
+      fluidRow(column(width = 12, 
+                      div(style="width:100%", uiOutput(ns("tsOverlayError"))),
+                      div(plotlyOutput(ns("display_time_series_overlay"))),
+                      div(plotOutput(ns("display_time_series_overlay_1")))
+                      
+               )#end of columns
+     ) # end of fluidRow
     ) # mainPanel end
   ) # sidebarLayout end
 
@@ -128,7 +133,7 @@ TsOverlayModuleServer <- function(id, dailyStats, renderTSOverlay) {
             #clean previous output, if any
             output$display_time_series_overlay <- renderPlotly({})
             output$display_time_series_overlay_1 <- renderPlot({})
-
+            clearContents()
 
             localStats <- dailyStats
             variables_avail$params <- names(localStats$processed_dailyStats)
@@ -220,16 +225,36 @@ TsOverlayModuleServer <- function(id, dailyStats, renderTSOverlay) {
                         })  # renderPlot close
       
                     }else{
-                      shinyalert("Warning","No data available to plot for the selected variable!"
-                                 ,closeOnClickOutside = TRUE
-                                 ,closeOnEsc = TRUE
-                                 ,confirmButtonText="OK"
-                                 ,inputId = "alert_data_not_avail_for_ts")
+                      renderErrorMsg(noAnnualOverlayData)
+                      clearPlot()
+
                     }##inner if else loop close
             } ## outer if else loop close
           }) ##observeEvent end
+          
+          
+          #common
+          renderErrorMsg <- function(msg) {
+            output$tsOverlayError <- renderUI({
+              div(class="alert alert-danger" , msg) 
+            })
+          }
+          clearContents <- function(){
+            output$tsOverlayError <- renderUI({})
+          }
+          
+          clearPlot <- function(){
+            output$display_time_series_overlay <- renderPlotly({
+              plotly_empty()
+            })
+            output$display_time_series_overlay_1 <- renderPlotly({
+              plotly_empty()
+            })
+          }
         
     }) # end of module server
+  
+
   
   #Tom Faber asked to comment out the new data feature on this tab
   # Moving the code here. It will need to be modified to work as shiny module. I am just storing it here.

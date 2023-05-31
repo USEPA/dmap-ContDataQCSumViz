@@ -16,51 +16,7 @@
 #    under the same folder where you unzip this App package.
 #    We don't need to source these R functions after we finalize them
 #
-
-##if(!require(ContDataQC)){source("_moved/install_packages_for_app.R")}  #install if not yet
-
-# library("readxl")        # to read excel files
-# library("writexl")
-# library("data.table")
-# library("DT")
-# library("tidyverse")
-# library("tibbletime")
-# library("shiny")
-# library("shinydashboard")
-# library("shinyjs")
-# library("shinyBS")
-# library("shinythemes")
-# library("shinyalert")
-# library("conflicted")
-# library("dataRetrieval")
-# library("doBy")
-# library("knitr")
-# library("htmltools")
-# library("rmarkdown")
-# library("highr")
-# library("survival")
-# library("shinyFiles")
-# library("plotly")
-# library("zip")
-# library("reshape2")
-# library("ContDataQC")
-# library("ContDataSumViz")
-# library("StreamThermal")
-# library("IHA")
-# library("XLConnect")
-
-
-## Moved to Global ***
-
-# source("_moved/import_raw_data.R")
-# source("update_ContDataQC/config.R")
-# source("update_ContDataQC/CompSiteCDF.updated.R")
-# source("update_ContDataQC/SumStats.updated.R")
-#source("update_ContDataQC/ReportMetaData.R")
-#
-#
-# options(shiny.maxRequestSize = 100*1024^2)
-
+#NOTE: code for multifile uploads and create reports are commented out and saved in files (codeOfMultipleFiles.R, codeOfCreateReport.R) in the root folder
 
 function(input, output, session) {
 
@@ -79,9 +35,6 @@ function(input, output, session) {
   
   
   currentOutPutId <- reactiveValues()
-  #gageColNames  <- NULL
-  #daymetCols <- NULL
-  #consoleUSGS <- NULL
   selected_to_plot <- reactiveValues(all_selected=data.frame())
   processed <- reactiveValues(processed_dailyStats=list(),
                               ST.freq=data.frame(),
@@ -89,10 +42,7 @@ function(input, output, session) {
                               ST.roc=data.frame(),
                               ST.tim=data.frame(),
                               ST.var=data.frame())
-  # gageRawData <- reactiveValues(gagedata = data.frame(),
-  #                               gageColName = as.character())
-  # dayMetRawData <- reactiveValues(dayMetData = data.frame(),
-  #                                 daymetColumns = as.character())
+
   
   formated_raw_data <- reactiveValues(derivedDF = data.frame(),
                                 baseColNames = as.character())
@@ -132,29 +82,36 @@ function(input, output, session) {
   #Hydrology Tab
   renderIHA <- reactiveValues(render=FALSE)
   renderFlashiness <- reactiveValues(render=FALSE)
+  renderDiscrete <- reactiveValues(render=FALSE)
 
   #  Upload Data##############################
-  #EWL
   if (file.exists("_moved/File_Format.rds")) file.remove("_moved/File_Format.rds")
   do.call(file.remove, list(list.files("Selected_Files", full.names = TRUE)))
  
-  #init modules, reactive values will reflect when the buttons are actually clicked
-  #shinyAlertModuleServer("de")
+  #init shiny modules
+  #workflow module (step1, step2, step3, step4, step5)
   progressWorkflowModuleServer("statusWorkflow", workflowStatus)
+  
+  #caluclate daily statistics
   calculateDailyStatsModuleServer("calculateDailyStats", formated_raw_data, homeDTvalues, metaHomeValues,loaded_data, dailyStatusCalculated,processed,readyForCalculation)
   
   ############ Continuous Data Exploration >>  All parameters ############
   
   #Continuous Data Exploration > All Parameters >  Summary tables tab
   SummaryTablesModuleServer(id="DataExpSummaryTbls", dailyStats=processed, renderSummaryTables)
-  #Continuous Data Exploration > All Parameters >  Time Series plots tab
+ 
+   #Continuous Data Exploration > All Parameters >  Time Series plots tab
   DataExplorationTSModuleServer(id="dataExpTS", dailyStats=processed, renderDataExp)
+  
   #Continuous Data Exploration > All Parameters >  Time series - Annual overlays tab
   TsOverlayModuleServer(id="tsOverlayTab", dailyStats=processed, renderTSOverlay)
+  
   #Continuous Data Exploration > All Parameters > Box plots tab
   TsBoxPlotModuleServer(id="tsBoxPlot", dailyStats=processed, renderTSBoxPlot)
-  #Continuous Data Exploration > All Parameters > CDFs tab
+ 
+   #Continuous Data Exploration > All Parameters > CDFs tab
   TsCDFPlotModuleServer(id="tsCDFPlot", dailyStats=processed, renderCDFPlot)
+  
   #Continuous Data Exploration > All Parameters > Raster graphs tab
   TsRasterPlotModuleServer(id="tsRasterPlot", dailyStats=processed, renderRasterPlot)
   
@@ -167,7 +124,7 @@ function(input, output, session) {
         
         my_data <- uploadFile(c(input$uploaded_data_file), stopExecution=FALSE, tab="homePage")
          # drop all rows where all the columns are empty
-       if (length(my_data) > 0 ) {
+        if (length(my_data) > 0 ) {
          my_data <- my_data[rowSums(is.na(my_data) | is.null(my_data) | my_data == "") != ncol(my_data),]
          my_colnames <- colnames(my_data)
          shinyjs::show(id="displayidLeft")
@@ -245,12 +202,23 @@ function(input, output, session) {
   
   #init server modules
   #uploaded_data is not availabe before this point
+  
   #Continuous Data Exploration >  Temperature > Thermal statistics tab
   ThermalStatsModuleServer("thermalStats", uploaded_data, formated_raw_data, dailyStats=processed, loaded_data, to_download, renderThermalStats)
+  
+  #Continuous Data Exploration >  Temperature > Air Vs Water tab
   AirVsWaterModuleServer("airVsWater", uploaded_data, dailyStats=processed, renderAirVsWater)
+  
+  #Continuous Data Exploration >  Temperature > Growing Degree days tab
   GrowingDegreeModuleServer("growingDegree",renderGrowingDegree)
+  
+  #Continuous Data Exploration >  Temperature > Thermal Classification tab
   ThermalClassificationModuleServer("thermalClassification", dailyStats=processed, uploaded_data, renderThermalClassification)
+  
+  #Continuous Data Exploration >  Hydrology > IHA tab
   IHAModuleServer("IHATab", dailyStats=processed, loaded_data, uploaded_data, to_download, renderIHA)
+ 
+  #Continuous Data Exploration >  Hydrology > Flashiness tab
   FlashinessModuleServer("flashinessTab",  renderFlashiness)
   
   #USGS & Daymet Exploration tab
@@ -313,38 +281,6 @@ function(input, output, session) {
       updateActionButton(session, buttonId, icon = icon("arrow-down"),label="Hide Selection")
     }
   }
-  
-
-  ## Load all the uploaded files to a list, this feature will be activated in the future
-  # datasetlist <- eventReactive(input$uploadId,{
-  #
-  #   Selected_Files <- list.files("Selected_Files/")
-  #   Sys.sleep(2)
-  #   File_Format <- readRDS("File_Format.rds")
-  #   datalist <- list()
-  #   datalist <- lapply(1:length(File_Format[[1]]), function(d) read.csv(paste0("Selected_Files/",File_Format$file[d] ),
-  #                                                                       header = File_Format$header[d],
-  #                                                                       sep = File_Format$sep[d],
-  #                                                                       dec = File_Format$dec[d],
-  #                                                                       check.names = FALSE,
-  #                                                                       quote = File_Format$quote[d]))
-  #   names(datalist) <- paste(File_Format$index, File_Format$file,sep = ". ")
-  #   return(datalist)
-  #
-  # })
-
-  # output$manage <- renderUI({
-  #   data <- uploaded_data() ## datasetlist()
-  #   print(length(data))
-  #   selectInput("dataset", "Dataset", choices = loaded_data$name, selected = loaded_data$name)  ## names(data) if use datasetlist()
-  # })
-  # 
-  # output$siteType <- renderUI({
-  #   data <- uploaded_data() ## datasetlist()
-  #   selectInput("siteType_input",label="Single site or multiple sites",
-  #               choices = c("Single site","Multiple sites"),
-  #               selected = "Single site")
-  # })
   
   output$displayFC <- renderUI({
     data <- uploaded_data() ## datasetlist()
@@ -493,26 +429,12 @@ function(input, output, session) {
 
   ## close the warning messages inside the above oberveEvent
 
-  observeEvent(input$get_the_year,{
-    #print(input$alert_no_date)
-    shinyjs::runjs("swal.close();")
-  })
-
-
-  observeEvent(input[["tabset"]], {
-
-
-  }) #observe Event end
-
-  
   #Discrete Data Exploration
   uploaded_discreteData<-eventReactive(c(input$uploaded_discrete_file),{
     discrete_data <- uploadFile(c(input$uploaded_discrete_file), stopExecution = FALSE)
         discrete_data <- discrete_data[rowSums(is.na(discrete_data) | is.null(discrete_data) | discrete_data == "") != ncol(discrete_data),]
     return(discrete_data)
   })
-  
- 
   
   observeEvent(input$uploaded_discrete_file,{
     cols_avail <- colnames(uploaded_discreteData())
@@ -557,13 +479,7 @@ function(input, output, session) {
     })
     # init the module
     discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData())
-    
   })
-  
-  # observeEvent(uploaded_discreteData(), {
-  #   discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData())
-  # })
-  
   
   output$baseParameters <- renderUI({
     baseParams <- homeDTvalues$homeDateAndTime$parmToProcess()
@@ -580,8 +496,6 @@ function(input, output, session) {
     )
   })
   
-  
- # draw_discrete_stats <- function(renderStatus=FALSE){
   observeEvent(input$display_discrete_data, {
     discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData())
     localDiscreteDateAndTime <- discreteDTvalues$disDateAndTime
@@ -623,8 +537,6 @@ function(input, output, session) {
               combinded_df$bothValues <- c(paste("\nContinuous Value: ", combinded_df$Matching_Continuous_value, "\n",
                                                       "Discrete Value: ", combinded_df$discrete_value, "\n"
                                               ))
-             
-
               
               # shared x axis so calculate using base data file
               mainMapTitle <- "Discrete and continuous data"
@@ -640,7 +552,6 @@ function(input, output, session) {
                   ggplotly(mainPlot, height=calculatePlotHeight(length(variable_to_plot)*2)) 
                    # %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
                 })
-                overridePotlyStyle("display_time_series_discrete")
               }
             }
           } 
@@ -659,8 +570,6 @@ function(input, output, session) {
   })
  
   # End of Discrete data related functions
-  
-  
   observeEvent(input$dtNumOfCols, {
     if(isolate(input$dtNumOfCols) == "combined")
       shinyjs::hide("timeFieldDiv")
@@ -683,98 +592,11 @@ function(input, output, session) {
       shinyjs::show("timeFieldDiv3")
   })
 
-  
-  overridePotlyStyle <- function(elementId) {
-    shinyjs::removeClass(elementId, "html-fill-item-overflow-hidden")
-    shinyjs::runjs("$('#display_time_series').removeAttr('style')")
-    shinyjs::runjs("$('#display_time_series_1').removeAttr('style')")
-    shinyjs::runjs("$('#display_time_series_3').removeAttr('style')")
-    
-  }
-
-  ## close the alert messages
-  observeEvent(input$alert_data_not_avail_for_ts,{
-    #print(input$alert_no_date)
-    shinyjs::runjs("swal.close();")
-  })
-
-
-
   observeEvent(input$toggleLayout,{
     shinyjs::toggle(id="ts_sidePanel")
     shinyjs::toggle(id="ts_mainPanel")
   })
 
-  #################  4:Boxplots << All parameters #################
-
-  ## close the alert messages
-  observeEvent(input$alert_data_not_avail_for_box,{
-    #print(input$alert_no_date)
-    shinyjs::runjs("swal.close();")
-  })
-
-
-
-  ## close the alert messages
-  observeEvent(input$alert_data_not_avail_for_CDF,{
-    #print(input$alert_no_date)
-    shinyjs::runjs("swal.close();")
-  })
-
-
-  ################### "Create report"####
-  #Not used, for the future
-  # observeEvent(input$createReport,{
-  # 
-  #   showModal(modalDialog("Creating the report now...",footer=NULL))
-  # 
-  #   #if (!file.exists("Output/reports")) dir.create(file.path("Output/reports"),showWarnings = FALSE, recursive = TRUE)
-  #   ## copy template file to a temporary directory so that the output file will be saved there
-  #   ## in case user do not have written permission to the app directory when deployed
-  #   tempRMD <- file.path(tempdir(),"SiteSummary.Rmd")
-  #   file.copy("_moved/SiteSummary.Rmd",tempRMD,overwrite= TRUE)
-  #   build_summary_updated(dir_data="Output/to_report/"
-  #                 ,file_main="_Captions_SiteX.xlsx"
-  #                 ,sheet_main="metadata"
-  #                 ,file_prefix_sep="_"
-  #                 ,rmd_template=tempRMD
-  #                 ,output_format=input$report_format
-  #                 ,output_file=paste0(input$report_name,".",input$report_format))
-  # 
-  #   to_download$fileName_report <- paste0(tempdir(),"/",input$report_name,".",input$report_format)
-  #   print(to_download$fileName_report)
-  #   removeModal()
-  # 
-  # })
-  # 
-  # 
-  # output$downloadReport <- downloadHandler(
-  #   filename = function(){
-  #     to_download$fileName_report
-  #   },
-  #   content = function(file){
-  #     file.copy(to_download$fileName_report,file)
-  #   }
-  # )
-
-  calculate_time_range <- function(baseData) {
-    time_range <- difftime(max(as.POSIXct(baseData$Date,format="%Y-%m-%d"),na.rm = TRUE),min(as.POSIXct(baseData$Date,format="%Y-%m-%d"),na.rm = TRUE),units="days")
-    if (as.numeric(time_range)<365*2){
-      myBreaks = paste0(1," months")
-      x_date_label = "%Y-%m-%d"
-      return(list(myBreaks, x_date_label))
-    }else if(as.numeric(time_range)>=365*2&as.numeric(time_range)<365*5){
-      myBreaks = paste0(2," months")
-      x_date_label = "%Y-%m-%d"
-      return(list(myBreaks, x_date_label))
-    }else{
-      myBreaks = paste0(6," months")
-      x_date_label = "%Y-%m"
-      return(list(myBreaks, x_date_label))
-    }
-  }
-
-  
   changeDateFormat <- function(uploadedDate, uploadedFormat) {
     newFormat = ""
     print(nchar(uploadedFormat))
@@ -790,25 +612,6 @@ function(input, output, session) {
         },error = function(err) {FALSE})  
   }
   
-  display_gage_stats <- function() {
-    gageStatsPlot <- NULL
-    if(input$gage_id != "" && length(input$gage_id) > 0 && nrow(gageRawData$gagedata) > 0) {
-      gageStatsPlot <-  fun.gageStatsPlot (
-                                          fun.gage.id = input$gage_id,
-                                          fun.gage.data = gageRawData$gagedata,
-                                          fun.gage.vars.to.process = input$gaze_params,
-                                          fun.stats.column = input$dailyStats_ts_metrics,
-                                          fun.internal = TRUE
-                                        )
-      return(gageStatsPlot)
-    } else {
-      if (input$gage_id != "" & input$gage_id > 0 & nrow(gageRawData$gagedata) == 0) {
-        shinyAlertUI("common_alert_msg", noGagaDataDownloaded, "WARNING")
-      }
-    }
-  }
-
-
  prepareDiscretePlot <- function(mergedDataSet, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
    mainPlot <- NULL
    discrete <- mergedDataSet$df 
@@ -832,21 +635,6 @@ function(input, output, session) {
      ) 
    return(mainPlot)
  }
- 
-  #Need to test below to remove unknown timezone error
-  checkTimeZone <- function (x) 
-  {
-    tzone <- attr(x, "tzone")[[1]]
-    if (is.null(tzone) && !is.POSIXt(x)) 
-      return("UTC")
-    if (is.character(tzone) && nzchar(tzone))
-      return(tzone)
-    tzone <- attr(as.POSIXlt(x[1]), "tzone")[[1]]
-    if (is.null(tzone)) 
-      return("UTC")
-    tzone
-  }
-
 
   prepareDateFormatErrorMsg <- function(errorMsg, tab="") {
     if(tab == "homePage") {
@@ -864,36 +652,6 @@ function(input, output, session) {
       return(errorMsg)
     }
   }
-
-  
-  validateNewLowerAndUpper <- function(elementId){
-    missingInputs <- FALSE
-    if (input$newData_lower_col == "" | input$newData_upper_col == ""){
-      missingInputs <- TRUE
-      output[[elementId]] <- renderUI({
-        shiny::validate(
-          shiny::need(input$newData_lower_col != "", 'Please lower bound column.'),
-          shiny::need(
-            input$newData_upper_col != "", 'Please select upper bound column.'
-          )
-        )
-      })
-    }
-    return(missingInputs)
-  }
-
-
-  calulatePlotHeight <- function(varNum) {
-    plotHeight <- 400
-    if(varNum > 2) {
-      plotHeight <- plotHeight + ((varNum - 2) * 82)
-    }
-    return(plotHeight)
-  }
-  fig <- function(width, heigth){
-    options(repr.plot.width = width, repr.plot.height = heigth)
-  }
-  
 
   uploadFile <- function(uploadedFile, stopExecution=FALSE, tab="") {
     my_data <- NULL
@@ -944,9 +702,10 @@ function(input, output, session) {
   observe({
     if(input$mainTabs == "downloadData") {
       renderUsgsAndDaymet$render <- TRUE
+    } else if(input$mainTabs == "discreateDataEx") {
+      renderDiscrete$render <- TRUE
     }
   })
-  
   
   #hydrology subtabs
   observe({
@@ -956,7 +715,6 @@ function(input, output, session) {
         renderFlashiness$render <- TRUE
       }
   })
-  
   
   # temperature subtabs
   observe({
@@ -987,5 +745,4 @@ function(input, output, session) {
       renderRasterPlot$render <- TRUE
     } 
   })
-  
 }

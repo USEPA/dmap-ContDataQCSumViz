@@ -41,7 +41,9 @@ DataExplorationTSModuleUI <- function(id) {
             ),
             mainPanel(
               width = 9,
-              fluidRow(column(width = 12, plotlyOutput(ns("display_time_series"))))
+              fluidRow(column(width = 12, 
+                        div(style="width:100%", uiOutput(ns("tsError"))),
+                        plotlyOutput(ns("display_time_series"))))
             ) # mainPanel end
           ) # sidebarLayout end
 }
@@ -108,8 +110,9 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
           #click("display_ts")
         })
         observeEvent(input$display_ts, {
+          clearContents()
+          clearPlot()
           localStats <- dailyStats
-
           if(length(variables_avail$params) > 0 & length(input$dailyStats_ts_variable_name) > 0) {
             #Display uploaded file stats
             if (!is.null(input$dailyStats_ts_metrics)&(input$dailyStats_ts_metrics=="mean"|input$dailyStats_ts_metrics=="median")){
@@ -131,14 +134,11 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
             }
 
           } else {
-            shinyalert("Warning",calculateDailyStatsMsg,closeOnClickOutside = TRUE,closeOnEsc = TRUE,confirmButtonText="OK",inputId="tsParamMissing")
+            renderErrorMsg(calculateDailyStatsMsg)
+            clearPlot()
           }
 
         })  # observeEvent end
-
-          observeEvent(input$tsParamMissing,{
-            shinyjs::runjs("swal.close();")
-          })
 
 
         draw_uploaded_file_ts <- function(){
@@ -261,7 +261,24 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
           return(basePlot)
 
         }
-
+        
+        #common
+        renderErrorMsg <- function(msg) {
+          output$tsError <- renderUI({
+            div(class="alert alert-danger" , msg) 
+          })
+        }
+        clearContents <- function(){
+          output$tsError <- renderUI({})
+        }
+        
+        clearPlot <- function(){
+          output$display_time_series <- renderPlotly({
+            plotly_empty()
+          })
+        }
+        
+ 
         #NEW data feature is removed for now but saving the code here as it was part of this tab
         #This part will need to be converted to shiny modules. If needed Discrete data upload
         #can be used as an example to convert below part to a shiny module
@@ -382,6 +399,23 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         #       return(mainPlot)
         #     })
         #   }
+        # }
+        
+        
+        # validateNewLowerAndUpper <- function(elementId){
+        #   missingInputs <- FALSE
+        #   if (input$newData_lower_col == "" | input$newData_upper_col == ""){
+        #     missingInputs <- TRUE
+        #     output[[elementId]] <- renderUI({
+        #       shiny::validate(
+        #         shiny::need(input$newData_lower_col != "", 'Please lower bound column.'),
+        #         shiny::need(
+        #           input$newData_upper_col != "", 'Please select upper bound column.'
+        #         )
+        #       )
+        #     })
+        #   }
+        #   return(missingInputs)
         # }
 
 
