@@ -168,13 +168,13 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
               timediff <- get_interval(tempData$Date)
               # print(timediff)
               timediff <- ifelse(timediff == "min", "15 mins", timediff)
-
               tempData <- as.data.frame(tempData %>%
                 mutate(Date = as.POSIXct(Date)) %>%
                 complete(Date = seq(min(Date, na.rm = TRUE), max(Date, na.rm = TRUE), by = timediff)))
             }
             tempData$lowerBoundgrp <- paste(varName, input$dailyStats_ts_metrics, ': lower bound', sep = ".")
             tempData$upperBoundgrp <- paste(varName, input$dailyStats_ts_metrics, ': upper bound', sep = ".")
+            
             mainList[[paste(varName, input$dailyStats_ts_metrics, sep = ".")]] <- tempData
 
             # mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "q.25%", sep="."), upper_col=paste(varName, "q.75%", sep="."), Date=Date))
@@ -222,13 +222,13 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
           isMissingDate <- TRUE
         }
 
-        mainPlot <- ggplot(data = tsData, dynamicTicks = TRUE) +
+        mainPlot <- ggplot(data = tsData, dynamicTicks = TRUE, aes(x=as.POSIXct(Date))) +
           labs(title = mapTitle, x = "Date", y = "Parameters")
         if (isMissingDate == TRUE) {
           mainPlot <- mainPlot + 
-            geom_line(inherit.aes = FALSE, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=upper_col, color=factor(upperBoundgrp)))+
-            geom_line(inherit.aes = FALSE, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=value, colour=df))+
-            geom_line(inherit.aes = FALSE, aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=lower_col, color=factor(lowerBoundgrp)))
+            geom_line(aes(y=upper_col, color=factor(upperBoundgrp)))+
+            geom_line(aes(y=value, colour=df))+
+            geom_line(aes(y=lower_col, color=factor(lowerBoundgrp)))
         } else {
           mainPlot <- mainPlot +
             geom_ribbon(show.legend = TRUE, aes(ymin = lower_col, ymax = upper_col, x = as.POSIXct(Date)), alpha = 0.3, inherit.aes = FALSE) +
