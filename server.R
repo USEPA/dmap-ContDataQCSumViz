@@ -83,6 +83,7 @@ function(input, output, session) {
   renderIHA <- reactiveValues(render=FALSE)
   renderFlashiness <- reactiveValues(render=FALSE)
   renderDiscrete <- reactiveValues(render=FALSE)
+  homePageInputs <- reactiveValues(changed=FALSE)
 
   #  Upload Data##############################
   if (file.exists("_moved/File_Format.rds")) file.remove("_moved/File_Format.rds")
@@ -224,10 +225,8 @@ function(input, output, session) {
   #USGS & Daymet Exploration tab
   GageAndDaymetModuleServer("gageDaymetAndBase", homeDTvalues, dateRange, formated_raw_data, renderUsgsAndDaymet)
   
-  
-  
   observeEvent(uploaded_data(), {
-    homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data())
+    homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data(), homePageInputs)
   })
   
   getFormattedRawData <- function(dateAndTimeFields, userData, tabName, errorDivId) {
@@ -309,14 +308,14 @@ function(input, output, session) {
       striped = TRUE,
       align = "c",
       width = "100%"
-    )
+      )
   })
 
   observeEvent(input$showrawTS,{
     shinyjs::show(id="display_all_raw_ts_div")
     shinyjs::removeClass("dateAndTimeError", "alert alert-danger")
     raw_data <- uploaded_data()
-    homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data())
+    homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data(), homePageInputs)
     showRawDateAndTime <- homeDTvalues$homeDateAndTime
   
     #display_validation_msgs dateBox
@@ -351,7 +350,6 @@ function(input, output, session) {
     shinyjs::runjs(paste0("$('#",elementId,"').text('",processedMsg,"')"))
     shinyjs::addClass(elementId, "alert alert-danger")
   }
-  
 
   observe({
     if(dailyStatusCalculated$status == "finished") {
@@ -369,7 +367,7 @@ function(input, output, session) {
   observeEvent(input$runQS,{
     tryCatch({
       raw_data <- uploaded_data()
-      homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data())
+      homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data(), homePageInputs)
       localHomeDateAndTime <- homeDTvalues$homeDateAndTime
       #display_validation_msgs dateBox
       if (localHomeDateAndTime$isTimeValid() & localHomeDateAndTime$isDateAndtimeValid()) {
@@ -405,6 +403,7 @@ function(input, output, session) {
                 workflowStatus$elementId="step3"
                 workflowStatus$state="success"
                 readyForCalculation$status <- TRUE
+                homePageInputs$changed <- FALSE
             }
               output$display_actionButton_calculateDailyStatistics <-
                 renderUI({calculateDailyStatsModuleUI("calculateDailyStats", readyForCalculation)})
@@ -478,7 +477,7 @@ function(input, output, session) {
       )
     })
     # init the module
-    discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData())
+    discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData(), homePageInputs)
   })
   
   output$baseParameters <- renderUI({
@@ -497,7 +496,7 @@ function(input, output, session) {
   })
   
   observeEvent(input$display_discrete_data, {
-    discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData())
+    discreteDTvalues$disDateAndTime <- dateAndTimeServer(id = "discretePage", uploaded_discreteData(), homePageInputs)
     localDiscreteDateAndTime <- discreteDTvalues$disDateAndTime
     mainPlot <- NULL
     if (localDiscreteDateAndTime$isTimeValid() & localDiscreteDateAndTime$isDateAndtimeValid()) {
@@ -525,7 +524,7 @@ function(input, output, session) {
 
                 step1 <- step1 %>%
                     mutate(Date = as.POSIXct(Date)) %>%
-                    complete(Date = seq(min(Date,na.rm = TRUE), max(Date, na.rm = TRUE), by=timediff))
+                    tidyr::complete(Date=seq(min(Date,na.rm=TRUE), max(Date, na.rm=TRUE), by=timediff))
                 
                 #write.csv(step1,"step1.csv",row.names=FALSE)
                 
@@ -548,6 +547,7 @@ function(input, output, session) {
             mainPlot <- prepareDiscretePlot(combinded_df, mapTitle=mainMapTitle, xDateLabel=main_x_date_label, xDateBrakes= mainBreaks,base_vars_to_plot)
               if(!is.null(mainPlot) & length(variable_to_plot) > 0){
                 shinyjs::runjs("$('#dateTimeBoxButton_discrete').click()")
+                
                 output$display_time_series_discrete <-  renderPlotly({
                   ggplotly(mainPlot, height=calculatePlotHeight(length(variable_to_plot)*2)) 
                    # %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
@@ -745,4 +745,20 @@ function(input, output, session) {
       renderRasterPlot$render <- TRUE
     } 
   })
+  
+  observe({
+    if(homePageInputs$changed == TRUE & workflowStatus$finish == TRUE) {
+      print("I am listening and work flow status is")
+      print(workflowStatus$finish)
+          workflowStatus$finish = FALSE
+          workflowStatus$elementId="step3"
+          workflowStatus$state="error"
+          readyForCalculation$status <- FALSE
+          dailyStatusCalculated$status <- "unfinished"
+      #Now reset to false
+      homePageInputs$changed = FALSE
+    }
+  })
+  
+
 }

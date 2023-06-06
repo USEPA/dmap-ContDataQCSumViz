@@ -3816,6 +3816,37 @@
         "Archs": "x64"
       }
     },
+    "packrat": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "packrat",
+        "Type": "Package",
+        "Title": "A Dependency Management System for Projects and their R Package\nDependencies",
+        "Version": "0.8.1",
+        "Author": "Kevin Ushey, Jonathan McPherson, Joe Cheng, Aron Atkins, JJ Allaire,\n    Toph Allen",
+        "Maintainer": "Aron Atkins <aron@rstudio.com>",
+        "Description": "Manage the R packages your project depends\n    on in an isolated, portable, and reproducible way.",
+        "License": "GPL-2",
+        "Depends": "R (>= 3.0.0)",
+        "Imports": "tools, utils",
+        "Suggests": "testthat (>= 3.0.0), devtools, httr, knitr, rmarkdown",
+        "URL": "https://github.com/rstudio/packrat/",
+        "BugReports": "https://github.com/rstudio/packrat/issues",
+        "RoxygenNote": "7.1.2",
+        "Encoding": "UTF-8",
+        "Config/testthat/edition": "3",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-06-29 19:15:34 UTC; aron",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-06-29 20:00:02 UTC",
+        "Built": "R 4.2.2; ; 2022-12-20 01:43:30 UTC; windows"
+      }
+    },
     "padr": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -5024,6 +5055,37 @@
         "Repository": "CRAN",
         "Date/Publication": "2022-04-02 16:40:02 UTC",
         "Built": "R 4.2.2; ; 2022-12-15 01:48:15 UTC; windows"
+      }
+    },
+    "rsconnect": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "GithubRepo": null,
+      "GithubUsername": null,
+      "GithubRef": null,
+      "GithubSha1": null,
+      "description": {
+        "Package": "rsconnect",
+        "Type": "Package",
+        "Title": "Deployment Interface for R Markdown Documents and Shiny\nApplications",
+        "Version": "0.8.29",
+        "Authors@R": "c(\n    person(\"Aron\", \"Atkins\", role = c(\"aut\", \"cre\"), email = \"aron@posit.co\"),\n    person(\"Jonathan\", \"McPherson\", role = \"aut\", email = \"jonathan@posit.co\"),\n    person(\"JJ\", \"Allaire\", role = \"aut\"),\n    person(\"Posit Software\", role = c(\"cph\", \"fnd\"))\n    )",
+        "Description": "Programmatic deployment interface for 'RPubs', 'shinyapps.io', and\n    'Posit Connect'. Supported content types include R Markdown documents,\n    Shiny applications, Plumber APIs, plots, and static web content.",
+        "Depends": "R (>= 3.0.0)",
+        "Imports": "curl, digest, jsonlite, openssl (>= 2.0.0), packrat (>= 0.6),\nrstudioapi (>= 0.5), tools, yaml (>= 2.1.5)",
+        "Suggests": "MASS, RCurl, callr, httpuv, knitr, plumber (>= 0.3.2),\nreticulate, rmarkdown (>= 1.1), shiny, sourcetools, testthat,\nxtable",
+        "License": "GPL-2",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.2.1",
+        "URL": "https://github.com/rstudio/rsconnect",
+        "BugReports": "https://github.com/rstudio/rsconnect/issues",
+        "NeedsCompilation": "no",
+        "Packaged": "2023-01-09 19:03:45 UTC; aron",
+        "Author": "Aron Atkins [aut, cre],\n  Jonathan McPherson [aut],\n  JJ Allaire [aut],\n  Posit Software [cph, fnd]",
+        "Maintainer": "Aron Atkins <aron@posit.co>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-01-09 22:50:10 UTC",
+        "Built": "R 4.2.2; ; 2023-03-16 03:44:41 UTC; windows"
       }
     },
     "rstudioapi": {
@@ -6917,7 +6979,7 @@
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
     ".RData": {
-      "checksum": "324c382ab021d4559ac40bab8cdb694c"
+      "checksum": "8e9eff42b71a55ec66ea7fd0730097d9"
     },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
@@ -7160,7 +7222,7 @@
       "checksum": "09d6f4bb2029f39f076a2172b191c95c"
     },
     "modules/allParameterTab/dataExplorationTSModule.R": {
-      "checksum": "1859fc71573fd88f0682e84187a4c855"
+      "checksum": "4d92625aca42980367dfbd63e416fa14"
     },
     "modules/allParameterTab/summaryTablesModule.R": {
       "checksum": "cd6e3c5e2a8e1c8ce2397525380126a5"
@@ -7184,7 +7246,7 @@
       "checksum": "f20708670efb19f5b256ccbc6e3c6513"
     },
     "modules/dateAndTimeModule.R": {
-      "checksum": "74a9ab71f1dec5846fa91016dbcdb419"
+      "checksum": "6b2810dde8e67a1f91777b7d210ae81f"
     },
     "modules/dateAndTimePopUp.R": {
       "checksum": "c602709363e3605404e20d237a97dce8"
@@ -7202,7 +7264,7 @@
       "checksum": "54a43e7eeb5a5a20063146dfef94f4b8"
     },
     "modules/progressWorkflowModule.R": {
-      "checksum": "b852555eed1c251e4328045b7fe90da0"
+      "checksum": "8fce51cd3f86e7049e62ab0bad7df413"
     },
     "modules/rawTSmodule.R": {
       "checksum": "45c00faa75613a90586fec2ce6781918"
@@ -7211,7 +7273,7 @@
       "checksum": "27d011384c89eaf1af82d23f03cd7cd3"
     },
     "modules/temperatureTab/airVsWaterModule.R": {
-      "checksum": "192940bbbf6b50d7010c270ff6623a08"
+      "checksum": "abb64ff1fb0f2b7a64fbf0f5d297f3eb"
     },
     "modules/temperatureTab/growingDegreeModule.R": {
       "checksum": "ed1876470f6a850152a9509d93b48cfb"
@@ -7220,7 +7282,7 @@
       "checksum": "99f5341ddb7ebf10432b07a8320b38d8"
     },
     "modules/temperatureTab/thermalStatsModule.R": {
-      "checksum": "b54aaf93b43b802a3139b0d94e1f4cbe"
+      "checksum": "779fb17e2178616a07a8eabf157def06"
     },
     "modules/usgsGageAndDayMetTab/dayMetFunctions/fun.daymet_raw_plot.R": {
       "checksum": "160caf5be8be46833dc843edefbb1663"
@@ -7300,6 +7362,564 @@
     "Output/to_report/9_Table_SiteX_WaterTempMonthlyMean.csv": {
       "checksum": "7fcc35a010bcf317125bd1b6b2f107a9"
     },
+    "practicing-building-docker-images-dmap0/.git/config": {
+      "checksum": "aba8acb0bfc8447a39ae73f380132abb"
+    },
+    "practicing-building-docker-images-dmap0/.git/description": {
+      "checksum": "a0a7c3fff21f2aea3cfa1d0316dd816c"
+    },
+    "practicing-building-docker-images-dmap0/.git/HEAD": {
+      "checksum": "4c7f1054b103548c9ad74ed65e5e6612"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/applypatch-msg.sample": {
+      "checksum": "ce562e08d8098926a3862fc6e7905199"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/commit-msg.sample": {
+      "checksum": "579a3c1e12a1e74a98169175fb913012"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/fsmonitor-watchman.sample": {
+      "checksum": "ea587b0fae70333bce92257152996e70"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/post-update.sample": {
+      "checksum": "2b7ea5cee3c49ff53d41e00785eb974c"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/pre-applypatch.sample": {
+      "checksum": "054f9ffb8bfe04a599751cc757226dda"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/pre-commit.sample": {
+      "checksum": "305eadbbcd6f6d2567e033ad12aabbc4"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/pre-merge-commit.sample": {
+      "checksum": "39cb268e2a85d436b9eb6f47614c3cbc"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/pre-push.sample": {
+      "checksum": "2c642152299a94e05ea26eae11993b13"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/pre-rebase.sample": {
+      "checksum": "56e45f2bcbc8226d2b4200f7c46371bf"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/pre-receive.sample": {
+      "checksum": "2ad18ec82c20af7b5926ed9cea6aeedd"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/prepare-commit-msg.sample": {
+      "checksum": "2b5c047bdb474555e1787db32b2d2fc5"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/push-to-checkout.sample": {
+      "checksum": "c7ab00c7784efeadad3ae9b228d4b4db"
+    },
+    "practicing-building-docker-images-dmap0/.git/hooks/update.sample": {
+      "checksum": "647ae13c682f7827c22f5fc08a03674e"
+    },
+    "practicing-building-docker-images-dmap0/.git/index": {
+      "checksum": "d10c49e5475b7c9eb8cb77950c1e0523"
+    },
+    "practicing-building-docker-images-dmap0/.git/info/exclude": {
+      "checksum": "036208b4a1ab4a235d75c181e685e5a3"
+    },
+    "practicing-building-docker-images-dmap0/.git/logs/HEAD": {
+      "checksum": "361fbacfd631ae7cc8e23f7c5d700104"
+    },
+    "practicing-building-docker-images-dmap0/.git/logs/refs/heads/docker-container": {
+      "checksum": "361fbacfd631ae7cc8e23f7c5d700104"
+    },
+    "practicing-building-docker-images-dmap0/.git/logs/refs/remotes/origin/HEAD": {
+      "checksum": "361fbacfd631ae7cc8e23f7c5d700104"
+    },
+    "practicing-building-docker-images-dmap0/.git/objects/pack/pack-28dec9931bc3a105e083c220b3fcee66e0b11dc4.idx": {
+      "checksum": "1648f79fdbedb8f06e826fa9d2c374f1"
+    },
+    "practicing-building-docker-images-dmap0/.git/objects/pack/pack-28dec9931bc3a105e083c220b3fcee66e0b11dc4.pack": {
+      "checksum": "c8f879c3ac6db22945d978391ab494d4"
+    },
+    "practicing-building-docker-images-dmap0/.git/packed-refs": {
+      "checksum": "36a04cefa5e30b09c6b42c666a9979ff"
+    },
+    "practicing-building-docker-images-dmap0/.git/refs/heads/docker-container": {
+      "checksum": "3bdacba812e7081810dbf4e05665ebbd"
+    },
+    "practicing-building-docker-images-dmap0/.git/refs/remotes/origin/HEAD": {
+      "checksum": "261012d1702e407894661c0eafe6f379"
+    },
+    "practicing-building-docker-images-dmap0/.github/workflows/deploy.yml": {
+      "checksum": "794c1bb854850b4657f35a9a0554063e"
+    },
+    "practicing-building-docker-images-dmap0/.github/workflows/deploy.yml.bak": {
+      "checksum": "73e2b2b18146eff290a49cb1ad1cfa5a"
+    },
+    "practicing-building-docker-images-dmap0/.gitignore": {
+      "checksum": "ea3cc835b112333f4edb14248b0d20aa"
+    },
+    "practicing-building-docker-images-dmap0/.grype.yml": {
+      "checksum": "14c988bffe2be833f7eb961e58bbdc88"
+    },
+    "practicing-building-docker-images-dmap0/.lintr": {
+      "checksum": "c91c966612c314b5e73a631c5df3921f"
+    },
+    "practicing-building-docker-images-dmap0/.Rprofile": {
+      "checksum": "db5ca1f86857f2b3c0910e743c10f0ed"
+    },
+    "practicing-building-docker-images-dmap0/.vscode/settings.json": {
+      "checksum": "588a23f324477417c7b809502f44ee11"
+    },
+    "practicing-building-docker-images-dmap0/_moved/import_raw_data.R": {
+      "checksum": "18e23c1777ea3a86ef1745d2731832ce"
+    },
+    "practicing-building-docker-images-dmap0/_moved/install_packages_for_app.R": {
+      "checksum": "1402d83f2d12f85f6bb2df757814fba3"
+    },
+    "practicing-building-docker-images-dmap0/_moved/myReport.html": {
+      "checksum": "0fda7d5c154e04ea4515346fba73b586"
+    },
+    "practicing-building-docker-images-dmap0/_moved/SiteSummary.Rmd": {
+      "checksum": "e24c8e503be8c64ab5f6844735446b52"
+    },
+    "practicing-building-docker-images-dmap0/_moved/SiteSummary_YD.Rmd": {
+      "checksum": "34a4484a74f12f566189b70ec50719e3"
+    },
+    "practicing-building-docker-images-dmap0/constants.R": {
+      "checksum": "a8e80a76f2f760bf51998c66dcbd395d"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/01104455_Gage_20150303_20201028.csv": {
+      "checksum": "9a882d718de77bbe5b43d35fb5752452"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/CDF_WaterTemp_2014_MA.csv": {
+      "checksum": "8ef4e057db706fc575d6a5087f2a30d8"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/CRBuoy discrete different data and time formatNG.csv": {
+      "checksum": "8026b29f0fd4527fb16558815a7f2218"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/DATA_test2_Aw_20130101_20141231.csv": {
+      "checksum": "018004935e4324fbd8ce20f1ab87f854"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/DATA_test2_Aw_20130101_20141231_dummy.csv": {
+      "checksum": "cbea9ebf35d68aa0b050a0326a75e291"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/DATA_two_columns.csv": {
+      "checksum": "53c9b607daca08245eb33bb2c03c4a15"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/DATA_two_columns_two_digits_years.csv": {
+      "checksum": "33505e96a7cc2ca26a80117375a16638"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromGopa/VT_Ranch_AW_20180412_20210427.csv": {
+      "checksum": "9350038e9907fad27feadc5777215c0f"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromJen/10RD014_AW_20170508_20211029.csv": {
+      "checksum": "faf52299633f6d68d114e1261accff22"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromJen/10RD014_DO_20170508_20211029.csv": {
+      "checksum": "f1d7d322e75659baa335b187c1cbe808"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromJen/Metadata_OverallSumStats_USGSgage.xlsx": {
+      "checksum": "b1f18c5f18631eb6bcc3a3f3447fa8d9"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromJen/Ranch_OverallSumStats_2001_2022_mod.csv": {
+      "checksum": "32679467e7ca76f6e3620db42497a350"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromJen/test_QC_Hunting_AW_20140422_20190425.csv": {
+      "checksum": "7b29f3fd81b325dd46f3607bcfe97d1e"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromJen/test_QC_LittleStony_AW_20140418_20180817.csv": {
+      "checksum": "2cb09171818a3b769894d0c89e44207f"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromJen/test_QC_Piney_AW_20140428_20181203.csv": {
+      "checksum": "fa6779834eec192e275a8f39561638bc"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromJen/VA_Instructions_ContDataSumViz_20221228.pdf": {
+      "checksum": "79286a8314b099164bc99f28e3b8d111"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/crbuoy .csv": {
+      "checksum": "e58faf2eb32be1e68777b62e9e0eed0d"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/CRBuoy discrete different data and time format.csv": {
+      "checksum": "845d72036bf21fe7a75250415b9d6850"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/CRBuoy discrete different data and time format.xlsx": {
+      "checksum": "d886edee37716c872464da5eec999b71"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/CRBuoy discrete same date and time format.csv": {
+      "checksum": "0c60b4751311ac83a3447ed071c20df3"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/CRBuoy discrete same date and time format.xlsx": {
+      "checksum": "77a0680933801d51cf4b0bc91902a1da"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/CRBuoy discrete same date and time format2.csv": {
+      "checksum": "0c60b4751311ac83a3447ed071c20df3"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/CRBuoy discrete same date and time formatorg.csv": {
+      "checksum": "d2dbdfc214551a50368b163ef8794c1e"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/CRBuoy discrete same date and time formatorg.xlsx": {
+      "checksum": "77a0680933801d51cf4b0bc91902a1da"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/crbuoy with site ID.csv": {
+      "checksum": "d8732fff562a28af96141da4bbce4abf"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/GB27_Water_05102022_10252022.csv": {
+      "checksum": "cc7fd5f95c0148e5118090628981f3bd"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/GB27_Water_05102022_10252022.xlsx": {
+      "checksum": "0f89626c7dc0ba27277dfc8dd6bba057"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/FromTom/GB27_Water_05102022_10252022_tom2.csv": {
+      "checksum": "a1d36d428e1c97737365ba94e6f7a9fa"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/HISS2 Sites LatLong.csv": {
+      "checksum": "8fbbe42df312319b22abdea9cb6089bc"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/Leah/BCGLSpCfinal_7-06-18.csv": {
+      "checksum": "2b2b9485523c3bae758120dacf871db8"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/MA_ParkersBrook_StageDischargeTemp_20121205_20210930.xlsx": {
+      "checksum": "eea161aee62248811d444ab82ff56c51"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/manyGageTest.csv": {
+      "checksum": "09d6f4bb2029f39f076a2172b191c95c"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/NANJ-331-S.csv": {
+      "checksum": "09aab089e7664891f9c2979efc376afa"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/newData_Water.Temp.C_2013_dummy.csv": {
+      "checksum": "2ca7cc24bc982ebad8539b04f83445e0"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/newData_Water.Temp.C_2018_dummy.csv": {
+      "checksum": "2f7d2ecebcf7484db66b9357d004546b"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/ngTest.csv": {
+      "checksum": "c8181f38fd6cf44fe38ac808d99b35ab"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/NY_Biscuit_01434025_Gage_20150101_20220101.csv": {
+      "checksum": "34c1ba59a45e9565cb2bbf19cbb6efe9"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/Pokagon_ContDataQC.xlsx": {
+      "checksum": "a9467fc23552f7e578fcdee5a12e0281"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/PRLN-626-S.csv": {
+      "checksum": "4a1e349d785da373186df0b94b881892"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/PRLN-626-S_dummy.csv": {
+      "checksum": "831cd2b55e8298461297676fcf5d17fe"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/Ranch_OverallSumStats_2001_2022_mod.csv": {
+      "checksum": "9e58133d544630f1f62ba1d3929de6b5"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/shortTestFile.csv": {
+      "checksum": "5d157c8cd2db0d11aedacd6f96ee0efc"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/StreamThermal.crbuoy with site ID.csv.Charles.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/StreamThermal.CTDEEP_15499_WBSalmon_100616_092021.csv.10332638.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230213.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/StreamThermal.DATA_ECO66G20_AW_20140728_20150316.csv.ECO66G20.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/StreamThermal.DATA_QC_QB283_AW_20150303_20201006.csv.QB283.20230308.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/StreamThermal.shortFileForTest.csv.QB283.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230203.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230320.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/test.xlsx": {
+      "checksum": "0c0859de82403b98ac93ea53a7b37e51"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/test_dailyCheck.RData": {
+      "checksum": "7814a703c263d03948ac20990e7b73e6"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/Tori/CRBuoy discrete different data with more points.csv": {
+      "checksum": "8b25f2dd0b1f858f4222db2382524ba2"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/Tori/crbuoy with site ID.csv": {
+      "checksum": "d8732fff562a28af96141da4bbce4abf"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/Tori/GB27_Water_05102022_10252022.csv": {
+      "checksum": "fcbc9d6a7e1f23320d7cd3678a962a4a"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/Tori/GB27_Water_05102022_10252022.xlsx": {
+      "checksum": "332a044e903d0c545eba4025b898e471"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/VT_Ranch_AW_20180412_20210427.csv": {
+      "checksum": "9350038e9907fad27feadc5777215c0f"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/VT_Ranch_AW_20180412_20210427_composite.csv": {
+      "checksum": "b500117e78009a153f09be5635c70fb2"
+    },
+    "practicing-building-docker-images-dmap0/ContDataQC_test_data/VT_Ranch_AW_20180412_20210427_forwardSlash.csv": {
+      "checksum": "2c55ac42cd5e8e36753301cb3b55662e"
+    },
+    "practicing-building-docker-images-dmap0/ContDataSumViz_Shiny.Rproj": {
+      "checksum": "584b2434d675b192dc1614bd62b5b93e"
+    },
+    "practicing-building-docker-images-dmap0/Dockerfile": {
+      "checksum": "9f681064f7bc9f89c9b4c5f818c807de"
+    },
+    "practicing-building-docker-images-dmap0/external/App_USGSgage.html": {
+      "checksum": "376e0086aa3b41aec3e9114cc238b7e8"
+    },
+    "practicing-building-docker-images-dmap0/external/tab_USGSgage_ui.R": {
+      "checksum": "6a5fab1891a38bcf5dcfb593edda555b"
+    },
+    "practicing-building-docker-images-dmap0/global.R": {
+      "checksum": "122dbfac882c5884243c1dd7a5ee6f9b"
+    },
+    "practicing-building-docker-images-dmap0/global.R.bak": {
+      "checksum": "7d2ff64d96b77c0d6e4775d2787cafbc"
+    },
+    "practicing-building-docker-images-dmap0/help_text_files/Hydrology_IHA.txt": {
+      "checksum": "221c734e8fc1313660b66acaaae49f61"
+    },
+    "practicing-building-docker-images-dmap0/help_text_files/Hydrology_RBI.txt": {
+      "checksum": "863401865ab7a1403c5ac8059b44a08d"
+    },
+    "practicing-building-docker-images-dmap0/help_text_files/Temperature_AirWater.txt": {
+      "checksum": "649da6b7cba8f9a83278bb580a76a55d"
+    },
+    "practicing-building-docker-images-dmap0/help_text_files/Temperature_Classification.txt": {
+      "checksum": "223be46707f1da7792cbf484459fbf79"
+    },
+    "practicing-building-docker-images-dmap0/help_text_files/Temperature_GrowingDegreeDays.txt": {
+      "checksum": "3838f0d4c998f7f9ffe9857b29a82e69"
+    },
+    "practicing-building-docker-images-dmap0/help_text_files/Temperature_ThermalStatistics.txt": {
+      "checksum": "34167516986ec25ae610428105d51a7c"
+    },
+    "practicing-building-docker-images-dmap0/log/contDataSumViz.log": {
+      "checksum": "71c77232b18888e0a7b07a5567b9b81f"
+    },
+    "practicing-building-docker-images-dmap0/manifest.json": {
+      "checksum": "629a9c5a20c6a981bb25c593c9a6fc95"
+    },
+    "practicing-building-docker-images-dmap0/manyGageTest.csv": {
+      "checksum": "09d6f4bb2029f39f076a2172b191c95c"
+    },
+    "practicing-building-docker-images-dmap0/modules/allParameterTab/dataExplorationTSModule.R": {
+      "checksum": "ecda1874e8c2b4e39945900be419ce33"
+    },
+    "practicing-building-docker-images-dmap0/modules/allParameterTab/summaryTablesModule.R": {
+      "checksum": "7b613a15c20396eb6ba1363cf7f684c3"
+    },
+    "practicing-building-docker-images-dmap0/modules/allParameterTab/tsBoxPlotModule.R": {
+      "checksum": "10e4f990f17a3a929b70e600e3f1b43a"
+    },
+    "practicing-building-docker-images-dmap0/modules/allParameterTab/tsCDFPlotModule.R": {
+      "checksum": "5da6668ce2a5140b93c13d20a41a1f1d"
+    },
+    "practicing-building-docker-images-dmap0/modules/allParameterTab/tsOverlayModule.R": {
+      "checksum": "27ee1e0a99fa75f8cc54720240672ceb"
+    },
+    "practicing-building-docker-images-dmap0/modules/allParameterTab/tsRasterPlotModule.R": {
+      "checksum": "41a85104b6031df4c070c8725122ab99"
+    },
+    "practicing-building-docker-images-dmap0/modules/calculateDailyStatsModule.R": {
+      "checksum": "8afbc1d07d9b5459e160ee36bb761e39"
+    },
+    "practicing-building-docker-images-dmap0/modules/common.functions.R": {
+      "checksum": "f20708670efb19f5b256ccbc6e3c6513"
+    },
+    "practicing-building-docker-images-dmap0/modules/dateAndTimeModule.R": {
+      "checksum": "74a9ab71f1dec5846fa91016dbcdb419"
+    },
+    "practicing-building-docker-images-dmap0/modules/dateAndTimePopUp.R": {
+      "checksum": "c602709363e3605404e20d237a97dce8"
+    },
+    "practicing-building-docker-images-dmap0/modules/fileUploadModule.R": {
+      "checksum": "62e948ce71d071b4b6923e515e22dc75"
+    },
+    "practicing-building-docker-images-dmap0/modules/hydrologyTab/flashinessModule.R": {
+      "checksum": "244cee397f57e07b1e8f2996a4cf5491"
+    },
+    "practicing-building-docker-images-dmap0/modules/hydrologyTab/ihaModule.R": {
+      "checksum": "f3de6eb2b5ddf6b33d6f79606c66923e"
+    },
+    "practicing-building-docker-images-dmap0/modules/metaDataModule.R": {
+      "checksum": "54a43e7eeb5a5a20063146dfef94f4b8"
+    },
+    "practicing-building-docker-images-dmap0/modules/progressWorkflowModule.R": {
+      "checksum": "b852555eed1c251e4328045b7fe90da0"
+    },
+    "practicing-building-docker-images-dmap0/modules/rawTSmodule.R": {
+      "checksum": "45c00faa75613a90586fec2ce6781918"
+    },
+    "practicing-building-docker-images-dmap0/modules/shinyAlertModule.R": {
+      "checksum": "27d011384c89eaf1af82d23f03cd7cd3"
+    },
+    "practicing-building-docker-images-dmap0/modules/temperatureTab/airVsWaterModule.R": {
+      "checksum": "ce231bf98e896925a7b296c0d9cda8a3"
+    },
+    "practicing-building-docker-images-dmap0/modules/temperatureTab/growingDegreeModule.R": {
+      "checksum": "ed1876470f6a850152a9509d93b48cfb"
+    },
+    "practicing-building-docker-images-dmap0/modules/temperatureTab/thermalClassificationModule.R": {
+      "checksum": "99f5341ddb7ebf10432b07a8320b38d8"
+    },
+    "practicing-building-docker-images-dmap0/modules/temperatureTab/thermalStatsModule.R": {
+      "checksum": "b54aaf93b43b802a3139b0d94e1f4cbe"
+    },
+    "practicing-building-docker-images-dmap0/modules/usgsGageAndDayMetTab/dayMetFunctions/fun.daymet_raw_plot.R": {
+      "checksum": "160caf5be8be46833dc843edefbb1663"
+    },
+    "practicing-building-docker-images-dmap0/modules/usgsGageAndDayMetTab/dayMetFunctions/fun.DayMetData.R": {
+      "checksum": "a31cfec905186df96deb64f0991f729a"
+    },
+    "practicing-building-docker-images-dmap0/modules/usgsGageAndDayMetTab/gageAndDaymetModule.R": {
+      "checksum": "b1cbf56830aeab02917e60e1991a97f7"
+    },
+    "practicing-building-docker-images-dmap0/modules/usgsGageAndDayMetTab/gageFunctions/fun.gage_raw_plot.R": {
+      "checksum": "d2860cbe1c05092d1d42972a72503c4f"
+    },
+    "practicing-building-docker-images-dmap0/modules/usgsGageAndDayMetTab/gageFunctions/fun.GageData.R": {
+      "checksum": "51c61333ad649c60a506037940f03668"
+    },
+    "practicing-building-docker-images-dmap0/Output/reports/myReport.html": {
+      "checksum": "409c923b7b56ece270a890064d734b9a"
+    },
+    "practicing-building-docker-images-dmap0/Output/reports/testWordReport.docx": {
+      "checksum": "741c0684aa1f00138498ed769741899e"
+    },
+    "practicing-building-docker-images-dmap0/Output/saved_IHA/IHA.DATA_test2_Aw_20130101_20141231.csv.calendar.20220927.142548.xlsx": {
+      "checksum": "999375459ceb083475f80b15a271bfbd"
+    },
+    "practicing-building-docker-images-dmap0/Output/saved_streamThermal/StreamThermal.DATA_test2_Aw_20130101_20141231.csv.Test2.20220927.142203.xlsx": {
+      "checksum": "bce3ffca4af83acccca126ae99266473"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/_Captions_SiteX.xlsx": {
+      "checksum": "1916a74c1a9c6845a444488385b08532"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/_Header_SiteX.docx": {
+      "checksum": "184843b6d9aae05ec9749e838e5fc489"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/1_Figure_SiteX_Photo.png": {
+      "checksum": "11fdd5484266bd09ad1d6d7467ff0eed"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/10_Figure_SiteX_WaterLevelTimeSeries.png": {
+      "checksum": "22a07ea288ccff527232f474cc48bce7"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/11_Table_SiteX_HydroMonthlyDischarge.csv": {
+      "checksum": "e263336601ddf7885fc9d8ccb771f0d8"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/12_Table_SiteX_HydroIHAGrp2.csv": {
+      "checksum": "7d4daa877a967a564d3cf3916e6d2c73"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/13_Table_SiteX_WaterChem.csv": {
+      "checksum": "d7a03e02658b6dc6a70dc9262597df91"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/14_Table_SiteX_Habitat.csv": {
+      "checksum": "6795f0bfd740cec81f88b409852e5bcc"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/15_Table_SiteX_BugsRA.csv": {
+      "checksum": "ef1386bfb466346fa0598175d8db44d6"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/2_Figure_SiteX_FocusMap.png": {
+      "checksum": "8af9d210dbb9268f0f7584ceeff621e9"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/3_Figure_SiteX_LULCMap.png": {
+      "checksum": "70e0f3927bfa443d83422b6d5374531b"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/4_Table_SiteX_LULC.csv": {
+      "checksum": "b516a84cf740288053b612485b7ba140"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/5_Table_SiteX_BugMetrics.csv": {
+      "checksum": "f56d42bb83a442480e4eaf2efadf07ec"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/6_Figure_SiteX_TempCDF_annual.png": {
+      "checksum": "21c17b30f3e069bb23863c4b8d5cba0b"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/7_Figure_SiteX_TempTimeSeries.png": {
+      "checksum": "933c7acb6a77bb0882b5e62e6809fc41"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/8_Figure_SiteX_TempJuneBoxPlot.png": {
+      "checksum": "526c87af2b160a2ae8cef0cb45540954"
+    },
+    "practicing-building-docker-images-dmap0/Output/to_report/9_Table_SiteX_WaterTempMonthlyMean.csv": {
+      "checksum": "7fcc35a010bcf317125bd1b6b2f107a9"
+    },
+    "practicing-building-docker-images-dmap0/README.md": {
+      "checksum": "b043dc203d5b23aeccc07efc94a44fe2"
+    },
+    "practicing-building-docker-images-dmap0/renv.lock.bak": {
+      "checksum": "327bc477b698af951bfb008dd8ade0b1"
+    },
+    "practicing-building-docker-images-dmap0/rsconnect/.gitkeep": {
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "practicing-building-docker-images-dmap0/run.R": {
+      "checksum": "db010fdb514a986ad6707a6c412d8cfb"
+    },
+    "practicing-building-docker-images-dmap0/server.R": {
+      "checksum": "b94c4819cb211756d552045e8179ea76"
+    },
+    "practicing-building-docker-images-dmap0/StreamThermal.GB27_Water_05102022_10252022.csv.GB27.20230523.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230530.xlsx": {
+      "checksum": "692057c7d33af0f60160746a3af6f572"
+    },
+    "practicing-building-docker-images-dmap0/test_dailyCheck.RData": {
+      "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
+    },
+    "practicing-building-docker-images-dmap0/ui.R": {
+      "checksum": "2319f4fe8c0632e74836450650454b8c"
+    },
+    "practicing-building-docker-images-dmap0/update_ContDataQC/build_summary_updated.R": {
+      "checksum": "f05982d5e94865988ec7a6b899bda136"
+    },
+    "practicing-building-docker-images-dmap0/update_ContDataQC/CompSiteCDF.updated.R": {
+      "checksum": "9b27bf0a2827a10208d606d85e924ddd"
+    },
+    "practicing-building-docker-images-dmap0/update_ContDataQC/config.R": {
+      "checksum": "23bf4005da9d6f81448e4d7530f2e606"
+    },
+    "practicing-building-docker-images-dmap0/update_ContDataQC/fun.ConvertDateFormat.R": {
+      "checksum": "893976a9ceb525e4d11cab7880ddcc52"
+    },
+    "practicing-building-docker-images-dmap0/update_ContDataQC/ReportMetaData.R": {
+      "checksum": "3dd1071a6c8662f096ea0365f1b2f0fc"
+    },
+    "practicing-building-docker-images-dmap0/update_ContDataQC/SumStats.updated.R": {
+      "checksum": "a9656e8edab407aea45e4a569f0a067d"
+    },
+    "practicing-building-docker-images-dmap0/www/ajax-loader-spinner.gif": {
+      "checksum": "0b29ec94c8c8c810e3e5f37c7701b717"
+    },
+    "practicing-building-docker-images-dmap0/www/app.css": {
+      "checksum": "194620ca027a498b3c58e2a67eac6182"
+    },
+    "practicing-building-docker-images-dmap0/www/ContDataSumViz_banner.png": {
+      "checksum": "af6a3abac239c0553226d175af54536d"
+    },
+    "practicing-building-docker-images-dmap0/www/ContDataSumViz_banner_no_EPA.png": {
+      "checksum": "650dc1b7258cf3ec47fa360a3c1c0f2d"
+    },
+    "practicing-building-docker-images-dmap0/www/ContDataSumViz_banner_updated.png": {
+      "checksum": "5bb10a550349dfe72443f10b6bdd4189"
+    },
+    "practicing-building-docker-images-dmap0/www/ContDataSumViz_header_banner.png": {
+      "checksum": "81a9cfa95cad3db97d3d034322ed786c"
+    },
+    "practicing-building-docker-images-dmap0/www/customLoader.css": {
+      "checksum": "6b68fb90522a19006846f4477be0ed27"
+    },
+    "practicing-building-docker-images-dmap0/www/GDD.R": {
+      "checksum": "ed8341d5bbf0eeb3ec8a577287112165"
+    },
+    "practicing-building-docker-images-dmap0/www/headerImage.png": {
+      "checksum": "4067a72274e46a747b64e181847d37c3"
+    },
+    "practicing-building-docker-images-dmap0/www/script.js": {
+      "checksum": "faa0e839f900b8ccdb80f1a1b147f684"
+    },
+    "practicing-building-docker-images-dmap0/www/styles.css": {
+      "checksum": "2722ddf4a5658ae6f51dd19b64e4dd8f"
+    },
     "README.html": {
       "checksum": "2ced8d1c9b73f277d49c2b0f32b4d093"
     },
@@ -7307,7 +7927,7 @@
       "checksum": "0c19455163ee629fb122fdb13628605a"
     },
     "server.R": {
-      "checksum": "452ea3af332c2dbe5635dde94b941dba"
+      "checksum": "5b6852504a1209f26d68f61e8b3d9f57"
     },
     "test_dailyCheck.RData": {
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
@@ -7337,7 +7957,7 @@
       "checksum": "0b29ec94c8c8c810e3e5f37c7701b717"
     },
     "www/app.css": {
-      "checksum": "194620ca027a498b3c58e2a67eac6182"
+      "checksum": "702b606b7bfbd0ec7d29edf4c840a268"
     },
     "www/ContDataSumViz_banner.png": {
       "checksum": "af6a3abac239c0553226d175af54536d"

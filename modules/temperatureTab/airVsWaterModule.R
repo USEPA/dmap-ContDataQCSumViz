@@ -105,7 +105,8 @@ AirVsWaterModuleServer <- function(id, uploaded_data, dailyStats, renderAirVsWat
                   output$display_thermal_sensitivity_button <- renderUI({
                     actionButton(inputId=ns("display_thermal_sensitivity"), label="Display thermal sensitivity",class="btn btn-primary")
                   })
-                  
+                  #clear previous error messages
+                  clearContents()
                   shinyjs::show(id=ns("display_help_text_air_water"), asis=TRUE)
                   
                   #Nilima Gandhi - Remvoing old way, it is a overkill, but keeping the code, do not know if there is a future plan to use the file.

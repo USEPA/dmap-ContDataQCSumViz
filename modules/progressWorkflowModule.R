@@ -52,12 +52,10 @@ progressWorkflowModuleServer <- function(id, workflowStatus) {
   moduleServer(
     id,
     function(input, output, session) {
+      
       ns <- session$ns
+      
       observe({
-        # print("workflow observed")
-        # print(paste("workflowStatus$elementId",workflowStatus$elementId))
-        # print(paste("workflowStatus$elementId",workflowStatus$state))
-        # print(paste("workflowStatus$elementId",workflowStatus$finish))
 
         if(workflowStatus$elementId == "step1" & workflowStatus$state == "success" & workflowStatus$finish == FALSE) {
             #print("int the step1 success")

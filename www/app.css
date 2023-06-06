@@ -21,17 +21,17 @@
  font-size: 18px;
  font-weight: bold;
  }
- 
+
  #big-heading {font-size:15px;color:black;font-style:bold;display:block;}
- 
+
  .shiny-notification{
   position:fixed;
   top:calc(50%);
   left:calc(50%);
  }
- 
+
 #display_fill_data .shiny-input-container .checkbox label span {font-weight: bold;}
-/*#display_validation_msgs, 
+/*#display_validation_msgs,
 #display_validation_msgs_new,
 #display_validation_msgs_new2,
 #display_validation_msgs_discrete {   color: red; font-weight: bold; }*/
@@ -108,3 +108,8 @@ div.dt-button-collection button {
     background-color: #2fa4e7;
     border-color: #2fa4e7;
 }
+
+/* .shiny-table > thead>tr>th {
+ background-color: '#e3e3e3'!important;
+ color: '#000' !important;
+} */

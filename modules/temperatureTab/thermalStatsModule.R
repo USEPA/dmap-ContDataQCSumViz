@@ -62,7 +62,7 @@ ThermalStatsModuleServer <- function(id, uploaded_data, formated_raw_data, daily
             localStats <- dailyStats
             variables_avail <- names(uploaded_data())
             if(renderThermalStats$render == TRUE) {
-              
+
               output$thermal_input_1 <- renderUI({
                 site_keys_in_favor_order <- c("Site","SITE","SiteID","SITEID")
                 possible_site_columns <- site_keys_in_favor_order[site_keys_in_favor_order %in% variables_avail]
