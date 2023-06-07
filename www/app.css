@@ -31,16 +31,9 @@
  }
 
 #display_fill_data .shiny-input-container .checkbox label span {font-weight: bold;}
-/*#display_validation_msgs,
-#display_validation_msgs_new,
-#display_validation_msgs_new2,
-#display_validation_msgs_discrete {   color: red; font-weight: bold; }*/
 
-/*.action-btn-style {
-  color:cornflowerblue;background-color:black;font-weight:bold;
-}*/
 
-#step1, #step2, #step3, #step4, #step5 {
+#statusWorkflow-step1, #statusWorkflow-step2, #statusWorkflow-step3, #statusWorkflow-step4, #statusWorkflow-step5 {
   cursor: not-allowed;
 }
 
@@ -99,17 +92,9 @@
   overflow-wrap: normal;
 }
 
-/*.sep {
-    float: right;
-}
-*/
 div.dt-button-collection button {
     color: #ffffff;
     background-color: #2fa4e7;
     border-color: #2fa4e7;
 }
 
-/* .shiny-table > thead>tr>th {
- background-color: '#e3e3e3'!important;
- color: '#000' !important;
-} */

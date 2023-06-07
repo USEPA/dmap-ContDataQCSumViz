@@ -39,6 +39,8 @@ shinyUI(fluidPage(
   shinyjs::extendShinyjs(text = app_jscode, functions = c("disableTab","enableTab")),
   tags$head(tags$script(src="script.js")),
   tags$head( tags$link(rel="stylesheet", type="text/css", href="app.css")),
+  tags$head(tags$link(rel="icon", type="mage/x-icon", href="https://www.epa.gov/themes/epa_theme/images/favicon.ico")),
+  #tags$head(tags$link(rel="icon", type="mage/x-icon", href="favicon.ico")),
   mainPanel(
     width = 12,
     # spacing

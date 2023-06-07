@@ -6917,7 +6917,7 @@
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
     ".RData": {
-      "checksum": "8e9eff42b71a55ec66ea7fd0730097d9"
+      "checksum": "2fe300e67ab7a34e412429f291f1ce6a"
     },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
@@ -7160,7 +7160,7 @@
       "checksum": "09d6f4bb2029f39f076a2172b191c95c"
     },
     "modules/allParameterTab/dataExplorationTSModule.R": {
-      "checksum": "92dbacfec1f3c13d533dcdce90416954"
+      "checksum": "1c84df77dc4c1688da85577b0160773a"
     },
     "modules/allParameterTab/summaryTablesModule.R": {
       "checksum": "cd6e3c5e2a8e1c8ce2397525380126a5"
@@ -7307,13 +7307,13 @@
       "checksum": "0c19455163ee629fb122fdb13628605a"
     },
     "server.R": {
-      "checksum": "5b6852504a1209f26d68f61e8b3d9f57"
+      "checksum": "d179335856b7e6b7d703e26da966ffcd"
     },
     "test_dailyCheck.RData": {
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
     },
     "ui.R": {
-      "checksum": "9bae7e3c9485f3c585748374a5945235"
+      "checksum": "26b87e53ccb220c0c21adadf61d87152"
     },
     "update_ContDataQC/build_summary_updated.R": {
       "checksum": "f05982d5e94865988ec7a6b899bda136"
@@ -7337,7 +7337,7 @@
       "checksum": "0b29ec94c8c8c810e3e5f37c7701b717"
     },
     "www/app.css": {
-      "checksum": "702b606b7bfbd0ec7d29edf4c840a268"
+      "checksum": "ce0a905e51c8137030b6c71be3dad9c1"
     },
     "www/ContDataSumViz_banner.png": {
       "checksum": "af6a3abac239c0553226d175af54536d"
@@ -7353,6 +7353,9 @@
     },
     "www/customLoader.css": {
       "checksum": "6b68fb90522a19006846f4477be0ed27"
+    },
+    "www/favicon.ico": {
+      "checksum": "25876ce08f1072d44ea2cbfe675e95f5"
     },
     "www/GDD.R": {
       "checksum": "ed8341d5bbf0eeb3ec8a577287112165"

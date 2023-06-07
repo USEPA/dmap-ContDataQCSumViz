@@ -174,7 +174,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
             }
             tempData$lowerBoundgrp <- paste(varName, input$dailyStats_ts_metrics, ': lower bound', sep = ".")
             tempData$upperBoundgrp <- paste(varName, input$dailyStats_ts_metrics, ': upper bound', sep = ".")
-            
+
             mainList[[paste(varName, input$dailyStats_ts_metrics, sep = ".")]] <- tempData
 
             # mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "q.25%", sep="."), upper_col=paste(varName, "q.75%", sep="."), Date=Date))
@@ -189,11 +189,11 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
                 mutate(Date = as.POSIXct(Date)) %>%
                 complete(Date = seq(min(Date, na.rm = TRUE), max(Date, na.rm = TRUE), by = timediff)))
             }
-            
+
             tempData$lowerBoundgrp <- paste(varName, input$dailyStats_ts_metrics, ': minimum', sep = ".")
             tempData$upperBoundgrp <- paste(varName, input$dailyStats_ts_metrics, ': maximum', sep = ".")
-            
-            
+
+
             mainList[[paste(varName, input$dailyStats_ts_metrics, sep = ".")]] <- tempData
             # mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "min", sep="."), upper_col=paste(varName, "max", sep="."), Date=Date))
           }
@@ -216,7 +216,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         tsData <- bind_rows(dataList, .id = "df")
         isMissingDate <- FALSE
         #print(tsData[complete.cases(tsData), ])
-        print(tsData)
+        #print(tsData)
         checkForMissingDate <- tsData[!complete.cases(tsData), ]
         if (nrow(checkForMissingDate) > 0) {
           isMissingDate <- TRUE
@@ -225,7 +225,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         mainPlot <- ggplot(data = tsData, dynamicTicks = TRUE, aes(x=as.POSIXct(Date))) +
           labs(title = mapTitle, x = "Date", y = "Parameters")
         if (isMissingDate == TRUE) {
-          mainPlot <- mainPlot + 
+          mainPlot <- mainPlot +
             geom_line(aes(y=upper_col, color=factor(upperBoundgrp)))+
             geom_line(aes(y=value, colour=df))+
             geom_line(aes(y=lower_col, color=factor(lowerBoundgrp)))
