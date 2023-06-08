@@ -6917,7 +6917,7 @@
       "checksum": "c91c966612c314b5e73a631c5df3921f"
     },
     ".RData": {
-      "checksum": "fa91cf8aebf2afa4ce30eb21fde89bb3"
+      "checksum": "c0f2f624fa95ddb8b3efa9a1f10385c8"
     },
     ".vscode/settings.json": {
       "checksum": "588a23f324477417c7b809502f44ee11"
@@ -7198,9 +7198,6 @@
     "Output/reports/testWordReport.docx": {
       "checksum": "741c0684aa1f00138498ed769741899e"
     },
-    "Output/saved_IHA/IHA.DATA_test2_Aw_20130101_20141231.csv.calendar.20220927.142548.xlsx": {
-      "checksum": "999375459ceb083475f80b15a271bfbd"
-    },
     "Output/to_report/_Captions_SiteX.xlsx": {
       "checksum": "1916a74c1a9c6845a444488385b08532"
     },
@@ -7265,16 +7262,7 @@
       "checksum": "3738b77a1ccf8e2d3b70ded22c10d20d"
     },
     "server.R": {
-      "checksum": "b5d70f4439b0620306dda969f078a72a"
-    },
-    "StreamThermal.crbuoy with site ID.csv.Charles.20230608.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.shortTestFile.csv.Ranch493238200015.20230608.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
-    },
-    "StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230608.xlsx": {
-      "checksum": "692057c7d33af0f60160746a3af6f572"
+      "checksum": "844fb88f51afb884b7c788389ab9fef8"
     },
     "test_dailyCheck.RData": {
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"
@@ -7330,23 +7318,14 @@
     "www/headerImage.png": {
       "checksum": "4067a72274e46a747b64e181847d37c3"
     },
-    "www/IHA.VT_Ranch_AW_20180412_20210427.csv.calendar.20230608 (1).xlsx": {
-      "checksum": "ad4d2d911c3f532a0db4239837f3ab10"
+    "www/IHA.shortTestFile.csv.calendar.20230608 (1).xlsx": {
+      "checksum": "6142e968e1aa72192fafc7539bac7339"
     },
-    "www/IHA.VT_Ranch_AW_20180412_20210427.csv.calendar.20230608.xlsx": {
-      "checksum": "fbddf2e02ce5d74f9a9dd4f87e9e004e"
+    "www/IHA.shortTestFile.csv.calendar.20230608.xlsx": {
+      "checksum": "0a5d5a68d5cc8da4a1f75e92bb176d4b"
     },
     "www/script.js": {
       "checksum": "faa0e839f900b8ccdb80f1a1b147f684"
-    },
-    "www/StreamThermal.shortTestFile.csv.Ranch493238200015.20230608 (1).xlsx": {
-      "checksum": "517a509eb57cae3d15252d961550cac3"
-    },
-    "www/StreamThermal.shortTestFile.csv.Ranch493238200015.20230608.xlsx": {
-      "checksum": "fd60242ab4c46d5f8af20eedde8c1a57"
-    },
-    "www/StreamThermal.VT_Ranch_AW_20180412_20210427.csv.Ranch493238200015.20230608.xlsx": {
-      "checksum": "9c3e1300091f00a2cb1d23e625bf2bb3"
     },
     "www/styles.css": {
       "checksum": "2722ddf4a5658ae6f51dd19b64e4dd8f"
