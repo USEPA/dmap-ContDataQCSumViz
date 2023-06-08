@@ -1,6 +1,12 @@
 #' Plot gage raw data
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#' @param fun.gage.id 
+#'
+#' @param fun.gage.data 
+#' @param fun.gage.vars.to.process 
+#' @param fun.year.End 
+#' @param fun.internal 
+#'
 #' @export
 
 fun.gageRawPlot <- function(

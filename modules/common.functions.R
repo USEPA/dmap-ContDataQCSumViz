@@ -1,3 +1,5 @@
+#' @param varNum 
+#' @description This function is used to calculate height of plots
 #' @export
 calculatePlotHeight <- function(varNum) {
   plotHeight <- 400
@@ -7,6 +9,8 @@ calculatePlotHeight <- function(varNum) {
   return(plotHeight)
 }
 
+#' @param baseData 
+#'
 #' @export
 calculate_time_range <- function(baseData) {
   if(!is.null(baseData$Date)) {
@@ -27,6 +31,8 @@ calculate_time_range <- function(baseData) {
   }
 }
 
+#' @param myDf 
+#'
 #' @export
 fun.getMetaSummary <- function(myDf){
   all.days <- seq.Date(min(myDf$Date,  na.rm = TRUE),max(myDf$Date, na.rm = TRUE),by="day")
@@ -44,6 +50,10 @@ fun.getMetaSummary <- function(myDf){
   return(mySummary)
 }
 
+#' @param fileColNames 
+#'
+#' @param getDateCols 
+#'
 #' @export
 fun.findVariableToProcess <- function(fileColNames, getDateCols= FALSE) {
   parmsToProcess <- NULL
@@ -65,6 +75,12 @@ fun.findVariableToProcess <- function(fileColNames, getDateCols= FALSE) {
   return(parmsToProcess)
 }
 
+#' @param shandingName 
+#'
+#' @param userTitle 
+#' @param lowerColumn 
+#' @param upperColumn 
+#'
 #' @export
 getMapTitle <- function(shandingName, userTitle, lowerColumn, upperColumn) {
   shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
@@ -84,6 +100,8 @@ getMapTitle <- function(shandingName, userTitle, lowerColumn, upperColumn) {
   return(shading_text)
 }
 
+#' @param df 
+#'
 #' @export
 addSeason <- function(df=myDf){
   #df[,"year"] <- format(df[,"Date"],"%Y")
@@ -106,6 +124,8 @@ addSeason <- function(df=myDf){
   return(df)
 }
 
+#' @param seasonCol 
+#'
 #' @export
 reorderSeason <- function(seasonCol=mySeasonCol){
   seasonNames <- unique(seasonCol)

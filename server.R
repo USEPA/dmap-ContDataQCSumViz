@@ -16,7 +16,8 @@
 #    under the same folder where you unzip this App package.
 #    We don't need to source these R functions after we finalize them
 #
-# NOTE: code for multifile uploads and create reports are commented out and saved in files (codeOfMultipleFiles.R, codeOfCreateReport.R) in the root folder
+# NOTE: code for multifile uploads (which was not in use) and create reports are commented out and saved in files 
+# (codeOfMultipleFiles.R, codeOfCreateReport.R) in the savedForFutureUse folder
 
 function(input, output, session) {
   useShinyjs()
@@ -90,11 +91,11 @@ function(input, output, session) {
   renderDiscrete <- reactiveValues(render = FALSE)
   homePageInputs <- reactiveValues(changed = FALSE)
 
-  #  Upload Data##############################
-  if (file.exists("_moved/File_Format.rds")) file.remove("_moved/File_Format.rds")
-  do.call(file.remove, list(list.files("Selected_Files", full.names = TRUE)))
 
+  ##############################
   # init shiny modules
+  ##############################
+  
   # workflow module (step1, step2, step3, step4, step5)
   progressWorkflowModuleServer("statusWorkflow", workflowStatus)
 
@@ -121,8 +122,35 @@ function(input, output, session) {
   # Continuous Data Exploration > All Parameters > Raster graphs tab
   TsRasterPlotModuleServer(id = "tsRasterPlot", dailyStats = processed, renderRasterPlot)
 
+  # Continuous Data Exploration >  Temperature > Thermal statistics tab
+  ThermalStatsModuleServer("thermalStats", uploaded_data, formated_raw_data, dailyStats = processed, loaded_data, to_download, renderThermalStats)
+  
+  # Continuous Data Exploration >  Temperature > Air Vs Water tab
+  AirVsWaterModuleServer("airVsWater", uploaded_data, dailyStats = processed, renderAirVsWater)
+  
+  # Continuous Data Exploration >  Temperature > Growing Degree days tab
+  GrowingDegreeModuleServer("growingDegree", renderGrowingDegree)
+  
+  # Continuous Data Exploration >  Temperature > Thermal Classification tab
+  ThermalClassificationModuleServer("thermalClassification", dailyStats = processed, uploaded_data, renderThermalClassification)
+  
+  # Continuous Data Exploration >  Hydrology > IHA tab
+  IHAModuleServer("IHATab", dailyStats = processed, loaded_data, uploaded_data, to_download, renderIHA)
+  
+  # Continuous Data Exploration >  Hydrology > Flashiness tab
+  FlashinessModuleServer("flashinessTab", renderFlashiness)
+  
+  # USGS & Daymet Exploration tab
+  GageAndDaymetModuleServer("gageDaymetAndBase", homeDTvalues, dateRange, formated_raw_data, renderUsgsAndDaymet)
+
+  
+  #  Upload Data##############################
+  if (file.exists("_moved/File_Format.rds")) file.remove("_moved/File_Format.rds")
+  do.call(file.remove, list(list.files("Selected_Files", full.names = TRUE)))
 
   # Home page file upload
+  # Already has a module included in the below code so following the KISS development principle
+  # and avoiding too much nesting of modules.
   uploaded_data <- eventReactive(c(input$uploaded_data_file), {
     readyForCalculation$status <- FALSE
     dailyStatusCalculated$status <- "unfinished"
@@ -212,33 +240,19 @@ function(input, output, session) {
     return(my_data)
   })
 
-  # init server modules
-  # uploaded_data is not availabe before this point
-
-  # Continuous Data Exploration >  Temperature > Thermal statistics tab
-  ThermalStatsModuleServer("thermalStats", uploaded_data, formated_raw_data, dailyStats = processed, loaded_data, to_download, renderThermalStats)
-
-  # Continuous Data Exploration >  Temperature > Air Vs Water tab
-  AirVsWaterModuleServer("airVsWater", uploaded_data, dailyStats = processed, renderAirVsWater)
-
-  # Continuous Data Exploration >  Temperature > Growing Degree days tab
-  GrowingDegreeModuleServer("growingDegree", renderGrowingDegree)
-
-  # Continuous Data Exploration >  Temperature > Thermal Classification tab
-  ThermalClassificationModuleServer("thermalClassification", dailyStats = processed, uploaded_data, renderThermalClassification)
-
-  # Continuous Data Exploration >  Hydrology > IHA tab
-  IHAModuleServer("IHATab", dailyStats = processed, loaded_data, uploaded_data, to_download, renderIHA)
-
-  # Continuous Data Exploration >  Hydrology > Flashiness tab
-  FlashinessModuleServer("flashinessTab", renderFlashiness)
-
-  # USGS & Daymet Exploration tab
-  GageAndDaymetModuleServer("gageDaymetAndBase", homeDTvalues, dateRange, formated_raw_data, renderUsgsAndDaymet)
-
   observeEvent(uploaded_data(), {
     homeDTvalues$homeDateAndTime <- dateAndTimeServer(id = "homePage", uploaded_data(), homePageInputs)
   })
+
+#' supporting function - formats date and time based on user inputs
+#' for the uploaded files
+#'
+#' @param dateAndTimeFields 
+#' @param userData 
+#' @param tabName 
+#' @param errorDivId 
+#'
+#' @return userDataL (formated user data)
 
   getFormattedRawData <- function(dateAndTimeFields, userData, tabName, errorDivId) {
     tryCatch(
@@ -367,6 +381,12 @@ function(input, output, session) {
   }) ## observeEvent end
 
 
+#' Supporting function to prepare error messages for display
+#'
+#' @param errorMsg 
+#' @param tabName 
+#' @param elementId 
+#'
   processErrors <- function(errorMsg, tabName = "", elementId) {
     processedMsg <- prepareDateFormatErrorMsg(errorMsg, tab = tabName)
     shinyjs::runjs(paste0("$('#", elementId, "').text('", processedMsg, "')"))
@@ -384,6 +404,28 @@ function(input, output, session) {
       workflowStatus$state <- "error"
     }
   })
+  
+  #' supporting function to prepare error message
+  #'
+  #' @param errorMsg 
+  #' @param tab 
+  #'
+  prepareDateFormatErrorMsg <- function(errorMsg, tab = "") {
+    if (tab == "homePage") {
+      workflowStatus$elementId <- "step3"
+      workflowStatus$state <- "error"
+      dailyStatusCalculated$status <- "unfinished"
+      readyForCalculation$status <- FALSE
+    }
+    readyForCalculation$status <- FALSE
+    if (grepl("All formats failed to parse. No formats found.", errorMsg[1], fixed = TRUE) |
+        grepl("failed to parse", errorMsg[1], fixed = TRUE)) {
+      formattedError <- "There is a mismatch between uploaded file date format and selected date format, please correct and try again."
+      return(formattedError)
+    } else {
+      return(errorMsg)
+    }
+  }
 
 
   observeEvent(input$runQS, {
@@ -670,6 +712,16 @@ function(input, output, session) {
     )
   }
 
+#' Prepares discrete data plot object
+#'
+#' @param mergedDataSet 
+#' @param mapTitle 
+#' @param xDateLabel 
+#' @param xDateBrakes 
+#' @param baseVarsToPlot 
+#'
+#' @return mainPlot (object of plot)
+
   prepareDiscretePlot <- function(mergedDataSet, mapTitle, xDateLabel, xDateBrakes, baseVarsToPlot) {
     mainPlot <- NULL
     discrete <- mergedDataSet$df
@@ -694,23 +746,16 @@ function(input, output, session) {
     return(mainPlot)
   }
 
-  prepareDateFormatErrorMsg <- function(errorMsg, tab = "") {
-    if (tab == "homePage") {
-      workflowStatus$elementId <- "step3"
-      workflowStatus$state <- "error"
-      dailyStatusCalculated$status <- "unfinished"
-      readyForCalculation$status <- FALSE
-    }
-    readyForCalculation$status <- FALSE
-    if (grepl("All formats failed to parse. No formats found.", errorMsg[1], fixed = TRUE) |
-      grepl("failed to parse", errorMsg[1], fixed = TRUE)) {
-      formattedError <- "There is a mismatch between uploaded file date format and selected date format, please correct and try again."
-      return(formattedError)
-    } else {
-      return(errorMsg)
-    }
-  }
 
+
+#' function for all file uploads
+#'
+#' @param uploadedFile 
+#' @param stopExecution 
+#' @param tab 
+#'
+#' @return my_data
+#'
   uploadFile <- function(uploadedFile, stopExecution = FALSE, tab = "") {
     my_data <- NULL
     otherExtension <- FALSE
@@ -816,4 +861,13 @@ function(input, output, session) {
       homePageInputs$changed <- FALSE
     }
   })
+  
+
+  session$onSessionEnded(function() {
+    unlink(sessiontemp, recursive = TRUE)
+  })
+  
+  
+  
+  
 }

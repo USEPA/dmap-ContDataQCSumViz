@@ -1,3 +1,7 @@
+#'USGS & Daymet exploration tab (user interface)
+#'
+#' @param id 
+#'
 GageAndDaymetModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -17,6 +21,14 @@ GageAndDaymetModuleUI <- function(id) {
   ) # sidebarLayout end
 }
 
+#'USGS & Daymet exploration tab (server side)
+#'
+#' @param id 
+#' @param homeDTvalues 
+#' @param dateRange 
+#' @param formated_raw_data 
+#' @param renderUsgsAndDaymet 
+#'
 GageAndDaymetModuleServer <- function(id, homeDTvalues, dateRange, formated_raw_data, renderUsgsAndDaymet) {
   
   moduleServer(

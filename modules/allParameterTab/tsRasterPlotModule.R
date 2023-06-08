@@ -1,3 +1,11 @@
+#' Continuous Data Exploration / All Parameter / Raster graphs (user interface side)
+#'
+#' @param id 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 TsRasterPlotModuleUI <- function(id) {
   ns <- NS(id)
   sidebarLayout(
@@ -25,6 +33,12 @@ TsRasterPlotModuleUI <- function(id) {
   ) # sidebarLayout end
 }
 
+#' Continuous Data Exploration / All Parameter / Raster graphs (server side)
+#'
+#' @param id 
+#' @param dailyStats 
+#' @param renderRasterPlot 
+#'
 TsRasterPlotModuleServer <- function(id, dailyStats, renderRasterPlot) {
  
   localStats <- reactiveValues(stats=list())
@@ -157,7 +171,6 @@ TsRasterPlotModuleServer <- function(id, dailyStats, renderRasterPlot) {
               plotly_empty()
             })
           }
-
 
     })# end of server module
 }

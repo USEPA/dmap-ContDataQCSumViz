@@ -1,3 +1,7 @@
+#' Continuous Data Exploration / All Parameter / Summary Tables (user interface side)
+#'
+#' @param id 
+#'
 SummaryTablesModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -25,6 +29,15 @@ SummaryTablesModuleUI <- function(id) {
       ) # sidebarLayout end
 }
 
+
+
+
+#' Continuous Data Exploration / All Parameter / Summary Tables (server side)
+#'
+#' @param id 
+#' @param dailyStats 
+#' @param renderSummaryTables 
+#'
 SummaryTablesModuleServer <- function(id, dailyStats, renderSummaryTables) {
 
   localStats <- reactiveValues(stats=list())

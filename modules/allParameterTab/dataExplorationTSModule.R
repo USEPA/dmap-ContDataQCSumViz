@@ -1,3 +1,7 @@
+#' Continuous Data Exploration / All Parameter / Time Series (user interface side)
+#' 
+#' @param id
+
 DataExplorationTSModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -51,6 +55,13 @@ DataExplorationTSModuleUI <- function(id) {
   ) # sidebarLayout end
 }
 
+#' Continuous Data Exploration / All Parameter / Time Series (server side)
+#' 
+#' @param id 
+#' @param dailyStats 
+#' @param renderDataExp 
+#'
+#'
 DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
   localStats <- reactiveValues(stats = list())
   variables_avail <- reactiveValues(params = list())

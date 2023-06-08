@@ -1,9 +1,22 @@
+#' Display Time Series button
+#' @description This module is related to 'Display Tie Series' button on the 
+#' Upload File tab
+#'
+#' @param id 
+#'
 rawTSModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
       column(width = 12, plotlyOutput(ns("display_all_raw_ts")))
 }
 
+#' Display Time Series button
+#' @description This module is server side logic for the 'Display Tie Series' button
+#'
+#' @param id 
+#' @param userSelectedValues 
+#' @param formated_raw_data 
+#'
 rawTSModuleServer <- function(id, userSelectedValues, formated_raw_data) {
   moduleServer(
     id,

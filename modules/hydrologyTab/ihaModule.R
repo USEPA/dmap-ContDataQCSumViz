@@ -1,3 +1,7 @@
+#' Continuous Data Exploration / Hydrology / IHA (user interface side)
+#'
+#' @param id 
+#'
 IHAModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -116,6 +120,15 @@ IHAModuleUI <- function(id) {
 
 }
 
+#' Continuous Data Exploration / Hydrology / IHA (server side)
+#'
+#' @param id 
+#' @param dailyStats 
+#' @param loaded_data 
+#' @param uploaded_data 
+#' @param to_download 
+#' @param renderIHA 
+#'
 IHAModuleServer <- function(id, dailyStats, loaded_data, uploaded_data, to_download, renderIHA) {
  
   localStats <- reactiveValues(stats=list(),myData.IHA=NULL,IHA.group.1=NULL)
@@ -180,11 +193,6 @@ IHAModuleServer <- function(id, dailyStats, loaded_data, uploaded_data, to_downl
               output$display_IHA_button <- renderUI({
                 actionButton(inputId=ns("display_IHA"), label="Display IHA tables",class="btn btn-primary")
               })
-
-
-              output$display_save_IHA_button <- renderUI({
-                downloadButton(outputId=ns("save_IHA"), label="Save IHA results to excel",class="btn btn-primary")
-              })
               
               shinyjs::show(id=ns("display_help_text_IHA"), asis=TRUE)
               
@@ -201,6 +209,9 @@ IHAModuleServer <- function(id, dailyStats, loaded_data, uploaded_data, to_downl
               
             }
           })
+           observeEvent(input$parameter_name, {
+             shinyjs::hide(ns("save_IHA"), asis=TRUE)
+           })
           
           observeEvent(input$display_IHA, {
             localStats <- dailyStats
@@ -325,8 +336,9 @@ IHAModuleServer <- function(id, dailyStats, loaded_data, uploaded_data, to_downl
             to_download$wb_IHA <- wb
             to_download$fileName_IHA <- myFile.XLSX
             
-            # shinyjs::runjs("$('button').removeClass('dt-button')") 
-            # shinyjs::runjs("$('button').addClass('btn btn-primary')") 
+            output$display_save_IHA_button <- renderUI({
+              downloadButton(outputId=ns("save_IHA"), label="Save IHA results to excel",class="btn btn-primary")
+            })
             
           }) #observeEvent end
           

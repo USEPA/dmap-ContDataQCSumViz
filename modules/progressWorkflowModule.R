@@ -1,3 +1,7 @@
+#' User guide - step workflow
+#'
+#' @param id 
+#'
 progressWorkflowModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -48,6 +52,11 @@ progressWorkflowModuleUI <- function(id) {
 
 }
 
+#' User guide - step workflow (server side)
+#'
+#' @param id 
+#' @param workflowStatus 
+#'
 progressWorkflowModuleServer <- function(id, workflowStatus) {
   moduleServer(
     id,

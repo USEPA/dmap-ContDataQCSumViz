@@ -1,3 +1,7 @@
+#' Continuous Data Exploration / Temperature / Air vs Water (user interface side)
+#'
+#' @param id 
+#'
 AirVsWaterModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -54,6 +58,14 @@ AirVsWaterModuleUI <- function(id) {
 
 }
 
+
+#' Continuous Data Exploration / Temperature / Air vs Water (server side)
+#'
+#' @param id 
+#' @param uploaded_data 
+#' @param dailyStats 
+#' @param renderAirVsWater 
+#'
 AirVsWaterModuleServer <- function(id, uploaded_data, dailyStats, renderAirVsWater) {
  
   localStats <- reactiveValues(stats=list())

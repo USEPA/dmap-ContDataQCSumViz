@@ -1,3 +1,7 @@
+#' Continuous Data Exploration / Temperature / Growing degree days (user interface side)
+#'
+#' @param id 
+#'
 GrowingDegreeModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -45,6 +49,11 @@ GrowingDegreeModuleUI <- function(id) {
 
 }
 
+#' Continuous Data Exploration / Temperature / Growing degree days (server side)
+#'
+#' @param id 
+#' @param renderGrowingDegree 
+#'
 GrowingDegreeModuleServer <- function(id, renderGrowingDegree) {
   moduleServer(
     id,

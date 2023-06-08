@@ -1,3 +1,7 @@
+#' Continuous Data Exploration / Temperature / Thermal Classification (user interface side)
+#'
+#' @param id 
+#'
 ThermalClassificationModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -56,6 +60,13 @@ ThermalClassificationModuleUI <- function(id) {
 
 }
 
+#' Continuous Data Exploration / Temperature / Thermal Classification (server side)
+#'
+#' @param id 
+#' @param dailyStats 
+#' @param uploaded_data 
+#' @param renderThermalClassification 
+#'
 ThermalClassificationModuleServer <- function(id, dailyStats,uploaded_data, renderThermalClassification) {
   localStats <- reactiveValues(stats=list())
   variables_avail <- reactiveValues()

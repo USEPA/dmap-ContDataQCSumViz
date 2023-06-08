@@ -1,3 +1,7 @@
+#' Continuous Data Exploration / All Parameter / Box Plots tab (user interface side)
+#'
+#' @param id 
+#'
 TsBoxPlotModuleUI <- function(id) {
   ns <- NS(id)
   sidebarLayout(
@@ -23,6 +27,12 @@ TsBoxPlotModuleUI <- function(id) {
   ) # sidebarLayout end
 }
 
+#' Continuous Data Exploration / All Parameter / Box Plots tab (server side)
+#'
+#' @param id 
+#' @param dailyStats 
+#' @param renderTSBoxPlot 
+#'
 TsBoxPlotModuleServer <- function(id, dailyStats, renderTSBoxPlot) {
  
   localStats <- reactiveValues(stats=list())

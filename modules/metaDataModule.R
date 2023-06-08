@@ -1,3 +1,7 @@
+#' Run Meta Summary Button (UI)
+#' @description    This module get meta data on user uploaded files
+#'
+#' @param id
 metaDataUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -12,6 +16,13 @@ metaDataUI <- function(id) {
   ) # end of tagList
 }
 
+#' Run Meta Summary Button (server side)
+#'
+#' @param id 
+#' @param paramToProcess 
+#' @param formatedUploadedData 
+#' @param uploadData 
+#'
 metaDataServer <- function(id, paramToProcess, formatedUploadedData, uploadData) {
   toReport <- NULL
 

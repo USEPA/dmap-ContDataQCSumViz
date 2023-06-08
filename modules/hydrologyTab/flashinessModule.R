@@ -1,3 +1,6 @@
+#' Continuous Data Exploration / Hydrology / Flashiness (user interface side)
+#' @param id 
+#'
 FlashinessModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -40,6 +43,11 @@ FlashinessModuleUI <- function(id) {
   # ) # sidebarLayout end
 }
 
+#' Continuous Data Exploration / Hydrology / Flashiness (server side)
+#'
+#' @param id 
+#' @param renderFlashiness 
+#'
 FlashinessModuleServer <- function(id, renderFlashiness) {
   moduleServer(
     id,

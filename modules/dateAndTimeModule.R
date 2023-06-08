@@ -1,3 +1,11 @@
+#' Date and Time module (user interface side)
+#' @description This module takes inputs from users for the uploaded file metadata. This is used on the Upload Data
+#' and discrete data exploration tabs
+#' 
+#' @param id 
+#' @param paramChoices 
+#' @param uploadedCols 
+#
 dateAndTimeUI <- function(id, paramChoices, uploadedCols) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -69,6 +77,16 @@ dateAndTimeUI <- function(id, paramChoices, uploadedCols) {
     )
   )
 }
+
+#' Date and Time module (server side)
+#' @description This module takes inputs from users for the uploaded file metadata. This is used on the Upload Data
+#' and discrete data exploration tabs
+#'
+#' @param id 
+#' @param data 
+#' @param homePageInputs 
+#'
+#' @return a list of all the selected values from users
 
 dateAndTimeServer <- function(id, data, homePageInputs) {
   moduleServer(

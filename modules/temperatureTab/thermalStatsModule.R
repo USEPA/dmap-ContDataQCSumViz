@@ -1,3 +1,11 @@
+#' Continuous Data Exploration / Temperature / Thermal Statistics (user interface side)
+#'
+#' @param id 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ThermalStatsModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -49,6 +57,16 @@ ThermalStatsModuleUI <- function(id) {
 
 }
 
+#' Continuous Data Exploration / Temperature / Thermal Statistics (server side)
+#'
+#' @param id 
+#' @param uploaded_data 
+#' @param formated_raw_data 
+#' @param dailyStats 
+#' @param loaded_data 
+#' @param to_download 
+#' @param renderThermalStats 
+#'
 ThermalStatsModuleServer <- function(id, uploaded_data, formated_raw_data, dailyStats, loaded_data, to_download, renderThermalStats) {
  
   localStats <- reactiveValues(stats=list())
@@ -56,6 +74,16 @@ ThermalStatsModuleServer <- function(id, uploaded_data, formated_raw_data, daily
   
   moduleServer(
     id,
+#' Title
+#'
+#' @param input 
+#' @param output 
+#' @param session 
+#'
+#' @return
+#' @export
+#'
+#' @examples
     function(input, output, session) {
           ns <- session$ns
            observe({
@@ -98,11 +126,9 @@ ThermalStatsModuleServer <- function(id, uploaded_data, formated_raw_data, daily
                 actionButton(inputId=ns("display_thermal"), label="Display Stream Thermal",class="btn btn-primary")
               })
               
-              output$display_save_thermal_button <- renderUI({
-                downloadButton(outputId=ns("save_thermal"), label="Save thermal statistics to excel",class="btn btn-primary")
-              })
+
               
-              #Nilima Gandhi - Remvoing old way, it is a overkill, but keeping the code, do not know if there is a future plan to use the file.
+              #Remvoing old way, it is a overkill, but keeping the code, do not know if there is a future plan to use the file.
               shinyjs::show(id=ns("display_help_text_thermal_statistics"), asis=TRUE)
               
               # output$display_help_text_thermal_statistics <- renderUI({
@@ -117,6 +143,10 @@ ThermalStatsModuleServer <- function(id, uploaded_data, formated_raw_data, daily
               
             }
           })
+           
+            observeEvent(input$thermal_Temp_name, {
+              shinyjs::hide(ns('save_thermal'), asis=TRUE);
+            })
             
             observeEvent(input$display_thermal, {
                         
@@ -233,6 +263,10 @@ ThermalStatsModuleServer <- function(id, uploaded_data, formated_raw_data, daily
                         # save workbook
                         to_download$wb <- wb
                         to_download$fileName <- fileName
+                        
+                        output$display_save_thermal_button <- renderUI({
+                          downloadButton(outputId=ns("save_thermal"), label="Save thermal statistics to excel",class="btn btn-primary")
+                        })
               
               
               }, error=function(e){
@@ -251,62 +285,7 @@ ThermalStatsModuleServer <- function(id, uploaded_data, formated_raw_data, daily
               
           }) #observeEvent end
             
-            
-            observeEvent(input$save_thermal, {
-                require(XLConnect)
-
-                #Desc.freq, Desc.mag, Desc.roc, Desc.tim, Desc.var descriptions are defined in the constants.R file
-                Group.Desc <- c(Desc.freq, Desc.mag, Desc.roc, Desc.tim, Desc.var)
-                df.Groups <- as.data.frame(cbind(c("freq","mag","roc","tim","var")
-                                                 ,Group.Desc))
-                SiteID <- localStats$ST.freq[1,1]
-                myDate <- format(Sys.Date(),"%Y%m%d")
-                myTime <- format(Sys.time(),"%H%M%S")
-                Notes.User <- Sys.getenv("USERNAME")
-
-                Notes.Names <- c("Dataset (SiteID)", "Analysis.Date (YYYYMMDD)"
-                                 , "Analysis.Time (HHMMSS)", "Analysis.User")
-                Notes.Data <- c(SiteID, myDate, myTime, Notes.User)
-                df.Notes <- as.data.frame(cbind(Notes.Names, Notes.Data))
-                ## New File Name
-                if (!file.exists("Output/saved_streamThermal/")) dir.create(file.path("Output/saved_streamThermal"),showWarnings = FALSE, recursive = TRUE)
-                name_in_file <- loaded_data$name
-                myFile.XLSX <- paste("Output/saved_streamThermal/StreamThermal"
-                                     , name_in_file
-                                     , SiteID
-                                     , myDate
-                                     , myTime
-                                     , "xlsx"
-                                     , sep=".")
-                ## Copy over template with Metric Definitions
-                file.copy(file.path(path.package("ContDataQC")
-                                    ,"extdata"
-                                    ,"StreamThermal_MetricList.xlsx")
-                          , myFile.XLSX)
-                ## load workbook, create if not existing
-                wb <- loadWorkbook(myFile.XLSX, create = TRUE)
-                # create sheets
-                createSheet(wb, name = "NOTES")
-                createSheet(wb, name = "freq")
-                createSheet(wb, name = "mag")
-                createSheet(wb, name = "roc")
-                createSheet(wb, name = "tim")
-                createSheet(wb, name = "var")
-                # write to worksheet
-                writeWorksheet(wb, df.Notes, sheet = "NOTES", startRow=1)
-                writeWorksheet(wb, df.Groups, sheet="NOTES", startRow=10)
-                writeWorksheet(wb, localStats$ST.freq, sheet = "freq")
-                writeWorksheet(wb, localStats$ST.mag, sheet = "mag")
-                writeWorksheet(wb, localStats$ST.roc, sheet = "roc")
-                writeWorksheet(wb, localStats$ST.tim, sheet = "tim")
-                writeWorksheet(wb, localStats$ST.var, sheet = "var")
-                # save workbook
-                saveWorkbook(wb, myFile.XLSX)
-
-              }) # observeEvent close
-
-            
-            output$save_thermal <- downloadHandler(
+              output$save_thermal <- downloadHandler(
               filename = function(){
                 to_download$fileName
               },

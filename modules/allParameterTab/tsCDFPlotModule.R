@@ -1,3 +1,7 @@
+#' Continuous Data Exploration / All Parameter / CDFs tab (user interface side)
+#'
+#' @param id 
+#'
 TsCDFPlotModuleUI <- function(id) {
   ns <- NS(id)
   sidebarLayout(
@@ -25,6 +29,12 @@ TsCDFPlotModuleUI <- function(id) {
   ) # sidebarLayout end
 }
 
+#' Continuous Data Exploration / All Parameter / CDFs tab (server side)
+#'
+#' @param id 
+#' @param dailyStats 
+#' @param renderCDFPlot 
+#'
 TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
 
   localStats <- reactiveValues(stats=list())

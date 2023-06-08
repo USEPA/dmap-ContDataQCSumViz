@@ -1,3 +1,11 @@
+#' Continuous Data Exploration / All Parameter / Time Series - Annual Overlays (user interface side)
+#'
+#' @param id 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 TsOverlayModuleUI <- function(id) {
   ns <- NS(id)
   shinyjs::useShinyjs()
@@ -76,6 +84,12 @@ TsOverlayModuleUI <- function(id) {
 
 }
 
+#' Continuous Data Exploration / All Parameter / Time Series - Annual Overlays (server side)
+#'
+#' @param id 
+#' @param dailyStats 
+#' @param renderTSOverlay 
+#'
 TsOverlayModuleServer <- function(id, dailyStats, renderTSOverlay) {
  
   localStats <- reactiveValues(stats=list())
