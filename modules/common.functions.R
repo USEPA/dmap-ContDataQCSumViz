@@ -83,13 +83,15 @@ fun.findVariableToProcess <- function(fileColNames, getDateCols= FALSE) {
 #'
 #' @export
 getMapTitle <- function(shandingName, userTitle, lowerColumn, upperColumn) {
-  shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
+  shadingText <- " \n <span style='font-size:10px'></span>"
   if (shandingName=="quantiles"){
     shadingText <- " \n <span style='font-size:10px'>(Shading between daily 25th percentiles and 75th percentiles)</span>"
   } else if (shandingName=="minMax"){
     shadingText <- " \n <span style='font-size:10px'>(Shading between daily minimum and maximum values)</span>"
   } else if (shandingName=="dynamic"){
     shadingText <- paste("\n <span style='font-size:10px'>(Shading between" , lowerColumn, "and", upperColumn, ")</span>", sep=" ")
+  } else if (shandingName=="noShading"){
+    shadingText <- paste("\n <span style='font-size:10px'>(No Shading applied)", "</span>", sep=" ")
   }
   
   if(userTitle != "") {

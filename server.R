@@ -862,12 +862,4 @@ function(input, output, session) {
     }
   })
   
-
-  session$onSessionEnded(function() {
-    unlink(sessiontemp, recursive = TRUE)
-  })
-  
-  
-  
-  
 }

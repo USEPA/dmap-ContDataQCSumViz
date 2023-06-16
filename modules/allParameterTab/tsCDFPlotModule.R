@@ -12,9 +12,9 @@ TsCDFPlotModuleUI <- function(id) {
           div(class="panel-body",
               uiOutput(ns("CDF_input_1")),
               uiOutput(ns("CDF_input_2")),
-              uiOutput(ns("CDF_input_3")),
               uiOutput(ns("CDF_input_4")),
               uiOutput(ns("CDF_input_5")),
+              uiOutput(ns("CDF_input_3")),
               hr(),
               uiOutput(ns("display_CDF_button"))
           )#end of panel body
@@ -72,23 +72,30 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
 
               output$CDF_input_2 <- renderUI({
                 div(
-                  radioButtons(ns("CDF_shading"), "Add shading with", choices = c("25th & 75th percentiles"="quantiles",
-                                                                              "minimum & maximum"="minMax"
+                  radioButtons(ns("CDF_shading"), "Add shading with", choices = c(
+                    "No shading" = "noShading",
+                    "25th & 75th percentiles"="quantiles",
+                    "minimum & maximum"="minMax"
                   ),
                   selected = "minMax"))
 
               })
+              
+              # output$CDF_input_3 <- renderUI({
+              #   numericInput(inputId=ns("cdf_plot_aspect_ratio"), label="Adjust plot aspect ratio",7.0,min=0,max=10,step=0.1)
+              #   
+              # })
 
-              output$CDF_input_3 <- renderUI({
-                variable_to_plot <- ifelse(is.null(input$CDF_variable_name), variables_avail$params[1], input$CDF_variable_name)
-                myData.all <- myList[[which(names(myList)==variable_to_plot)]]
-                myData.all[,"year"] <- format(myData.all[,"Date"],"%Y")
-                selectizeInput(ns("CDF_select_year"),label ="Select year",
-                               choices=c("All", unique(myData.all[,"year"])),
-                               multiple = FALSE,
-                               selected = "All",
-                               options = list(hideSelected = FALSE))
-              })
+              # output$CDF_input_3 <- renderUI({
+              #   variable_to_plot <- ifelse(is.null(input$CDF_variable_name), variables_avail$params[1], input$CDF_variable_name)
+              #   myData.all <- myList[[which(names(myList)==variable_to_plot)]]
+              #   myData.all[,"year"] <- format(myData.all[,"Date"],"%Y")
+              #   selectizeInput(ns("CDF_select_year"),label ="Select year",
+              #                  choices=c("All", unique(myData.all[,"year"])),
+              #                  multiple = FALSE,
+              #                  selected = "All",
+              #                  options = list(hideSelected = FALSE))
+              # })
 
               output$CDF_input_4 <- renderUI({
                 selectizeInput(ns("CDF_select_season"),label ="Select season",
@@ -119,20 +126,28 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
             myList <- localStats$processed_dailyStats
             variable_to_plot <- input$CDF_variable_name
             myData.all <- myList[[which(names(myList)==variable_to_plot)]]
-
-            if (input$CDF_select_year=="All"){
-              myData <- myData.all
-            }else{
-              myData.all[,"year"] <- format(myData.all[,"Date"],"%Y")
-              myData <- myData.all[myData.all$year==input$CDF_select_year,]
-            }
+            myData <- myData.all
+            # if (input$CDF_select_year=="All"){
+            #   myData <- myData.all
+            # }else{
+            #   myData.all[,"year"] <- format(myData.all[,"Date"],"%Y")
+            #   myData <- myData.all[myData.all$year==input$CDF_select_year,]
+            # }
+            
+            
+            shadeSelection <- NULL
             mean_col <- paste0(input$CDF_variable_name,".mean")
             if (input$CDF_shading=="quantiles"){
               upper_col <- paste0(input$CDF_variable_name,".q.75%")
               lower_col <- paste0(input$CDF_variable_name,".q.25%")
-            }else if (input$CDF_shading=="minMax"){
+              shadeSelection <- c(lower_col,upper_col)
+            } else if (input$CDF_shading=="minMax"){
               lower_col <- paste0(input$CDF_variable_name,".min")
               upper_col <- paste0(input$CDF_variable_name,".max")
+              shadeSelection <- c(lower_col,upper_col)
+            } else if (input$CDF_shading=="noShading") {
+              upper_col <- NULL
+              lower_col <- NULL
             }
             cols_selected = c("Date",mean_col,lower_col,upper_col)
             data.plot <- myData[cols_selected]
@@ -152,7 +167,8 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
                                               , Plot.title = isolate(input$CDF_title)
                                               , Plot.season = isolate(season.choice)
                                               , hist.columnName = NULL
-                                              , df.input = data.plot)
+                                              , df.input = data.plot
+                                              )
 
               if (is.null(CDF_plot)){
                 renderErrorMsg(noCDFDataFound)
@@ -162,7 +178,8 @@ TsCDFPlotModuleServer <- function(id, dailyStats, renderCDFPlot) {
                 renderErrorMsg(paste("Process failed due to invalid data, error: " , CDF_plot))
                 clearPlot()
               } else {
-                CDF_plot <- ggplotly(CDF_plot) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+                CDF_plot <- ggplotly(CDF_plot, height = 800) %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
+                #CDF_plot <- ggplotly(CDF_plot, height = 900) %>% plotly::layout( yaxis = list(scaleanchor = "x", scaleratio = isolate(input$cdf_plot_aspect_ratio)), legend = list(orientation = "h", x = 0.4, y = -0.3))
               }
               print(CDF_plot)
             })

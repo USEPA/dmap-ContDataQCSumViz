@@ -141,9 +141,9 @@ AirVsWaterModuleServer <- function(id, uploaded_data, dailyStats, renderAirVsWat
              shinyjs::hide(id=ns("display_help_text_air_water"), asis=TRUE)
              
              myList <- localStats$processed_dailyStats
-
              ## check if both of "Air.Temp.C" and "Water.Temp.C" are available
-             if(all(names(myList) %in% c(input$air_temp_name,input$water_temp_name))){
+             #if(all(names(myList) %in% c(input$air_temp_name,input$water_temp_name))){
+             if(input$air_temp_name %in% names(myList) & input$water_temp_name %in% names(myList)){
                myData.Air <- myList[[which(names(myList)==input$air_temp_name)]]
                myData.Water <- myList[[which(names(myList)==input$water_temp_name)]]
                mean_col_air <- paste0(input$air_temp_name,".mean")

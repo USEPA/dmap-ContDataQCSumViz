@@ -16,8 +16,9 @@ CompSiteCDF.updated <- function(file.input = NULL
                         , Plot.title = " "
                         , Plot.season = "Summer"
                         , hist.columnName = NULL
-                        , df.input = NULL){##FUNCTION.CompSiteCDF.START
-  
+                        , df.input = NULL
+                        ){##FUNCTION.CompSiteCDF.START
+
   # load data (data.frame or from CSV)
   # if no data frame then import file.
   
@@ -91,54 +92,55 @@ CompSiteCDF.updated <- function(file.input = NULL
   if (!is.null(Plot.season)){
     data.import <- data.import[data.import[,ContData.env$myName.Season]==Plot.season,]
   }
-  
-  if (is.null(Shaded.Names)){
-  data.plot <- data.import[colnames(data.import) %in% Col.Sites]
-  data.plot <- reshape2::melt(data.plot,"Date")
-  print(colnames(data.plot))
-  my_plot <- ggplot(data=data.plot,aes(x=value,colour=variable))+
-    stat_ecdf(geom="step",alpha=0.6,pad=TRUE)+
-    labs(x=ParamName.xlab,y="Proportion <= value")+
-    theme(text=element_text(size=14,face = "bold", color="blue"),
-          plot.title = element_text(hjust=0.5),
-          legend.position = "right",
-          legend.title=element_blank(),
-          panel.grid.major.y=element_blank())+
-    scale_color_viridis_d(option="D")+
-    ggtitle(Plot.title)
-  
-  }else{
-    if (nrow(data.import)>0){
-      
-    # g <- ggplot(data=data.import,aes(x=!!sym(Param.Name) color=paste0(Param.Name," CDF")))+
-    #      geom_step(stat="ecdf")
+  #It does not work paramName.xlab is not found
+  #if (is.null(Shaded.Names)){
+  # data.plot <- data.import[colnames(data.import) %in% Col.Sites]
+  # data.plot <- reshape2::melt(data.plot,"Date")
+  # print(colnames(data.plot))
+  # my_plot <- ggplot(data=data.plot,aes(x=value,colour=variable))+
+  #   stat_ecdf(geom="step",alpha=0.6,pad=TRUE)+
+  #   labs(x=ParamName.xlab,y="Proportion <= value")+
+  #   theme(text=element_text(size=14,face = "bold", color="blue"),
+  #         plot.title = element_text(hjust=0.5),
+  #         legend.position = "right",
+  #         legend.title=element_blank(),
+  #         panel.grid.major.y=element_blank())+
+  #   scale_color_viridis_d(option="D")+
+  #   ggtitle(Plot.title)
+  #}
+
+    if (nrow(data.import) > 0){
     distinctYear <- unique(data.import$Year)
-
+ 
     g <- ggplot(data=data.import,aes(x=!!sym(Param.Name),color=factor(Year)))+
-         geom_step(stat="ecdf")
-    inside <- ggplot_build(g)
+          geom_step(stat="ecdf")
     
-    matched <- merge(inside$data[[1]],data.frame(x=data.import[,names(data.import)==Param.Name]
-                                                 ,data.import[,names(data.import)==Shaded.Names[1]]
-                                                 ,data.import[,names(data.import)==Shaded.Names[2]]
-                                                 ),by="x")
+    if (!is.null(Shaded.Names)){
+      inside <- ggplot_build(g)
+      matched <- merge(inside$data[[1]],data.frame(x=data.import[,names(data.import)==Param.Name]
+                                                   ,data.import[,names(data.import)==Shaded.Names[1]]
+                                                   ,data.import[,names(data.import)==Shaded.Names[2]]
+                                                   ),by="x")
+      
+  
+      names(matched)[ncol(matched)] <- "data.import.max"
+      names(matched)[ncol(matched)-1] <-"data.import.min"
+    }
     
-
-    names(matched)[ncol(matched)] <- "data.import.max"
-    names(matched)[ncol(matched)-1] <-"data.import.min"
-
-    if (grepl("25%",Shaded.Names[1])){
-      shading_text <- paste0(Param.Name, " CDF between daily 25th percentiles and 75th percentiles")
-    }else if (grepl("min",Shaded.Names[1])){
-      shading_text <- paste0(Param.Name, " CDF between daily minimum and maximum values ")
-    }else{
+    if(!is.null(Shaded.Names)){
+      if (grepl("25%",Shaded.Names[1])){
+        shading_text <- paste0(Param.Name, " CDF between daily 25th percentiles and 75th percentiles")
+      }else if (grepl("min",Shaded.Names[1])){
+        shading_text <- paste0(Param.Name, " CDF between daily minimum and maximum values ")
+      }
+    } else{
       shading_text <- "Shading"
     }
-
-    
-    my_plot <- g+
-                geom_ribbon(data=matched,inherit.aes = FALSE,aes(x=x,ymin=ecdf(data.import.min)(x),ymax=ecdf(data.import.max)(x),fill=shading_text),color="transparent",alpha=0.5)+
-                theme_minimal()+
+    if (!is.null(Shaded.Names)){
+      g <- g + geom_ribbon(data=matched,inherit.aes = FALSE,aes(x=x,ymin=ecdf(data.import.min)(x),ymax=ecdf(data.import.max)(x),fill=shading_text),color="transparent",alpha=0.5)
+      
+    }
+    my_plot <-  g +
                 labs(title=Plot.title,y="Proportion <= value")+
                 scale_colour_manual("", values = distinctYear)+
                 scale_fill_manual("", values = distinctYear)+
@@ -149,8 +151,7 @@ CompSiteCDF.updated <- function(file.input = NULL
     }else{
       my_plot <- NULL
     }
-                
-  }
+  
  return(my_plot)
  }, error=function(error){
     print("error in CompSiteCDF.updated function")

@@ -59,7 +59,10 @@ shinyUI(fluidPage(
       column(
         width = 12,
         br(),
-        div("Please complete below steps before proceeding to 'Data Exploration' :", class="text-info", style="font-weight:bold"),
+        div(span("Please complete below steps before proceeding to 'Data Exploration' :", class="text-info", style="font-weight:bold"),
+            span(style="float:right",
+              a(tags$button(tags$i(class="fas fa-arrow-down"), "Download Test Data", class="btn btn-primary btn-sm"), href="TestData.zip", target="_blank"))
+        ),
         br()
       )
     ),

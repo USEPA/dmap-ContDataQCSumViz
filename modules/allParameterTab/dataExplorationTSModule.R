@@ -103,12 +103,13 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
           })
           output$time_series_input_3 <- renderUI({
             div(
-              radioButtons(ns("dailyStats_shading"), "Add shading with",
+              radioButtons(ns("dailyStats_shading"), "Add shading",
                 choices = c(
+                  "No shading" = "noShading",
                   "25th & 75th percentiles" = "quantiles",
                   "Minimum & Maximum" = "minMax"
                 ),
-                selected = "quantiles"
+                selected = "noShading"
               )
             )
           })
@@ -128,6 +129,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         if (!is.null(input$dailyStats_ts_metrics) & (input$dailyStats_ts_metrics == "mean" | input$dailyStats_ts_metrics == "median")) {
           shinyjs::show("cp_shaded_region")
         } else {
+          reset(ns("dailyStats_shading"), asis=TRUE)
           shinyjs::hide("cp_shaded_region")
         }
         # click("display_ts")
@@ -138,7 +140,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         localStats <- dailyStats
         if (length(variables_avail$params) > 0 & length(input$dailyStats_ts_variable_name) > 0) {
           # Display uploaded file stats
-          if (!is.null(input$dailyStats_ts_metrics) & (input$dailyStats_ts_metrics == "mean" | input$dailyStats_ts_metrics == "median")) {
+          if ((!is.null(input$dailyStats_ts_metrics) & (input$dailyStats_ts_metrics == "mean" | input$dailyStats_ts_metrics == "median")) & input$dailyStats_shading != "noShading") {
             mainPlot <- draw_uploaded_file_ts()
             if (!is.null(mainPlot) & length(input$dailyStats_ts_variable_name) > 0) {
               output$display_time_series <- renderPlotly({
@@ -150,7 +152,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
             basePlot <- draw_uploaded_file_stats()
             if (!is.null(basePlot)) {
               output$display_time_series <- renderPlotly({
-                ggplotly(basePlot, height = calculatePlotHeight(length(input$dailyStats_ts_variable_name)))
+                ggplotly(basePlot, height = calculatePlotHeight(length(input$dailyStats_ts_variable_name) * 2))
                 # %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
               })
             }
@@ -173,7 +175,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         # shadingText <- paste0(variable_to_plot, " between daily 25th percentiles and 75th percentiles")
         mainList <- list()
         for (varName in variable_to_plot) {
-          if (input$dailyStats_shading == "quantiles" | input$dailyStats_shading == "newData") {
+          if (input$dailyStats_shading == "quantiles") {
             tempData <- as.data.frame(mainData %>% select(value = paste(varName, input$dailyStats_ts_metrics, sep = "."), lower_col = paste(varName, "q.25%", sep = "."), upper_col = paste(varName, "q.75%", sep = "."), Date = Date))
             if (ContData.env$myStats.missing.data.fill == TRUE) {
               timediff <- get_interval(tempData$Date)
@@ -207,7 +209,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
 
             mainList[[paste(varName, input$dailyStats_ts_metrics, sep = ".")]] <- tempData
             # mainList[[paste(varName,input$dailyStats_ts_metrics, sep=".")]] <- as.data.frame(mainData %>% select(value=paste(varName,input$dailyStats_ts_metrics, sep="."), lower_col= paste(varName, "min", sep="."), upper_col=paste(varName, "max", sep="."), Date=Date))
-          }
+          } 
         }
         main_range <- calculate_time_range(as.list(bind_rows(mainList, .id = "df")))
         mainBreaks <- main_range[[1]]
@@ -217,10 +219,10 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         mainPlot <- prepareBasePlot(dataList = mainList, mapTitle = mainMapTitle, xDateLabel = main_x_date_label, xDateBrakes = mainBreaks)
         return(mainPlot)
       }
+      
+      #Tried geom ribbon for shading but at present it has issues with missing data so changed it to line graphs
+      #in the future, geom_riboon could be a better option
       # geom_ribbon(show.legend=TRUE, aes(ymin=lower_col,ymax=upper_col,x=as.POSIXct(Date)), alpha=0.3,inherit.aes = FALSE)+
-      # stat_difference(aes(ymin=lower_col,ymax=upper_col,x=as.POSIXct(Date), alpha=0.3))+
-      # geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=upper_col), linetype = "dashed")+
-      # geom_line(aes(x=as.POSIXct(Date,format="%Y-%m-%d"), y=lower_col), linetype = "dashed")+
 
       prepareBasePlot <- function(dataList, mapTitle, xDateLabel, xDateBrakes) {
         mainPlot <- NULL
@@ -267,7 +269,6 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
       draw_uploaded_file_stats <- function() {
         basePlot <- NULL
         localStats <- dailyStats
-
         statsList <- localStats$stats
 
         mainMapTitle <- getMapTitle(input$dailyStats_shading, input$dailyStats_ts_title, lowerColumn = NULL, upperColumn = NULL)
@@ -276,6 +277,19 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
         # shinyjs::alert(statsCols)
 
         mainData <- Reduce(full_join, statsList)
+        
+        
+        if (ContData.env$myStats.missing.data.fill == TRUE) {
+          timediff <- get_interval(mainData$Date)
+          # print(timediff)
+          timediff <- ifelse(timediff == "min", "15 mins", timediff)
+          mainData <- as.data.frame(mainData %>%
+                                    mutate(Date = as.POSIXct(Date)) %>%
+                                    complete(Date = seq(min(Date, na.rm = TRUE), max(Date, na.rm = TRUE), by = timediff)))
+          }
+        
+           
+        
         myData <- mainData %>%
           select(statsCols, "Date") %>%
           gather(key = "parameter", value = "value", -Date)
