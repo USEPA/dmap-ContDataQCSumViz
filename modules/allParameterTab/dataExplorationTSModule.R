@@ -144,7 +144,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
             mainPlot <- draw_uploaded_file_ts()
             if (!is.null(mainPlot) & length(input$dailyStats_ts_variable_name) > 0) {
               output$display_time_series <- renderPlotly({
-                ggplotly(mainPlot, height = calculatePlotHeight(length(input$dailyStats_ts_variable_name) * 2))
+                ggplotly(mainPlot, height = calculatePlotHeight(length(isolate(input$dailyStats_ts_variable_name)) * 2))
                 # %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
               })
             }
@@ -152,7 +152,7 @@ DataExplorationTSModuleServer <- function(id, dailyStats, renderDataExp) {
             basePlot <- draw_uploaded_file_stats()
             if (!is.null(basePlot)) {
               output$display_time_series <- renderPlotly({
-                ggplotly(basePlot, height = calculatePlotHeight(length(input$dailyStats_ts_variable_name) * 2))
+                ggplotly(basePlot, height = calculatePlotHeight(length(isolate(input$dailyStats_ts_variable_name)) * 2))
                 # %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
               })
             }

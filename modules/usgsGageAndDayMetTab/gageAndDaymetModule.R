@@ -172,7 +172,7 @@ GageAndDaymetModuleServer <- function(id, homeDTvalues, dateRange, formated_raw_
                                          fun.internal = TRUE)
           
           output$display_downloaded_data <- renderPlotly({
-            ggplotly(gageRawPlot, height = calculatePlotHeight(length(input$gaze_params) * 2)) 
+            ggplotly(gageRawPlot, height = calculatePlotHeight(length(isolate(input$gaze_params)) * 2)) 
             #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
           })
         } else {
@@ -239,7 +239,7 @@ GageAndDaymetModuleServer <- function(id, homeDTvalues, dateRange, formated_raw_
         if (!is.null(dayMetPlotRaw) & length(input$daymet_params) > 0) {
           #output$display_time_series_3 <- renderPlotly({
           output$display_downloaded_data <- renderPlotly({
-            ggplotly(dayMetPlotRaw, height = calculatePlotHeight(length(input$daymet_params) * 2)) 
+            ggplotly(dayMetPlotRaw, height = calculatePlotHeight(length(isolate(input$daymet_params)) * 2)) 
             #%>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.3))
           })
         } else {
