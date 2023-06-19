@@ -16,7 +16,7 @@ GageAndDaymetModuleUI <- function(id) {
       width = 9,
       column(width = 12,
              div(style="width:100%", uiOutput(ns("gageDayMetError"))),
-             plotlyOutput(ns("display_downloaded_data")))
+             withSpinner(plotlyOutput(ns("display_downloaded_data"))),type=1)
     ) # mainPanel end
   ) # sidebarLayout end
 }
@@ -42,6 +42,10 @@ GageAndDaymetModuleServer <- function(id, homeDTvalues, dateRange, formated_raw_
                                     gageColName = as.character())
       dayMetRawData <- reactiveValues(dayMetData = data.frame(),
                                       daymetColumns = as.character())
+      
+      output$display_downloaded_data <- renderPlotly({
+        plotly_empty()
+      })
 
       observe({
         if(renderUsgsAndDaymet$render == TRUE) {

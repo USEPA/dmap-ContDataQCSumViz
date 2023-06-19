@@ -158,7 +158,9 @@ shinyUI(fluidPage(
               mainPanel(
                 width = 9,
                 column(width = 12, uiOutput("discreteDateAndTimeBox")),
-                fluidRow(column(width = 12, plotlyOutput("display_time_series_discrete"))),
+                fluidRow(column(width = 12,
+                                      withSpinner(plotlyOutput("display_time_series_discrete"), type=1)
+                                )),
               ) # mainPanel end
             ) # sidebarLayout end
           ), # column close

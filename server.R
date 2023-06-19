@@ -34,6 +34,10 @@ function(input, output, session) {
     elementId = "step1",
     state = "init"
   )
+  
+  output$display_time_series_discrete <- renderPlotly({
+    plotly_empty()
+  })
 
 
   currentOutPutId <- reactiveValues()
@@ -523,7 +527,7 @@ function(input, output, session) {
               )
             )
           ),
-          div(uiOutput("disDateAndTimeError"), style = "padding:4px;"),
+          div(uiOutput("disDateAndTimeError")),
           box(
             width = "100%", class = "displayed", id = "dateBox_discrete",
             div(
@@ -598,9 +602,7 @@ function(input, output, session) {
                 mergedData <- NULL
                 for (varName in variable_to_plot) {
                   step1 <- base_data %>% select("continuous_value" = all_of(varName), "Date" = c(date.formatted))
-
                   step2 <- discrete_data %>% select("discrete_value" = all_of(varName), "Date" = c(date.formatted))
-
                   step2 <- step2 %>%
                     dplyr::left_join(step1, by = "Date") %>%
                     dplyr::select(discrete_value, "Matching_Continuous_value" = continuous_value, "discrete_Date" = c(Date))
@@ -612,7 +614,6 @@ function(input, output, session) {
                   step1 <- step1 %>%
                     mutate(Date = as.POSIXct(Date)) %>%
                     tidyr::complete(Date = seq(min(Date, na.rm = TRUE), max(Date, na.rm = TRUE), by = timediff))
-
                   # write.csv(step1,"step1.csv",row.names=FALSE)
 
                   tempdf <- as.data.frame(qpcR:::cbind.na(step1, step2))
@@ -634,15 +635,17 @@ function(input, output, session) {
 
                 mainPlot <- prepareDiscretePlot(combinded_df, mapTitle = mainMapTitle, xDateLabel = main_x_date_label, xDateBrakes = mainBreaks, base_vars_to_plot)
                 if (!is.null(mainPlot) & length(variable_to_plot) > 0) {
-                  shinyjs::runjs("$('#dateTimeBoxButton_discrete').click()")
-
-                  output$display_time_series_discrete <- renderPlotly({
-                    ggplotly(mainPlot, height = calculatePlotHeight(length(variable_to_plot) * 2))
-                    # %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
-                  })
-                }
+                  shinyjs::runjs("$('html, body').animate({scrollTop: $(document).height()},2000)")
+                   shinyjs::runjs("$('#dateTimeBoxButton_discrete').click()")
+                        output$display_time_series_discrete <- renderPlotly({
+                            ggplotly(mainPlot, height = calculatePlotHeight(length(variable_to_plot) * 2))
+                            # %>% plotly::layout(legend = list(orientation = "h", x = 0.4, y = -0.4))
+                          })
+                  }
               }
+             
             }
+          
           } else {
             shinyAlertUI("common_alert_msg", discreteVarMismatch, "ERROR")
             return(mainPlot)
@@ -658,7 +661,8 @@ function(input, output, session) {
           processErrors(parsingMsg, elementId = "disDateAndTimeError")
         }
       ) # end of tryCatch
-    }
+      }
+    
   })
 
   # End of Discrete data related functions
