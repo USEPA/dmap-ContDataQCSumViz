@@ -538,7 +538,7 @@ function(input, output, session) {
             fluidRow(
               div(
                 style = "padding:2px;",
-                span(width = "85%", actionButton(inputId = "display_discrete_data", label = "Display", class = "btn btn-primary"), style = "margin:5px 15px 5px 25px;"),
+                span(width = "85%", actionButton(inputId = "display_discrete_data", label = "View Discrete-Continuous Plot", class = "btn btn-primary"), style = "margin:5px 15px 5px 25px;"),
                 span("Note: Red border denotes required fields.", style = "font-weight:bold;color:#b94a48;")
               )
             ),

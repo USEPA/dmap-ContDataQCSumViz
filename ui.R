@@ -138,7 +138,7 @@ shinyUI(fluidPage(
                     div(class="panel-heading", "Upload discrete data in .csv format", style="font-weight:bold;", icon("info-circle", style = "color: #2fa4e7", id="discreteHelp")),
                     div(class="panel-body",
                         tagList(
-                          bsPopover(id="discreteHelp", title="Discrete data rules", content = "\\'continuous parameters to process\\' and \\'discrete parameters to process\\' must match.",
+                          bsPopover(id="discreteHelp", title="Discrete data rules", content = "The column headings for the parameter\\(s\\) you are matching must be the same in the discrete and continuous data files\\. The date\\(s\\) and time\\(s\\) of the discrete vs. continuous measurements do not need to match.",
                                     placement = "right", trigger = "hover"),
                           fileInput("uploaded_discrete_file",
                                     label = NULL,
