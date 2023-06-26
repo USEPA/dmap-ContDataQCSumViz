@@ -67,7 +67,7 @@ dateAndTimeUI <- function(id, paramChoices, uploadedCols) {
       column(width = 4, selectizeInput(
         ns("timeZoneId"),
         label = "Time Zone",
-        choices = c("UTC","AKST","CST","CDT","EST","EDT","HST","MST","PST"),
+        choices = c("UTC"="UTC","AKST"="US/Alaska","CST/CDT"="US/Central", "EST"="EST","EDT"="EDT","HST"="HST","MST"="MST","PST"="PST"),
         multiple = FALSE,
         options = list(
           hideSelected = FALSE,

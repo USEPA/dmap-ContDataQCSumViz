@@ -7102,6 +7102,9 @@
     "ContDataQC_test_data/test_dailyCheck.RData": {
       "checksum": "7814a703c263d03948ac20990e7b73e6"
     },
+    "ContDataQC_test_data/Tori/09RD003_AW_20170508_20211029_JS.csv": {
+      "checksum": "f3baa2146e45d832e6486e1315ae376c"
+    },
     "ContDataQC_test_data/Tori/CRBuoy discrete different data with more points.csv": {
       "checksum": "8b25f2dd0b1f858f4222db2382524ba2"
     },
@@ -7151,7 +7154,7 @@
       "checksum": "6fe4b187268ca83b32fde4e14251d733"
     },
     "modules/dateAndTimeModule.R": {
-      "checksum": "f2bca27cce12009402f3cd455e1b29a2"
+      "checksum": "9f2aae3019aa1861a7d095c7aba67272"
     },
     "modules/hydrologyTab/flashinessModule.R": {
       "checksum": "9d3eaa5499de38dd5f563fafc2610f82"
@@ -7265,7 +7268,7 @@
       "checksum": "3738b77a1ccf8e2d3b70ded22c10d20d"
     },
     "server.R": {
-      "checksum": "8e80e3131d97308a87983d6e59e4faad"
+      "checksum": "86c316f4146a586e009fba77b1203ecb"
     },
     "test_dailyCheck.RData": {
       "checksum": "c74dbce3ab1155cfe848033ed867f5d4"

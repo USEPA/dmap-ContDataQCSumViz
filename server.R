@@ -427,7 +427,7 @@ function(input, output, session) {
       formattedError <- "There is a mismatch between uploaded file date format and selected date format, please correct and try again."
       return(formattedError)
     } else {
-      return(errorMsg)
+      return(errorMsg[1])
     }
   }
 
